@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -34,9 +35,36 @@ android {
     }
 }
 
+dependencies {
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.kotlinx.coroutines.android)
+
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.material3)
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.tooling.preview)
+
+    ksp(libs.androidx.room.compiler)
+
+    testImplementation(libs.junit)
+
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.compose.ui.test.junit4)
+
+    debugImplementation(libs.compose.ui.test.manifest)
+    debugImplementation(libs.compose.ui.tooling)
+}
+
 kotlin {
     compilerOptions {
         jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
-
