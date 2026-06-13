@@ -23,9 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -72,7 +75,8 @@ fun CreateRequestScreen(
     val (datePickerState, timePickerState) = key(dialogSessionKey, uiState.nextActionDateTime == null) {
         val dateState = rememberDatePickerState(
             initialSelectedDateMillis = uiState.nextActionDateTime
-                ?.atZone(ZoneOffset.UTC)
+                ?.toLocalDate()
+                ?.atStartOfDay(ZoneOffset.UTC)
                 ?.toInstant()
                 ?.toEpochMilli()
                 ?: LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
@@ -158,18 +162,20 @@ fun CreateRequestScreen(
         )
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.clearForm()
-        viewModel.events.collect { event ->
-            when (event) {
-                is CreateRequestViewModel.CreateRequestEvent.NavigationSuccess -> {
-                    android.widget.Toast.makeText(context.applicationContext, R.string.create_success_message, android.widget.Toast.LENGTH_SHORT).show()
-                    navController.navigate(Screen.Active.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+    val lifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(viewModel.events, lifecycleOwner) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.events.collect { event ->
+                when (event) {
+                    is CreateRequestViewModel.CreateRequestEvent.NavigationSuccess -> {
+                        android.widget.Toast.makeText(context.applicationContext, R.string.create_success_message, android.widget.Toast.LENGTH_SHORT).show()
+                        navController.navigate(Screen.Active.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
                     }
                 }
             }

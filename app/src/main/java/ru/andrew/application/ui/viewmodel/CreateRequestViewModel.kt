@@ -142,6 +142,7 @@ class CreateRequestViewModel(
                 )
                 
                 requestRepository.createRequest(newRequest)
+                clearForm()
                 _eventChannel.send(CreateRequestEvent.NavigationSuccess)
                 _uiState.update { 
                     it.copy(
