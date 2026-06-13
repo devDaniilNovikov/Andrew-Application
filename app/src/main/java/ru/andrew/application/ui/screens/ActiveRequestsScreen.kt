@@ -29,6 +29,7 @@ import java.time.ZoneOffset
 import androidx.navigation.NavController
 import androidx.compose.ui.res.stringResource
 import ru.andrew.application.R
+import ru.andrew.application.ui.util.cleanPhoneNumber
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.animation.animateColorAsState
@@ -53,6 +54,7 @@ fun ActiveRequestsScreen(
     var selectedRequest by remember { mutableStateOf<Request?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val cancelActionLabel = stringResource(R.string.btn_cancel_action)
 
     // Состояния для переноса даты/времени (Подэтап 5.2)
     var showDatePickerForReschedule by remember { mutableStateOf(false) }
@@ -181,7 +183,7 @@ fun ActiveRequestsScreen(
                                                     viewModel.completeRequest(request.id)
                                                     val result = snackbarHostState.showSnackbar(
                                                         message = "Заявка успешно выполнена!",
-                                                        actionLabel = "Отменить",
+                                                        actionLabel = cancelActionLabel,
                                                         duration = SnackbarDuration.Short
                                                     )
                                                     if (result == SnackbarResult.ActionPerformed) {
@@ -231,7 +233,7 @@ fun ActiveRequestsScreen(
                                                 )
                                                 SwipeToDismissBoxValue.EndToStart -> Icon(
                                                     imageVector = Icons.Default.Close,
-                                                    contentDescription = "Отменить",
+                                                    contentDescription = cancelActionLabel,
                                                     tint = Color.White
                                                 )
                                                 else -> {}
@@ -262,7 +264,7 @@ fun ActiveRequestsScreen(
                         if (request.phone.isNotEmpty()) {
                             try {
                                 val intent = Intent(Intent.ACTION_DIAL).apply {
-                                    data = Uri.parse("tel:${request.phone}")
+                                    data = Uri.parse("tel:${cleanPhoneNumber(request.phone)}")
                                 }
                                 context.startActivity(intent)
                             } catch (e: Exception) {
@@ -287,7 +289,7 @@ fun ActiveRequestsScreen(
                         scope.launch {
                             val result = snackbarHostState.showSnackbar(
                                 message = "Заявка успешно выполнена!",
-                                actionLabel = "Отменить",
+                                actionLabel = cancelActionLabel,
                                 duration = SnackbarDuration.Short
                             )
                             if (result == SnackbarResult.ActionPerformed) {
@@ -405,7 +407,7 @@ fun ActiveRequestsScreen(
                                 scope.launch {
                                     val result = snackbarHostState.showSnackbar(
                                         message = "Заявка отменена.",
-                                        actionLabel = "Отменить",
+                                        actionLabel = cancelActionLabel,
                                         duration = SnackbarDuration.Short
                                     )
                                     if (result == SnackbarResult.ActionPerformed) {

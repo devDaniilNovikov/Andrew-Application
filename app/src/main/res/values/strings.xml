@@ -64,4 +64,8 @@
     <string name="toast_request_completed">Request completed successfully!</string>
     <string name="toast_request_cancelled">Request cancelled.</string>
     <string name="client_name_hint">No name</string>
+    <string name="urgency_overdue">Overdue</string>
+    <string name="urgency_today">Today</string>
+    <string name="urgency_planned">Scheduled</string>
+    <string name="btn_cancel_action">Cancel</string>
 </resources>

@@ -65,4 +65,8 @@
     <string name="toast_request_completed">Заявка успешно выполнена!</string>
     <string name="toast_request_cancelled">Заявка отменена.</string>
     <string name="client_name_hint">Без имени</string>
+    <string name="urgency_overdue">Просрочено</string>
+    <string name="urgency_today">Сегодня</string>
+    <string name="urgency_planned">Запланировано</string>
+    <string name="btn_cancel_action">Отменить</string>
 </resources>
