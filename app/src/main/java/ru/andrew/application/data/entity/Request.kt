@@ -2,6 +2,7 @@ package ru.andrew.application.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.Index
 import java.time.LocalDateTime
 import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.domain.EquipmentType
@@ -11,7 +12,14 @@ import ru.andrew.application.domain.ActionType
  * Сущность заявки для хранения в локальной базе данных Room.
  * Соответствует спецификации модели данных из PRD.md.
  */
-@Entity(tableName = "requests")
+@Entity(
+    tableName = "requests",
+    indices = [
+        Index("status"),
+        Index("nextActionDateTime"),
+        Index("closedAt")
+    ]
+)
 data class Request(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,

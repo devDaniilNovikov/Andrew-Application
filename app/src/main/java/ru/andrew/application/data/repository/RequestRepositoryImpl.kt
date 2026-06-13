@@ -1,11 +1,11 @@
 package ru.andrew.application.data.repository
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
 import ru.andrew.application.data.dao.RequestDao
 import ru.andrew.application.data.entity.Request
 import ru.andrew.application.domain.RequestStatus
+import ru.andrew.application.data.util.TimeProvider
+import ru.andrew.application.data.util.SystemTimeProvider
 import java.time.LocalDateTime
 
 /**
@@ -13,7 +13,8 @@ import java.time.LocalDateTime
  * Корутины Room (suspend и Flow) автоматически и безопасно выполняются на фоновом пуле потоков.
  */
 class RequestRepositoryImpl(
-    private val requestDao: RequestDao
+    private val requestDao: RequestDao,
+    private val timeProvider: TimeProvider = SystemTimeProvider()
 ) : RequestRepository {
 
     override fun getRequestById(id: Long): Flow<Request?> {
@@ -41,8 +42,9 @@ class RequestRepositoryImpl(
     }
 
     override suspend fun createRequest(request: Request): Long {
-        val now = LocalDateTime.now()
+        val now = timeProvider.getNow()
         val finalRequest = request.copy(
+            id = 0L, // Принудительно обнуляем id для автогенерации первичного ключа и предотвращения REPLACE перезаписи
             status = RequestStatus.ACTIVE,
             createdAt = now,
             updatedAt = now
@@ -52,13 +54,13 @@ class RequestRepositoryImpl(
 
     override suspend fun updateRequest(request: Request) {
         val finalRequest = request.copy(
-            updatedAt = LocalDateTime.now()
+            updatedAt = timeProvider.getNow()
         )
         requestDao.updateRequest(finalRequest)
     }
 
     override suspend fun completeRequest(id: Long, finalPrice: Double?, finalComment: String?) {
-        val now = LocalDateTime.now()
+        val now = timeProvider.getNow()
         requestDao.updateRequestStatusAndResults(
             id = id,
             status = RequestStatus.COMPLETED,
@@ -71,7 +73,7 @@ class RequestRepositoryImpl(
     }
 
     override suspend fun cancelRequest(id: Long, cancelReason: String, finalComment: String?) {
-        val now = LocalDateTime.now()
+        val now = timeProvider.getNow()
         requestDao.updateRequestStatusAndResults(
             id = id,
             status = RequestStatus.CANCELLED,
@@ -84,7 +86,7 @@ class RequestRepositoryImpl(
     }
 
     override suspend fun restoreToActive(id: Long) {
-        val now = LocalDateTime.now()
+        val now = timeProvider.getNow()
         requestDao.updateRequestStatusAndResults(
             id = id,
             status = RequestStatus.ACTIVE,
@@ -102,7 +104,7 @@ class RequestRepositoryImpl(
         finalComment: String?,
         cancelReason: String?
     ) {
-        val now = LocalDateTime.now()
+        val now = timeProvider.getNow()
         requestDao.updateRequestResultsOnly(
             id = id,
             finalPrice = finalPrice,
@@ -112,3 +114,4 @@ class RequestRepositoryImpl(
         )
     }
 }
+
