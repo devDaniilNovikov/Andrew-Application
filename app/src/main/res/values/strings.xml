@@ -44,6 +44,7 @@
     <string name="create_date_time_label">Next Action Date &amp; Time *</string>
     <string name="create_comment_label">Comment</string>
     <string name="create_validation_error">Fill in title, phone and next action date.</string>
+    <string name="create_db_error">Database error</string>
     <string name="create_success_message">Request created successfully!</string>
     <string name="btn_create">Create Request</string>
     <string name="btn_clear">Clear Form</string>

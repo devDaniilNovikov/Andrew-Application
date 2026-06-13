@@ -143,7 +143,9 @@ class CreateRequestViewModel(
                 }
             } catch (e: Exception) {
                 _uiState.update { 
-                    it.copy(error = UiText.DynamicString(e.localizedMessage ?: "Database error")) 
+                    val errorText = e.localizedMessage?.takeIf { it.isNotBlank() }?.let { UiText.DynamicString(it) }
+                        ?: UiText.StringResource(ru.andrew.application.R.string.create_db_error)
+                    it.copy(error = errorText) 
                 }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }

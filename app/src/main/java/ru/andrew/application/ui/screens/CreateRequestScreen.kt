@@ -66,11 +66,15 @@ fun CreateRequestScreen(
     // Обернуто в key(uiState.nextActionDateTime == null), чтобы при сбросе формы (clearForm) состояния пикеров также сбрасывались.
     val (datePickerState, timePickerState) = key(uiState.nextActionDateTime == null) {
         val dateState = rememberDatePickerState(
-            initialSelectedDateMillis = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
+            initialSelectedDateMillis = uiState.nextActionDateTime
+                ?.atZone(ZoneOffset.UTC)
+                ?.toInstant()
+                ?.toEpochMilli()
+                ?: LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
         )
         val timeState = rememberTimePickerState(
-            initialHour = LocalDateTime.now().hour,
-            initialMinute = LocalDateTime.now().minute
+            initialHour = uiState.nextActionDateTime?.hour ?: LocalDateTime.now().hour,
+            initialMinute = uiState.nextActionDateTime?.minute ?: LocalDateTime.now().minute
         )
         Pair(dateState, timeState)
     }
