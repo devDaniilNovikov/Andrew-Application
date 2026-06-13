@@ -1,7 +1,6 @@
 package ru.andrew.application.data.repository
 
 import android.content.Context
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -9,8 +8,7 @@ import ru.andrew.application.ui.theme.AppTheme
 import ru.andrew.application.ui.theme.ThemePreferences
 
 class ThemeRepositoryImpl(
-    context: Context,
-    private val externalScope: CoroutineScope
+    context: Context
 ) : ThemeRepository {
     private val themePreferences = ThemePreferences(context)
     private val _themeFlow = MutableStateFlow(themePreferences.getTheme())

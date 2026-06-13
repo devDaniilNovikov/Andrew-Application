@@ -5,10 +5,13 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 
 class ThemePreferences(context: Context) {
-    private val prefs: SharedPreferences = context.applicationContext.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.applicationContext.getSharedPreferences(
+        PREFS_NAME,
+        Context.MODE_PRIVATE
+    )
 
     fun getTheme(): AppTheme {
-        val themeName = prefs.getString("selected_theme", AppTheme.SYSTEM.name) ?: AppTheme.SYSTEM.name
+        val themeName = prefs.getString(KEY_SELECTED_THEME, AppTheme.SYSTEM.name) ?: AppTheme.SYSTEM.name
         return try {
             AppTheme.valueOf(themeName)
         } catch (e: IllegalArgumentException) {
@@ -18,7 +21,12 @@ class ThemePreferences(context: Context) {
 
     fun setTheme(theme: AppTheme) {
         prefs.edit {
-            putString("selected_theme", theme.name)
+            putString(KEY_SELECTED_THEME, theme.name)
         }
+    }
+
+    companion object {
+        private const val PREFS_NAME = "theme_prefs"
+        private const val KEY_SELECTED_THEME = "selected_theme"
     }
 }
