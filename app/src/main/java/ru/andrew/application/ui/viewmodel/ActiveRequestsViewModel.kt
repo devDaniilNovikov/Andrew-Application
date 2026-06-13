@@ -9,9 +9,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import ru.andrew.application.data.entity.Request
 import ru.andrew.application.data.repository.RequestRepository
 import ru.andrew.application.di.DependencyProvider
+import java.time.LocalDateTime
 
 /**
  * Состояние экрана активных заявок.
@@ -42,6 +44,24 @@ class ActiveRequestsViewModel(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = ActiveRequestsUiState(isLoading = true)
         )
+
+    fun rescheduleRequest(request: Request, nextDateTime: LocalDateTime) {
+        viewModelScope.launch {
+            requestRepository.updateRequest(request.copy(nextActionDateTime = nextDateTime))
+        }
+    }
+
+    fun completeRequest(requestId: Long, finalPrice: Double? = null, finalComment: String? = null) {
+        viewModelScope.launch {
+            requestRepository.completeRequest(requestId, finalPrice, finalComment)
+        }
+    }
+
+    fun cancelRequest(requestId: Long, cancelReason: String, finalComment: String? = null) {
+        viewModelScope.launch {
+            requestRepository.cancelRequest(requestId, cancelReason, finalComment)
+        }
+    }
 
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
