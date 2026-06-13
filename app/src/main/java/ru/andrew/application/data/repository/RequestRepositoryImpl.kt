@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 
 /**
  * Реализация RequestRepository с использованием Room DAO.
- * Все тяжелые операции ввода-вывода (IO) принудительно переключаются на Dispatchers.IO.
+ * Корутины Room (suspend и Flow) автоматически и безопасно выполняются на фоновом пуле потоков.
  */
 class RequestRepositoryImpl(
     private val requestDao: RequestDao

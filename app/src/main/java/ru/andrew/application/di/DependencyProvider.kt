@@ -1,6 +1,9 @@
 package ru.andrew.application.di
 
 import android.content.Context
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import ru.andrew.application.data.db.AppDatabase
 import ru.andrew.application.data.repository.ThemeRepository
 import ru.andrew.application.data.repository.ThemeRepositoryImpl
@@ -13,6 +16,8 @@ import ru.andrew.application.data.repository.RequestRepositoryImpl
  */
 object DependencyProvider {
 
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
     @Volatile
     private var themeRepository: ThemeRepository? = null
 
@@ -22,7 +27,8 @@ object DependencyProvider {
     fun provideThemeRepository(context: Context): ThemeRepository {
         return themeRepository ?: synchronized(this) {
             themeRepository ?: ThemeRepositoryImpl(
-                context.applicationContext
+                context.applicationContext,
+                applicationScope
             ).also {
                 themeRepository = it
             }

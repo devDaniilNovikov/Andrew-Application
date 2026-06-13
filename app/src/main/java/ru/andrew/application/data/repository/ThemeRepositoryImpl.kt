@@ -13,17 +13,16 @@ import ru.andrew.application.ui.theme.AppTheme
 import ru.andrew.application.ui.theme.ThemePreferences
 
 class ThemeRepositoryImpl(
-    context: Context
+    context: Context,
+    private val externalScope: CoroutineScope
 ) : ThemeRepository {
     private val themePreferences = ThemePreferences(context)
     private val _themeFlow = MutableStateFlow(themePreferences.getTheme())
     
     override val themeFlow: StateFlow<AppTheme> = _themeFlow.asStateFlow()
-    
-    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override fun setTheme(theme: AppTheme) {
-        repositoryScope.launch {
+        externalScope.launch {
             withContext(Dispatchers.IO) {
                 themePreferences.setTheme(theme)
             }

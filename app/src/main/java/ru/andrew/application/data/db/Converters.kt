@@ -3,7 +3,7 @@ package ru.andrew.application.data.db
 import androidx.room.TypeConverter
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
+import java.time.ZoneOffset
 import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.domain.EquipmentType
 import ru.andrew.application.domain.ActionType
@@ -16,18 +16,24 @@ class Converters {
     @TypeConverter
     fun fromTimestamp(value: Long?): LocalDateTime? {
         return value?.let { 
-            LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault()) 
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneOffset.UTC) 
         }
     }
 
     @TypeConverter
     fun dateToTimestamp(date: LocalDateTime?): Long? {
-        return date?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
+        return date?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
     }
 
     @TypeConverter
     fun fromStatus(value: String?): RequestStatus? {
-        return value?.let { RequestStatus.valueOf(it) }
+        return value?.let { 
+            try {
+                RequestStatus.valueOf(it)
+            } catch (e: Exception) {
+                RequestStatus.ACTIVE
+            }
+        }
     }
 
     @TypeConverter
@@ -37,7 +43,13 @@ class Converters {
 
     @TypeConverter
     fun fromEquipmentType(value: String?): EquipmentType? {
-        return value?.let { EquipmentType.valueOf(it) }
+        return value?.let { 
+            try {
+                EquipmentType.valueOf(it)
+            } catch (e: Exception) {
+                EquipmentType.OTHER
+            }
+        }
     }
 
     @TypeConverter
@@ -47,7 +59,13 @@ class Converters {
 
     @TypeConverter
     fun fromActionType(value: String?): ActionType? {
-        return value?.let { ActionType.valueOf(it) }
+        return value?.let { 
+            try {
+                ActionType.valueOf(it)
+            } catch (e: Exception) {
+                ActionType.OTHER
+            }
+        }
     }
 
     @TypeConverter
