@@ -143,18 +143,18 @@ private fun AppRoot(
     }
 }
 
+private val ThemeOptions = listOf(
+    ThemeOption(AppTheme.LIGHT, "☀️", R.string.theme_light),
+    ThemeOption(AppTheme.DARK, "🌙", R.string.theme_dark),
+    ThemeOption(AppTheme.SYSTEM, "⚙️", R.string.theme_system)
+)
+
 @Composable
 private fun ThemeSelector(
     currentTheme: AppTheme,
     onThemeSelected: (AppTheme) -> Unit
 ) {
-    val options = remember {
-        listOf(
-            ThemeOption(AppTheme.LIGHT, "☀️", R.string.theme_light),
-            ThemeOption(AppTheme.DARK, "🌙", R.string.theme_dark),
-            ThemeOption(AppTheme.SYSTEM, "⚙️", R.string.theme_system)
-        )
-    }
+    val options = ThemeOptions
 
     Card(
         modifier = Modifier
