@@ -49,10 +49,6 @@ private fun AppRoot() {
                 text = stringResource(id = R.string.app_name),
                 style = MaterialTheme.typography.headlineMedium
             )
-            Text(
-                text = stringResource(id = R.string.app_skeleton_ready),
-                style = MaterialTheme.typography.bodyLarge
-            )
         }
     }
 }
