@@ -8,6 +8,7 @@ import java.time.ZoneOffset
 import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.domain.EquipmentType
 import ru.andrew.application.domain.ActionType
+import android.util.Log
 
 /**
  * Конвертеры типов Room для сериализации сложных объектов (дат и перечислений) в SQLite.
@@ -31,7 +32,8 @@ class Converters {
         return value?.let { 
             try {
                 RequestStatus.valueOf(it)
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
+                Log.e("Converters", "Failed to parse RequestStatus from: $it", e)
                 RequestStatus.ACTIVE
             }
         }
@@ -47,7 +49,8 @@ class Converters {
         return value?.let { 
             try {
                 EquipmentType.valueOf(it)
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
+                Log.e("Converters", "Failed to parse EquipmentType from: $it", e)
                 EquipmentType.OTHER
             }
         }
@@ -63,7 +66,8 @@ class Converters {
         return value?.let { 
             try {
                 ActionType.valueOf(it)
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
+                Log.e("Converters", "Failed to parse ActionType from: $it", e)
                 ActionType.OTHER
             }
         }
