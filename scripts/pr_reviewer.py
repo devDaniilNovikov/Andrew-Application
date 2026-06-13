@@ -370,6 +370,15 @@ async def main():
     except Exception as e:
         print(f"Error writing to dashboard data: {e}", file=sys.stderr)
 
+    # Save raw review data as JSON for event integration
+    latest_review_json_path = os.path.join(workspace_dir, "scripts", "latest_review.json")
+    try:
+        with open(latest_review_json_path, 'w', encoding='utf-8') as f:
+            json.dump(review_data, f, ensure_ascii=False, indent=2)
+        print(" Saved scripts/latest_review.json successfully!")
+    except Exception as e:
+        print(f"Error writing to latest_review.json: {e}", file=sys.stderr)
+
     # 6. Telegram notifications & automatic chat-id resolution
     tg_token = os.environ.get("TELEGRAM_BOT_TOKEN")
     tg_chat_id = os.environ.get("TELEGRAM_CHAT_ID")
