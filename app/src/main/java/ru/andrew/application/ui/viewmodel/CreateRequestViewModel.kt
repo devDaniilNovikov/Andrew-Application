@@ -89,6 +89,12 @@ class CreateRequestViewModel(
         _uiState.update { it.copy(isSuccess = false) }
     }
 
+    private fun isValidPhoneNumber(phone: String): Boolean {
+        val cleanPhone = phone.replace(Regex("[\\s\\-\\(\\)]"), "")
+        val phoneRegex = "^\\+?\\d{7,15}$".toRegex()
+        return phoneRegex.matches(cleanPhone)
+    }
+
     /**
      * Попытаться сохранить заявку в базу данных.
      * Проверяет обязательные поля: название, телефон и дата действия.
@@ -99,6 +105,7 @@ class CreateRequestViewModel(
         // Валидация полей согласно PRD (название, телефон, дата следующего действия)
         if (currentState.title.trim().isEmpty() || 
             currentState.phone.trim().isEmpty() || 
+            !isValidPhoneNumber(currentState.phone) ||
             currentState.nextActionDateTime == null
         ) {
             _uiState.update { 

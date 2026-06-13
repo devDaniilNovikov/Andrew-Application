@@ -1,7 +1,5 @@
 package ru.andrew.application.ui.screens
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,12 +18,11 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,9 +34,11 @@ import ru.andrew.application.domain.EquipmentType
 import ru.andrew.application.ui.extensions.displayNameResId
 import ru.andrew.application.ui.navigation.Screen
 import ru.andrew.application.ui.viewmodel.CreateRequestViewModel
+import java.time.Instant
 import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,35 +47,89 @@ fun CreateRequestScreen(
     viewModel: CreateRequestViewModel = viewModel(factory = CreateRequestViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val scrollState = rememberScrollState()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
 
     var equipmentMenuExpanded by remember { mutableStateOf(false) }
     var actionMenuExpanded by remember { mutableStateOf(false) }
 
+    // Состояния для нативных пикеров Material 3
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    var showTimePicker by rememberSaveable { mutableStateOf(false) }
+
+    val datePickerState = rememberDatePickerState()
+    val timePickerState = rememberTimePickerState()
+
     val showDateTimePicker = {
-        val currentDateTime = uiState.nextActionDateTime ?: LocalDateTime.now()
-        val datePickerDialog = DatePickerDialog(
-            context,
-            { _, year, month, dayOfMonth ->
-                val timePickerDialog = TimePickerDialog(
-                    context,
-                    { _, hourOfDay, minute ->
-                        val selectedDateTime = LocalDateTime.of(year, month + 1, dayOfMonth, hourOfDay, minute)
-                        viewModel.updateNextActionDateTime(selectedDateTime)
-                    },
-                    currentDateTime.hour,
-                    currentDateTime.minute,
-                    true
-                )
-                timePickerDialog.show()
+        showDatePicker = true
+    }
+
+    // Нативный диалог выбора даты
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDatePicker = false
+                        showTimePicker = true
+                    }
+                ) {
+                    Text("OK")
+                }
             },
-            currentDateTime.year,
-            currentDateTime.monthValue - 1,
-            currentDateTime.dayOfMonth
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Отмена")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
+    // Нативный диалог выбора времени
+    if (showTimePicker) {
+        AlertDialog(
+            onDismissRequest = { showTimePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showTimePicker = false
+                        val dateMillis = datePickerState.selectedDateMillis
+                        if (dateMillis != null) {
+                            val localDate = Instant.ofEpochMilli(dateMillis)
+                                .atZone(ZoneOffset.UTC)
+                                .toLocalDate()
+                            val localTime = LocalTime.of(timePickerState.hour, timePickerState.minute)
+                            val selectedDateTime = LocalDateTime.of(localDate, localTime)
+                            viewModel.updateNextActionDateTime(selectedDateTime)
+                        }
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showTimePicker = false }) {
+                    Text("Отмена")
+                }
+            },
+            title = {
+                Text(
+                    text = "Выберите время",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            },
+            text = {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    TimePicker(state = timePickerState)
+                }
+            }
         )
-        datePickerDialog.show()
     }
 
     LaunchedEffect(uiState.isSuccess) {
@@ -202,7 +255,7 @@ fun CreateRequestScreen(
                     expanded = equipmentMenuExpanded,
                     onDismissRequest = { equipmentMenuExpanded = false }
                 ) {
-                    EquipmentType.values().forEach { type ->
+                    EquipmentType.entries.forEach { type ->
                         DropdownMenuItem(
                             text = { Text(stringResource(id = type.displayNameResId)) },
                             onClick = {
@@ -235,7 +288,7 @@ fun CreateRequestScreen(
                     expanded = actionMenuExpanded,
                     onDismissRequest = { actionMenuExpanded = false }
                 ) {
-                    ActionType.values().forEach { type ->
+                    ActionType.entries.forEach { type ->
                         DropdownMenuItem(
                             text = { Text(stringResource(id = type.displayNameResId)) },
                             onClick = {
