@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -52,6 +53,7 @@ fun CreateRequestScreen(
     viewModel: CreateRequestViewModel = viewModel(factory = CreateRequestViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     val scrollState = rememberScrollState()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
 
@@ -154,6 +156,7 @@ fun CreateRequestScreen(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
+            android.widget.Toast.makeText(context, R.string.create_success_message, android.widget.Toast.LENGTH_SHORT).show()
             navController.navigate(Screen.Active.route) {
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
@@ -161,8 +164,9 @@ fun CreateRequestScreen(
                 launchSingleTop = true
                 restoreState = true
             }
-            viewModel.resetSuccess()
+            kotlinx.coroutines.delay(500)
             viewModel.clearForm()
+            viewModel.resetSuccess()
         }
     }
 

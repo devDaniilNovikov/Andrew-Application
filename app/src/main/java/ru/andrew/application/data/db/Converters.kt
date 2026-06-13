@@ -15,19 +15,15 @@ import ru.andrew.application.domain.ActionType
 class Converters {
 
     @TypeConverter
-    fun fromString(value: String?): LocalDateTime? {
+    fun fromTimestamp(value: Long?): LocalDateTime? {
         return value?.let { 
-            try {
-                LocalDateTime.parse(it)
-            } catch (e: Exception) {
-                null
-            }
+            LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(it), java.time.ZoneOffset.UTC) 
         }
     }
 
     @TypeConverter
-    fun dateToString(date: LocalDateTime?): String? {
-        return date?.toString()
+    fun dateToTimestamp(date: LocalDateTime?): Long? {
+        return date?.toInstant(java.time.ZoneOffset.UTC)?.toEpochMilli()
     }
 
     @TypeConverter

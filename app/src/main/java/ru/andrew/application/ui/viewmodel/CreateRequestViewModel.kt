@@ -123,6 +123,7 @@ class CreateRequestViewModel(
 
         viewModelScope.launch {
             try {
+                val now = LocalDateTime.now()
                 val newRequest = Request(
                     id = 0L, // Автогенерация ID в БД
                     title = currentState.title.trim(),
@@ -133,7 +134,9 @@ class CreateRequestViewModel(
                     actionType = currentState.actionType,
                     nextActionDateTime = currentState.nextActionDateTime,
                     comment = currentState.comment.trim().takeIf { it.isNotEmpty() },
-                    status = RequestStatus.ACTIVE
+                    status = RequestStatus.ACTIVE,
+                    createdAt = now,
+                    updatedAt = now
                 )
                 
                 requestRepository.createRequest(newRequest)
