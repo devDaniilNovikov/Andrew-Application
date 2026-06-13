@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
-import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.andrew.application.data.repository.ThemeRepository
 import ru.andrew.application.ui.theme.AppTheme
@@ -14,17 +14,18 @@ import ru.andrew.application.di.DependencyProvider
 
 class ThemeViewModel(private val repository: ThemeRepository) : ViewModel() {
 
-    val themeState: StateFlow<AppTheme> = repository.themeFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = repository.getTheme()
-        )
+    private val _themeState = MutableStateFlow(AppTheme.SYSTEM)
+    val themeState: StateFlow<AppTheme> = _themeState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            _themeState.value = repository.getTheme()
+        }
+    }
 
     fun selectTheme(theme: AppTheme) {
-        viewModelScope.launch {
-            repository.setTheme(theme)
-        }
+        repository.setTheme(theme)
+        _themeState.value = theme
     }
 
     companion object {

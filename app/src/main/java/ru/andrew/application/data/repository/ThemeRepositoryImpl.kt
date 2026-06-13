@@ -11,18 +11,16 @@ import ru.andrew.application.ui.theme.ThemePreferences
 
 class ThemeRepositoryImpl(context: Context) : ThemeRepository {
     private val themePreferences = ThemePreferences(context)
-    private val _themeFlow = MutableStateFlow(themePreferences.getTheme())
+    private val _themeFlow = MutableStateFlow(AppTheme.SYSTEM)
     
     override val themeFlow: Flow<AppTheme> = _themeFlow.asStateFlow()
 
-    override fun getTheme(): AppTheme {
-        return themePreferences.getTheme()
+    override suspend fun getTheme(): AppTheme = withContext(Dispatchers.IO) {
+        themePreferences.getTheme()
     }
 
-    override suspend fun setTheme(theme: AppTheme) {
-        withContext(Dispatchers.IO) {
-            themePreferences.setTheme(theme)
-        }
+    override fun setTheme(theme: AppTheme) {
+        themePreferences.setTheme(theme)
         _themeFlow.value = theme
     }
 }

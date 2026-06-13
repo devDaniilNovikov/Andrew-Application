@@ -5,6 +5,6 @@ import ru.andrew.application.ui.theme.AppTheme
 
 interface ThemeRepository {
     val themeFlow: Flow<AppTheme>
-    fun getTheme(): AppTheme
-    suspend fun setTheme(theme: AppTheme)
+    suspend fun getTheme(): AppTheme
+    fun setTheme(theme: AppTheme)
 }
