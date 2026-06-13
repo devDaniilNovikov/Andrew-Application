@@ -11,7 +11,7 @@ import ru.andrew.application.data.entity.Request
 @Dao
 interface RequestDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertRequest(request: Request): Long
 
     @Update

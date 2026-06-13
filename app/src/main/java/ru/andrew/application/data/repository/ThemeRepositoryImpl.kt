@@ -23,10 +23,10 @@ class ThemeRepositoryImpl(
 
     override fun setTheme(theme: AppTheme) {
         externalScope.launch {
+            _themeFlow.value = theme
             withContext(Dispatchers.IO) {
                 themePreferences.setTheme(theme)
             }
-            _themeFlow.value = theme
         }
     }
 }
