@@ -12,7 +12,7 @@
 - [x] 0.2. Подключить зависимости: Compose BOM, Material 3, Navigation Compose, Lifecycle/ViewModel, Room (runtime, ktx, compiler через ksp), Coroutines.
 - [x] 0.3. Завести структуру пакетов: `data` (entity, dao, db, repository), `domain` (модели, enum’ы), `ui` (screens, components, theme), `notifications`.
 - [x] 0.4. Настроить тему Material 3 (светлая, спокойная палитра, крупная типографика) и точку входа `MainActivity` с `setContent`.
-- [ ] 0.5. Прописать в `AndroidManifest` базовые настройки; интернет-разрешение не добавлять (приложение офлайн).
+- [x] 0.5. Прописать в `AndroidManifest` базовые настройки; интернет-разрешение не добавлять (приложение офлайн).
 
 ## Этап 1. Слой данных
 
