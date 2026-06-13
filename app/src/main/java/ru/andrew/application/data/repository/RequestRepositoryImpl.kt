@@ -36,67 +36,60 @@ class RequestRepositoryImpl(
         }
     }
 
-    override suspend fun createRequest(request: Request): Long = withContext(Dispatchers.IO) {
+    override suspend fun createRequest(request: Request): Long {
         val now = LocalDateTime.now()
         val finalRequest = request.copy(
             status = RequestStatus.ACTIVE,
             createdAt = now,
             updatedAt = now
         )
-        requestDao.insertRequest(finalRequest)
+        return requestDao.insertRequest(finalRequest)
     }
 
-    override suspend fun updateRequest(request: Request) = withContext(Dispatchers.IO) {
+    override suspend fun updateRequest(request: Request) {
         val finalRequest = request.copy(
             updatedAt = LocalDateTime.now()
         )
         requestDao.updateRequest(finalRequest)
     }
 
-    override suspend fun completeRequest(id: Long, finalPrice: Double?, finalComment: String?) = withContext(Dispatchers.IO) {
-        val current = requestDao.getRequestByIdOneShot(id)
-        if (current != null) {
-            val now = LocalDateTime.now()
-            val updated = current.copy(
-                status = RequestStatus.COMPLETED,
-                finalPrice = finalPrice,
-                finalComment = finalComment,
-                closedAt = now,
-                updatedAt = now
-            )
-            requestDao.updateRequest(updated)
-        }
+    override suspend fun completeRequest(id: Long, finalPrice: Double?, finalComment: String?) {
+        val now = LocalDateTime.now()
+        requestDao.updateRequestStatusAndResults(
+            id = id,
+            status = RequestStatus.COMPLETED,
+            finalPrice = finalPrice,
+            finalComment = finalComment,
+            closedAt = now,
+            cancelReason = null,
+            updatedAt = now
+        )
     }
 
-    override suspend fun cancelRequest(id: Long, cancelReason: String, finalComment: String?) = withContext(Dispatchers.IO) {
-        val current = requestDao.getRequestByIdOneShot(id)
-        if (current != null) {
-            val now = LocalDateTime.now()
-            val updated = current.copy(
-                status = RequestStatus.CANCELLED,
-                cancelReason = cancelReason,
-                finalComment = finalComment,
-                closedAt = now,
-                updatedAt = now
-            )
-            requestDao.updateRequest(updated)
-        }
+    override suspend fun cancelRequest(id: Long, cancelReason: String, finalComment: String?) {
+        val now = LocalDateTime.now()
+        requestDao.updateRequestStatusAndResults(
+            id = id,
+            status = RequestStatus.CANCELLED,
+            finalPrice = null,
+            finalComment = finalComment,
+            closedAt = now,
+            cancelReason = cancelReason,
+            updatedAt = now
+        )
     }
 
-    override suspend fun restoreToActive(id: Long) = withContext(Dispatchers.IO) {
-        val current = requestDao.getRequestByIdOneShot(id)
-        if (current != null) {
-            val now = LocalDateTime.now()
-            val updated = current.copy(
-                status = RequestStatus.ACTIVE,
-                closedAt = null,
-                cancelReason = null,
-                finalPrice = null,
-                finalComment = null,
-                updatedAt = now
-            )
-            requestDao.updateRequest(updated)
-        }
+    override suspend fun restoreToActive(id: Long) {
+        val now = LocalDateTime.now()
+        requestDao.updateRequestStatusAndResults(
+            id = id,
+            status = RequestStatus.ACTIVE,
+            finalPrice = null,
+            finalComment = null,
+            closedAt = null,
+            cancelReason = null,
+            updatedAt = now
+        )
     }
 
     override suspend fun updateRequestResults(
@@ -104,17 +97,14 @@ class RequestRepositoryImpl(
         finalPrice: Double?,
         finalComment: String?,
         cancelReason: String?
-    ) = withContext(Dispatchers.IO) {
-        val current = requestDao.getRequestByIdOneShot(id)
-        if (current != null) {
-            val now = LocalDateTime.now()
-            val updated = current.copy(
-                finalPrice = finalPrice,
-                finalComment = finalComment,
-                cancelReason = cancelReason,
-                updatedAt = now
-            )
-            requestDao.updateRequest(updated)
-        }
+    ) {
+        val now = LocalDateTime.now()
+        requestDao.updateRequestResultsOnly(
+            id = id,
+            finalPrice = finalPrice,
+            finalComment = finalComment,
+            cancelReason = cancelReason,
+            updatedAt = now
+        )
     }
 }

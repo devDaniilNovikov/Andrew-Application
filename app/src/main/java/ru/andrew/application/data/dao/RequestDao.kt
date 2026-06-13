@@ -41,6 +41,32 @@ interface RequestDao {
     /**
      * Поток истории заявок с сортировкой сначала по статусу, затем по дате закрытия (closedAt) по убыванию.
      */
-    @Query("SELECT * FROM requests WHERE status != 'ACTIVE' ORDER BY status ASC, closedAt DESC")
+    @Query("SELECT * FROM requests WHERE status != 'ACTIVE' ORDER BY CASE WHEN status = 'COMPLETED' THEN 1 WHEN status = 'CANCELLED' THEN 2 ELSE 3 END ASC, closedAt DESC")
     fun getHistoryRequestsByStatusAndClosedAt(): Flow<List<Request>>
+
+    /**
+     * Атомарный SQL-запрос для обновления статуса и результатов заявки в обход read-modify-write гонок.
+     */
+    @Query("UPDATE requests SET status = :status, finalPrice = :finalPrice, finalComment = :finalComment, closedAt = :closedAt, cancelReason = :cancelReason, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updateRequestStatusAndResults(
+        id: Long,
+        status: ru.andrew.application.domain.RequestStatus,
+        finalPrice: Double?,
+        finalComment: String?,
+        closedAt: java.time.LocalDateTime?,
+        cancelReason: String?,
+        updatedAt: java.time.LocalDateTime
+    )
+
+    /**
+     * Атомарный SQL-запрос для обновления результатов заявки (цена, комментарий, причина отмены) без изменения статуса.
+     */
+    @Query("UPDATE requests SET finalPrice = :finalPrice, finalComment = :finalComment, cancelReason = :cancelReason, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updateRequestResultsOnly(
+        id: Long,
+        finalPrice: Double?,
+        finalComment: String?,
+        cancelReason: String?,
+        updatedAt: java.time.LocalDateTime
+    )
 }
