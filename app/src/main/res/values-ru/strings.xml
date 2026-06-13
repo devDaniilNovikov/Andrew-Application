@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Контроль заявок</string>
+    <string name="theme_selection_title">Выберите тему оформления</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Темная</string>
+    <string name="theme_system">Системная</string>
+
+    <!-- RequestStatus -->
+    <string name="status_active">Активная</string>
+    <string name="status_completed">Выполнена</string>
+    <string name="status_cancelled">Отменена</string>
+
+    <!-- EquipmentType -->
+    <string name="equipment_domestic_refrigerator">бытовой холодильник</string>
+    <string name="equipment_commercial">торговое оборудование</string>
+    <string name="equipment_industrial">промышленное оборудование</string>
+    <string name="equipment_ice_generator">ледогенератор</string>
+    <string name="equipment_freezer_chamber">морозильная камера</string>
+    <string name="equipment_refrigerated_showcase">холодильная витрина</string>
+    <string name="equipment_split_system">сплит-система / кондиционер</string>
+    <string name="equipment_other">другое</string>
+
+    <!-- ActionType -->
+    <string name="action_call">позвонить</string>
+    <string name="action_visit">приехать</string>
+    <string name="action_diagnostics">диагностика</string>
+    <string name="action_repair">ремонт</string>
+    <string name="action_awaiting_parts">ожидание детали</string>
+    <string name="action_clarify_info">уточнить информацию</string>
+    <string name="action_other">другое</string>
+
+    <!-- Navigation -->
+    <string name="nav_create">Создание</string>
+    <string name="nav_active">Список</string>
+    <string name="nav_history">История</string>
+
+    <!-- Create Request Form -->
+    <string name="create_title_label">Название заявки *</string>
+    <string name="create_phone_label">Телефон *</string>
+    <string name="create_client_name_label">Имя клиента</string>
+    <string name="create_address_label">Адрес</string>
+    <string name="create_equipment_type_label">Тип оборудования</string>
+    <string name="create_action_type_label">Тип действия</string>
+    <string name="create_date_time_label">Дата и время следующего действия *</string>
+    <string name="create_comment_label">Комментарий</string>
+    <string name="create_validation_error">Заполните название, телефон и дату следующего действия.</string>
+    <string name="create_db_error">Ошибка базы данных</string>
+    <string name="create_success_message">Заявка успешно создана!</string>
+    <string name="btn_create">Создать заявку</string>
+    <string name="btn_clear">Очистить форму</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_select_time">Выберите время</string>
+    <string name="edit_request_title">Редактирование заявки</string>
+    <string name="btn_save_changes">Сохранить изменения</string>
+    <string name="update_success_message">Изменения успешно сохранены!</string>
+    <string name="cancel_dialog_title">Отмена заявки</string>
+    <string name="cancel_reason_client_refused">Клиент отказался</string>
+    <string name="cancel_reason_no_contact">Не удалось дозвониться</string>
+    <string name="cancel_reason_no_parts">Нет нужных деталей</string>
+    <string name="cancel_reason_other">Другое (укажите ниже)</string>
+    <string name="cancel_dialog_comment_placeholder">Опишите причину подробнее…</string>
+    <string name="cancel_dialog_confirm">Подтвердить отмену</string>
+    <string name="toast_request_completed">Заявка успешно выполнена!</string>
+    <string name="toast_request_cancelled">Заявка отменена.</string>
+    <string name="client_name_hint">Без имени</string>
+    <string name="urgency_overdue">Просрочено</string>
+    <string name="urgency_today">Сегодня</string>
+    <string name="urgency_planned">Запланировано</string>
+    <string name="btn_cancel_action">Отменить</string>
+
+    <!-- History Screen -->
+    <string name="history_title">История</string>
+    <string name="history_empty">Нет выполненных или отмененных заявок.</string>
+    <string name="history_empty_desc">Здесь будут отображаться завершенные или отмененные заявки. Попробуйте выбрать другой фильтр или добавьте новую заявку.</string>
+    <string name="active_empty_title">Нет активных заявок</string>
+    <string name="active_empty_desc">Все задачи выполнены! Чтобы создать новую заявку, перейдите на вкладку «Создать» в нижнем меню.</string>
+    <string name="history_created_at">Создана: %s</string>
+    <string name="history_closed_at">Закрыта: %s</string>
+    <string name="history_final_price">Стоимость: %s ₽</string>
+    <string name="history_final_comment">Результат: %s</string>
+    <string name="history_cancel_reason">Причина отмены: %s</string>
+    <string name="history_sort_title">Сортировка:</string>
+    <string name="history_sort_by_date">По дате</string>
+    <string name="history_sort_by_status">По статусу</string>
+    <string name="history_filter_all">Все</string>
+    <string name="history_filter_completed">Выполненные</string>
+    <string name="history_filter_cancelled">Отмененные</string>
+    <string name="history_edit_dialog_title">Редактирование итога</string>
+    <string name="history_edit_price_label">Финальная стоимость (₽)</string>
+    <string name="history_edit_comment_label">Итоговый комментарий</string>
+    <string name="history_edit_reason_label">Причина отмены</string>
+    <string name="history_invalid_price_error">Неверный формат цены</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Напоминания о действиях</string>
+    <string name="notification_channel_description">Напоминания о запланированных действиях и звонках клиентам</string>
+    <string name="notification_today">Сегодня</string>
+    <string name="notification_tomorrow">Завтра</string>
+
+    <!-- Stage 10: Import Contact -->
+    <string name="create_import_contact_desc">Выбрать контакт из адресной книги</string>
+    <string name="import_contact_success">Контакт успешно импортирован!</string>
+    <string name="import_contact_error_no_phone">У выбранного контакта нет номера телефона или имени.</string>
+</resources>

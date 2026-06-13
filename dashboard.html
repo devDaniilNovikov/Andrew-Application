@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antigravity PR Reviewer Dashboard</title>
+    <!-- Modern Premium Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Sleek Space Dark Color Palette */
+            --bg-color: #080B10;
+            --bg-gradient: radial-gradient(circle at top right, #101622 0%, #06090e 100%);
+            --card-bg: rgba(21, 27, 38, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-hover-border: rgba(255, 255, 255, 0.16);
+            
+            /* High-fidelity Neon Status Colors */
+            --color-high: #ff4d6d;
+            --color-medium: #ffb703;
+            --color-low: #00f5d4;
+            --color-primary: #7209b7;
+            --color-secondary: #3f37c9;
+            --color-accent: #4cc9f0;
+            --color-text-main: #f8f9fa;
+            --color-text-muted: #9ba4b5;
+            --color-success: #38b000;
+            
+            /* Glassmorphism shadow effects */
+            --shadow-subtle: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            --shadow-high-glow: 0 0 15px rgba(255, 77, 109, 0.25);
+            --shadow-medium-glow: 0 0 15px rgba(255, 183, 3, 0.25);
+            --shadow-low-glow: 0 0 15px rgba(0, 245, 212, 0.25);
+            --shadow-accent-glow: 0 0 20px rgba(76, 201, 240, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: var(--bg-gradient);
+            color: var(--color-text-main);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        /* Ambient Glow Blobs background */
+        .ambient-blob-1 {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(114, 9, 183, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: -100px;
+            left: -100px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .ambient-blob-2 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(76, 201, 240, 0.1) 0%, rgba(0,0,0,0) 70%);
+            bottom: -150px;
+            right: -100px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        header {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto 2rem auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 30%, var(--color-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-section h1 span.badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 0.25rem 0.6rem;
+            border-radius: 20px;
+            background: rgba(76, 201, 240, 0.15);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            color: var(--color-accent);
+            text-shadow: var(--shadow-accent-glow);
+        }
+
+        .logo-section p {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .meta-info {
+            text-align: right;
+        }
+
+        .meta-info span {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+
+        .meta-info .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(56, 176, 0, 0.1);
+            border: 1px solid rgba(56, 176, 0, 0.3);
+            color: #38b000;
+            padding: 0.35rem 0.8rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .live-indicator::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #38b000;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #38b000;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0% { transform: scale(0.9); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.9); opacity: 0.5; }
+        }
+
+        /* Layout Grid */
+        .dashboard-grid {
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.8fr;
+            gap: 2rem;
+            flex-grow: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            body {
+                padding: 1rem;
+            }
+        }
+
+        /* Glassmorphic Panel Base Styles */
+        .glass-panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 1.75rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: var(--shadow-subtle);
+            transition: border-color 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-panel:hover {
+            border-color: var(--card-hover-border);
+        }
+
+        .panel-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 0.75rem;
+        }
+
+        /* Left Panel - Roadmap Progression */
+        .roadmap-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+            max-height: 75vh;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        /* Custom Scrollbar for dark dashboard list */
+        .roadmap-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .roadmap-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        .roadmap-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .roadmap-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.20);
+        }
+
+        .roadmap-item {
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+
+        .roadmap-item:hover {
+            transform: translateX(4px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .roadmap-item.completed {
+            border-left: 4px solid var(--color-low);
+        }
+
+        .roadmap-item.empty {
+            border-left: 4px dashed rgba(255, 255, 255, 0.15);
+            opacity: 0.6;
+        }
+
+        .roadmap-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stage-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--color-text-main);
+        }
+
+        .stage-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 6px;
+        }
+
+        .stage-score.high {
+            background: rgba(0, 245, 212, 0.12);
+            color: var(--color-low);
+            border: 1px solid rgba(0, 245, 212, 0.25);
+        }
+
+        .stage-score.pending {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--color-text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-accent) 100%);
+            transition: width 0.8s ease;
+        }
+
+        .progress-bar.completed {
+            background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-low) 100%);
+        }
+
+        .progress-bar.empty {
+            width: 0% !important;
+        }
+
+        /* Right Panel - Code-Review Details */
+        .review-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .review-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1.25rem;
+            border-radius: 14px;
+        }
+
+        .active-review-info h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .active-review-info p {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.25rem;
+        }
+
+        .score-radial {
+            position: relative;
+            width: 90px;
+            height: 90px;
+            background: radial-gradient(circle, rgba(11, 14, 20, 0.8) 60%, rgba(0,0,0,0) 70%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(76, 201, 240, 0.2);
+        }
+
+        .score-radial::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: -3px;
+            right: -3px;
+            bottom: -3px;
+            border-radius: 50%;
+            background: conic-gradient(var(--color-accent) calc(var(--score-pct) * 1%), rgba(255,255,255,0.05) 0);
+            z-index: -1;
+            transition: background 0.8s ease;
+        }
+
+        .score-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1;
+        }
+
+        .score-value span {
+            font-size: 0.7rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            margin-top: 0.25rem;
+        }
+
+        /* Glassmorphic Navigation Tabs */
+        .tab-navigation {
+            display: flex;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.35rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            gap: 0.25rem;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 0.65rem;
+            border: none;
+            background: none;
+            color: var(--color-text-muted);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .tab-btn.active {
+            color: #ffffff;
+            background: var(--color-secondary);
+            box-shadow: 0 4px 15px rgba(63, 55, 201, 0.4);
+        }
+
+        /* Review Content Sections */
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 1.25rem;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Summary Tab Styles */
+        .summary-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 1.5rem;
+            line-height: 1.6;
+            font-size: 1.05rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Issues Tab Styles */
+        .issue-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .issue-item {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 1.1rem;
+            display: flex;
+            gap: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .issue-item:hover {
+            transform: scale(1.01);
+        }
+
+        .issue-item.severity-high {
+            border-left: 4px solid var(--color-high);
+            background: linear-gradient(90deg, rgba(255, 77, 109, 0.05) 0%, rgba(0,0,0,0) 100%);
+            box-shadow: var(--shadow-high-glow);
+        }
+
+        .issue-item.severity-medium {
+            border-left: 4px solid var(--color-medium);
+            background: linear-gradient(90deg, rgba(255, 183, 3, 0.05) 0%, rgba(0,0,0,0) 100%);
+            box-shadow: var(--shadow-medium-glow);
+        }
+
+        .issue-item.severity-low {
+            border-left: 4px solid var(--color-low);
+            background: linear-gradient(90deg, rgba(0, 245, 212, 0.05) 0%, rgba(0,0,0,0) 100%);
+            box-shadow: var(--shadow-low-glow);
+        }
+
+        .severity-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            align-self: flex-start;
+        }
+
+        .severity-badge.high {
+            background: rgba(255, 77, 109, 0.15);
+            color: var(--color-high);
+            border: 1px solid rgba(255, 77, 109, 0.2);
+        }
+
+        .severity-badge.medium {
+            background: rgba(255, 183, 3, 0.15);
+            color: var(--color-medium);
+            border: 1px solid rgba(255, 183, 3, 0.2);
+        }
+
+        .severity-badge.low {
+            background: rgba(0, 245, 212, 0.15);
+            color: var(--color-low);
+            border: 1px solid rgba(0, 245, 212, 0.2);
+        }
+
+        .issue-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            flex-grow: 1;
+        }
+
+        .issue-file {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .issue-file span.line {
+            color: var(--color-accent);
+            background: rgba(76, 201, 240, 0.1);
+            padding: 0.05rem 0.35rem;
+            border-radius: 4px;
+        }
+
+        .issue-description {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--color-text-main);
+        }
+
+        /* Recommendations Tab Styles */
+        .recommendation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+        }
+
+        .recommendation-item {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 1.1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .recommendation-icon {
+            color: var(--color-accent);
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        /* Fallback Instructions Banner */
+        .fallback-banner {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, rgba(114, 9, 183, 0.1) 0%, rgba(63, 55, 201, 0.1) 100%);
+            border: 1px dashed rgba(76, 201, 240, 0.3);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .fallback-info h3 {
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .fallback-info p {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+        }
+
+        .fallback-code {
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--color-accent);
+            letter-spacing: -0.2px;
+        }
+
+        /* Footer styling */
+        footer {
+            max-width: 1400px;
+            width: 100%;
+            margin: 3rem auto 0 auto;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-blob-1"></div>
+    <div class="ambient-blob-2"></div>
+
+    <!-- Fallback/Help banner shown when dashboard loads default mock data -->
+    <div class="fallback-banner" id="fallbackBanner">
+        <div class="fallback-info">
+            <h3>💡 Отображаются демонстрационные данные</h3>
+            <p>Чтобы обновить дашборд реальными отчетами анализа вашей ветки, запустите автоматический рецензент в консоли.</p>
+        </div>
+        <div class="fallback-code">python3 scripts/pr_reviewer.py</div>
+    </div>
+
+    <header>
+        <div class="logo-section">
+            <h1>Antigravity PR <span class="badge">QA Agent</span></h1>
+            <p>Интеллектуальная система контроля качества кода мобильного приложения «Контроль заявок»</p>
+        </div>
+        <div class="meta-info">
+            <span id="updateTime">Обновлено: Прямо сейчас</span>
+            <div class="live-indicator">Сервис активен</div>
+        </div>
+    </header>
+
+    <main class="dashboard-grid">
+        <!-- Left Column: Roadmap and progress across development stages -->
+        <section class="glass-panel">
+            <div class="panel-title">
+                Карта этапов разработки
+                <span id="completedStagesCount" style="font-size: 0.85rem; font-weight: 600; color: var(--color-accent);">0 / 13 готово</span>
+            </div>
+            <div class="roadmap-list" id="roadmapList">
+                <!-- Roadmap Stages will be rendered dynamically by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Right Column: Interactive Detail Panel for the Latest PR Review -->
+        <section class="glass-panel review-panel">
+            <div class="panel-title">
+                Детальный отчет последнего анализа PR
+            </div>
+
+            <div class="review-card-header">
+                <div class="active-review-info">
+                    <h2 id="reviewStageName">Этап не определен</h2>
+                    <p id="reviewSummaryBrief">Пожалуйста, запустите pr_reviewer.py для анализа кода.</p>
+                </div>
+                <!-- Dynamic Radial Score Progress Gauge -->
+                <div class="score-radial" id="scoreRadialGauge" style="--score-pct: 0;">
+                    <div class="score-value">
+                        <span id="scoreNumber">0</span>
+                        <span>Баллов</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Beautiful Tab Navigation -->
+            <nav class="tab-navigation">
+                <button class="tab-btn active" onclick="switchTab('summary')">📝 Сводка</button>
+                <button class="tab-btn" onclick="switchTab('issues')">⚠️ Замечания (<span id="bugsCount">0</span>)</button>
+                <button class="tab-btn" onclick="switchTab('recommendations')">💡 Рекомендации</button>
+            </nav>
+
+            <!-- Tab Panels -->
+            <div class="tab-container">
+                <!-- Summary Tab -->
+                <div class="tab-content active" id="tab-summary">
+                    <div class="summary-card" id="summaryText">
+                        Нет доступных данных.
+                    </div>
+                </div>
+
+                <!-- Bugs & Issues Tab -->
+                <div class="tab-content" id="tab-issues">
+                    <div class="issue-list" id="issuesListContainer">
+                        <!-- Code issues will be injected dynamically -->
+                    </div>
+                </div>
+
+                <!-- Recommendations Tab -->
+                <div class="tab-content" id="tab-recommendations">
+                    <div class="recommendation-list" id="recsListContainer">
+                        <!-- Recommendations will be injected dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Разработано в рамках проекта Advanced Agentic Coding с использованием Google Antigravity SDK.</p>
+    </footer>
+
+    <!-- Dashboard Data Scripts -->
+    <script src="scripts/data.js"></script>
+    <script>
+        // Full standard list of stages from PRD/TASKS.md
+        const allStages = [
+            "Этап 0. Каркас проекта",
+            "Этап 1. Слой данных",
+            "Этап 2. Навигация и каркас экранов",
+            "Этап 3. Создание заявки",
+            "Этап 4. Список активных заявок",
+            "Этап 5. Детальная карточка заявки",
+            "Этап 6. Свайпы и смена статуса",
+            "Этап 7. История",
+            "Этап 8. Звонок клиенту",
+            "Этап 9. Уведомления",
+            "Этап 10. Импорт контакта",
+            "Этап 11. Полировка интерфейса",
+            "Этап 12. Приёмка по критериям готовности"
+        ];
+
+        // Retrieve local variables. Fallback to undefined safe checking
+        let liveEvaluations = {};
+        let liveLatestReview = null;
+
+        try {
+            if (typeof evaluationsData !== 'undefined') {
+                liveEvaluations = evaluationsData;
+                // If evaluationsData exists and is loaded successfully, hide fallback help banner
+                const fallbackBanner = document.getElementById('fallbackBanner');
+                if (fallbackBanner && Object.keys(evaluationsData).length > 0) {
+                    fallbackBanner.style.display = 'none';
+                    document.getElementById('updateTime').innerText = 'Обновлено: Интегрирован с кодовой базой';
+                }
+            }
+            if (typeof latestReview !== 'undefined') {
+                liveLatestReview = latestReview;
+            }
+        } catch (e) {
+            console.warn("Could not load local data.js. Visual dashboard falling back to default preview.", e);
+        }
+
+        // Render Stage Roadmap
+        function renderRoadmap() {
+            const container = document.getElementById('roadmapList');
+            container.innerHTML = '';
+            let completedCount = 0;
+
+            allStages.forEach((stageName) => {
+                const scoreStr = liveEvaluations[stageName];
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'roadmap-item';
+
+                if (scoreStr) {
+                    completedCount++;
+                    itemDiv.classList.add('completed');
+                    const scoreVal = parseInt(scoreStr.split('/')[0]) || 100;
+
+                    itemDiv.innerHTML = `
+                        <div class="roadmap-header">
+                            <span class="stage-title">${stageName}</span>
+                            <span class="stage-score high">${scoreStr}</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar completed" style="width: ${scoreVal}%"></div>
+                        </div>
+                    `;
+                } else {
+                    itemDiv.classList.add('empty');
+                    itemDiv.innerHTML = `
+                        <div class="roadmap-header">
+                            <span class="stage-title">${stageName}</span>
+                            <span class="stage-score pending">Ожидает</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar empty" style="width: 0%"></div>
+                        </div>
+                    `;
+                }
+                container.appendChild(itemDiv);
+            });
+
+            document.getElementById('completedStagesCount').innerText = `${completedCount} / ${allStages.length} завершено`;
+        }
+
+        // Render Latest Code Review
+        function renderLatestReview() {
+            if (!liveLatestReview) return;
+
+            // Set Header information
+            document.getElementById('reviewStageName').innerText = liveLatestReview.stage_name || "Общий Обзор";
+            document.getElementById('reviewSummaryBrief').innerText = "Краткое резюме найденных архитектурных аспектов:";
+            
+            // Set Radial Gauge
+            const scoreVal = liveLatestReview.score || 0;
+            const gauge = document.getElementById('scoreRadialGauge');
+            gauge.style.setProperty('--score-pct', scoreVal);
+            document.getElementById('scoreNumber').innerText = scoreVal;
+
+            // Set Summary Tab content
+            document.getElementById('summaryText').innerHTML = `<p>${liveLatestReview.summary || 'Нет доступной сводки для данного обзора.'}</p>`;
+
+            // Render Bugs & Issues
+            const issuesContainer = document.getElementById('issuesListContainer');
+            issuesContainer.innerHTML = '';
+            const issues = liveLatestReview.bugs_and_issues || [];
+            document.getElementById('bugsCount').innerText = issues.length;
+
+            if (issues.length === 0) {
+                issuesContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--color-success); font-weight: 600;">
+                        🟢 Все отлично! Критических ошибок и недочетов не обнаружено.
+                    </div>
+                `;
+            } else {
+                issues.forEach((issue) => {
+                    const issueItem = document.createElement('div');
+                    const severityClass = `severity-${(issue.severity || 'LOW').toLowerCase()}`;
+                    issueItem.className = `issue-item ${severityClass}`;
+
+                    issueItem.innerHTML = `
+                        <span class="severity-badge ${(issue.severity || 'LOW').toLowerCase()}">${issue.severity || 'LOW'}</span>
+                        <div class="issue-details">
+                            <div class="issue-file">
+                                📁 ${issue.file_path} <span class="line">строка ${issue.line_number}</span>
+                            </div>
+                            <div class="issue-description">
+                                ${issue.description}
+                            </div>
+                        </div>
+                    `;
+                    issuesContainer.appendChild(issueItem);
+                });
+            }
+
+            // Render Recommendations
+            const recsContainer = document.getElementById('recsListContainer');
+            recsContainer.innerHTML = '';
+            const recs = liveLatestReview.recommendations || [];
+
+            if (recs.length === 0) {
+                recsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
+                        Рекомендаций по улучшению кода не предоставлено.
+                    </div>
+                `;
+            } else {
+                recs.forEach((rec) => {
+                    const recItem = document.createElement('div');
+                    recItem.className = 'recommendation-item';
+                    recItem.innerHTML = `
+                        <span class="recommendation-icon">⚡</span>
+                        <div>${rec}</div>
+                    `;
+                    recsContainer.appendChild(recItem);
+                });
+            }
+        }
+
+        // Tab Navigation switching mechanism
+        function switchTab(tabName) {
+            // Remove active class from all buttons and tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Find current active elements
+            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.innerText.includes(
+                tabName === 'summary' ? 'Сводка' : tabName === 'issues' ? 'Замечания' : 'Рекомендации'
+            ));
+            
+            if (activeBtn) activeBtn.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // Initialize dashboard rendering on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderRoadmap();
+            renderLatestReview();
+        });
+    </script>
+</body>
+</html>
