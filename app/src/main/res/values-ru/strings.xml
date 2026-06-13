@@ -69,4 +69,23 @@
     <string name="urgency_today">Сегодня</string>
     <string name="urgency_planned">Запланировано</string>
     <string name="btn_cancel_action">Отменить</string>
+
+    <!-- History Screen -->
+    <string name="history_title">История</string>
+    <string name="history_empty">Нет выполненных или отмененных заявок.</string>
+    <string name="history_created_at">Создана: %s</string>
+    <string name="history_closed_at">Закрыта: %s</string>
+    <string name="history_final_price">Стоимость: %s ₽</string>
+    <string name="history_final_comment">Результат: %s</string>
+    <string name="history_cancel_reason">Причина отмены: %s</string>
+    <string name="history_sort_title">Сортировка:</string>
+    <string name="history_sort_by_date">По дате</string>
+    <string name="history_sort_by_status">По статусу</string>
+    <string name="history_filter_all">Все</string>
+    <string name="history_filter_completed">Выполненные</string>
+    <string name="history_filter_cancelled">Отмененные</string>
+    <string name="history_edit_dialog_title">Редактирование итога</string>
+    <string name="history_edit_price_label">Финальная стоимость (₽)</string>
+    <string name="history_edit_comment_label">Итоговый комментарий</string>
+    <string name="history_edit_reason_label">Причина отмены</string>
 </resources>
