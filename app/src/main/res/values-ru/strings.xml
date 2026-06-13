@@ -29,4 +29,9 @@
     <string name="action_awaiting_parts">ожидание детали</string>
     <string name="action_clarify_info">уточнить информацию</string>
     <string name="action_other">другое</string>
+
+    <!-- Navigation -->
+    <string name="nav_create">Создание</string>
+    <string name="nav_active">Список</string>
+    <string name="nav_history">История</string>
 </resources>

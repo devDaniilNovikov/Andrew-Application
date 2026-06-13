@@ -47,6 +47,7 @@ import kotlinx.coroutines.launch
 import ru.andrew.application.ui.theme.AndrewApplicationTheme
 import ru.andrew.application.ui.theme.AppTheme
 import ru.andrew.application.ui.viewmodel.ThemeViewModel
+import ru.andrew.application.ui.screens.MainScreen
 
 class MainActivity : ComponentActivity() {
 
@@ -92,7 +93,7 @@ class MainActivity : ComponentActivity() {
             val currentTheme by themeViewModel.themeState.collectAsStateWithLifecycle()
             
             AndrewApplicationTheme(theme = currentTheme) {
-                AppRoot(
+                MainScreen(
                     currentTheme = currentTheme,
                     onThemeSelected = { newTheme ->
                         themeViewModel.selectTheme(newTheme)
@@ -102,152 +103,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-@Composable
-private fun AppRoot(
-    currentTheme: AppTheme,
-    onThemeSelected: (AppTheme) -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .safeDrawingPadding()
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = stringResource(id = R.string.app_name),
-                style = MaterialTheme.typography.displayMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 32.dp)
-            )
-
-            Text(
-                text = stringResource(id = R.string.theme_selection_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            // Premium segmented control
-            ThemeSelector(
-                currentTheme = currentTheme,
-                onThemeSelected = onThemeSelected
-            )
-        }
-    }
-}
-
-private val ThemeOptions = listOf(
-    ThemeOption(AppTheme.LIGHT, "☀️", R.string.theme_light),
-    ThemeOption(AppTheme.DARK, "🌙", R.string.theme_dark),
-    ThemeOption(AppTheme.SYSTEM, "⚙️", R.string.theme_system)
-)
-
-@Composable
-private fun ThemeSelector(
-    currentTheme: AppTheme,
-    onThemeSelected: (AppTheme) -> Unit
-) {
-    val options = ThemeOptions
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        ),
-        border = BorderStroke(
-            1.dp,
-            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            options.forEach { option ->
-                val isSelected = currentTheme == option.theme
-                
-                val baseColor = MaterialTheme.colorScheme.primary
-                val backgroundColor by animateColorAsState(
-                    targetValue = if (isSelected) {
-                        baseColor
-                    } else {
-                        baseColor.copy(alpha = 0f)
-                    },
-                    animationSpec = tween(durationMillis = 300),
-                    label = "bgColor"
-                )
-
-                // Animate content (text/icon) color
-                val contentColor by animateColorAsState(
-                    targetValue = if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    animationSpec = tween(durationMillis = 300),
-                    label = "contentColor"
-                )
-
-                // Animate scale on click
-                val scale by animateFloatAsState(
-                    targetValue = if (isSelected) 1.05f else 1.0f,
-                    animationSpec = spring(
-                        dampingRatio = spring.DampingRatioMediumBouncy,
-                        stiffness = spring.StiffnessLow
-                    ),
-                    label = "scale"
-                )
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .graphicsLayer(scaleX = scale, scaleY = scale)
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(backgroundColor)
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) { onThemeSelected(option.theme) }
-                        .padding(vertical = 12.dp, horizontal = 4.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = option.icon,
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(bottom = 2.dp)
-                        )
-                        Text(
-                            text = stringResource(id = option.titleResId),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = contentColor,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-private data class ThemeOption(
-    val theme: AppTheme,
-    val icon: String,
-    val titleResId: Int
-)
