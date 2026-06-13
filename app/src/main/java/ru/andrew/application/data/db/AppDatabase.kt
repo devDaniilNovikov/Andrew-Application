@@ -29,7 +29,6 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "andrew_application.db"
                 )
-                .fallbackToDestructiveMigration() // Безопасно для разработки MVP
                 .build()
                 .also { INSTANCE = it }
             }
