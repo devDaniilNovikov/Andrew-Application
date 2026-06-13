@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Контроль заявок</string>
-    <string name="theme_selection_title">Выберите тему оформления</string>
-    <string name="theme_light">Светлая</string>
-    <string name="theme_dark">Темная</string>
-    <string name="theme_system">Системная</string>
+    <string name="app_name">Request Control</string>
+    <string name="theme_selection_title">Select Theme</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_system">System</string>
 </resources>

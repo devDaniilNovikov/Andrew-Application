@@ -39,63 +39,29 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.andrew.application.ui.theme.AndrewApplicationTheme
 import ru.andrew.application.ui.theme.AppTheme
-import ru.andrew.application.ui.theme.ThemePreferences
+import ru.andrew.application.ui.viewmodel.ThemeViewModel
 
 class MainActivity : ComponentActivity() {
-    private lateinit var themePreferences: ThemePreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        themePreferences = ThemePreferences(this)
+        
+        // Initialize Edge-to-Edge once during Activity creation per standard Android guidelines
+        enableEdgeToEdge()
 
         setContent {
-            var currentTheme by remember { mutableStateOf(AppTheme.SYSTEM) }
-
-            LaunchedEffect(Unit) {
-                val savedTheme = withContext(Dispatchers.IO) {
-                    themePreferences.getTheme()
-                }
-                currentTheme = savedTheme
-            }
-
-            val darkTheme = when (currentTheme) {
-                AppTheme.LIGHT -> false
-                AppTheme.DARK -> true
-                AppTheme.SYSTEM -> isSystemInDarkTheme()
-            }
-
-            // Dynamically re-call enableEdgeToEdge based on light/dark mode
-            LaunchedEffect(darkTheme) {
-                enableEdgeToEdge(
-                    statusBarStyle = if (darkTheme) {
-                        SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.light(
-                            android.graphics.Color.TRANSPARENT,
-                            android.graphics.Color.TRANSPARENT
-                        )
-                    },
-                    navigationBarStyle = if (darkTheme) {
-                        SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
-                    } else {
-                        SystemBarStyle.light(
-                            android.graphics.Color.TRANSPARENT,
-                            android.graphics.Color.TRANSPARENT
-                        )
-                    }
-                )
-            }
+            val themeViewModel: ThemeViewModel = viewModel()
+            val currentTheme by themeViewModel.themeState.collectAsStateWithLifecycle()
 
             AndrewApplicationTheme(theme = currentTheme) {
                 AppRoot(
                     currentTheme = currentTheme,
                     onThemeSelected = { newTheme ->
-                        currentTheme = newTheme
-                        themePreferences.setTheme(newTheme)
+                        themeViewModel.selectTheme(newTheme)
                     }
                 )
             }
