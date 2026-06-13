@@ -1,0 +1,151 @@
+package ru.andrew.application.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import ru.andrew.application.data.entity.Request
+import ru.andrew.application.data.repository.RequestRepository
+import ru.andrew.application.domain.ActionType
+import ru.andrew.application.domain.EquipmentType
+import ru.andrew.application.domain.RequestStatus
+import ru.andrew.application.di.DependencyProvider
+import java.time.LocalDateTime
+
+/**
+ * Состояние формы создания заявки.
+ */
+data class CreateRequestUiState(
+    val title: String = "",
+    val phone: String = "",
+    val clientName: String = "",
+    val address: String = "",
+    val equipmentType: EquipmentType = EquipmentType.OTHER,
+    val actionType: ActionType = ActionType.OTHER,
+    val nextActionDateTime: LocalDateTime? = null,
+    val comment: String = "",
+    val errorMessage: String? = null,
+    val isSuccess: Boolean = false
+)
+
+/**
+ * ViewModel для управления формой создания новой заявки с валидацией и сохранением в Room.
+ */
+class CreateRequestViewModel(
+    private val requestRepository: RequestRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(CreateRequestUiState())
+    val uiState: StateFlow<CreateRequestUiState> = _uiState.asStateFlow()
+
+    fun updateTitle(title: String) {
+        _uiState.update { it.copy(title = title, errorMessage = null) }
+    }
+
+    fun updatePhone(phone: String) {
+        _uiState.update { it.copy(phone = phone, errorMessage = null) }
+    }
+
+    fun updateClientName(clientName: String) {
+        _uiState.update { it.copy(clientName = clientName) }
+    }
+
+    fun updateAddress(address: String) {
+        _uiState.update { it.copy(address = address) }
+    }
+
+    fun updateEquipmentType(type: EquipmentType) {
+        _uiState.update { it.copy(equipmentType = type) }
+    }
+
+    fun updateActionType(type: ActionType) {
+        _uiState.update { it.copy(actionType = type) }
+    }
+
+    fun updateNextActionDateTime(dateTime: LocalDateTime?) {
+        _uiState.update { it.copy(nextActionDateTime = dateTime, errorMessage = null) }
+    }
+
+    fun updateComment(comment: String) {
+        _uiState.update { it.copy(comment = comment) }
+    }
+
+    /**
+     * Сбросить все поля формы в исходное состояние.
+     */
+    fun clearForm() {
+        _uiState.value = CreateRequestUiState()
+    }
+
+    /**
+     * Сбросить флаг успешного завершения.
+     */
+    fun resetSuccess() {
+        _uiState.update { it.copy(isSuccess = false) }
+    }
+
+    /**
+     * Попытаться сохранить заявку в базу данных.
+     * Проверяет обязательные поля: название, телефон и дата действия.
+     */
+    fun saveRequest() {
+        val currentState = _uiState.value
+        
+        // Валидация полей согласно PRD (название, телефон, дата следующего действия)
+        if (currentState.title.trim().isEmpty() || 
+            currentState.phone.trim().isEmpty() || 
+            currentState.nextActionDateTime == null
+        ) {
+            _uiState.update { 
+                it.copy(errorMessage = "Заполните название, телефон и дату следующего действия.") 
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val newRequest = Request(
+                    id = 0L, // Автогенерация ID в БД
+                    title = currentState.title.trim(),
+                    clientName = currentState.clientName.trim().takeIf { it.isNotEmpty() },
+                    phone = currentState.phone.trim(),
+                    address = currentState.address.trim().takeIf { it.isNotEmpty() },
+                    equipmentType = currentState.equipmentType,
+                    actionType = currentState.actionType,
+                    nextActionDateTime = currentState.nextActionDateTime,
+                    comment = currentState.comment.trim().takeIf { it.isNotEmpty() },
+                    status = RequestStatus.ACTIVE
+                )
+                
+                requestRepository.createRequest(newRequest)
+                _uiState.update { 
+                    it.copy(
+                        isSuccess = true,
+                        errorMessage = null
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update { 
+                    it.copy(errorMessage = "Ошибка при сохранении заявки: ${e.localizedMessage}") 
+                }
+            }
+        }
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
+                val repository = DependencyProvider.provideRequestRepository(application)
+                return CreateRequestViewModel(repository) as T
+            }
+        }
+    }
+}
+

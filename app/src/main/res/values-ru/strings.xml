@@ -34,4 +34,18 @@
     <string name="nav_create">Создание</string>
     <string name="nav_active">Список</string>
     <string name="nav_history">История</string>
+
+    <!-- Create Request Form -->
+    <string name="create_title_label">Название заявки *</string>
+    <string name="create_phone_label">Телефон *</string>
+    <string name="create_client_name_label">Имя клиента</string>
+    <string name="create_address_label">Адрес</string>
+    <string name="create_equipment_type_label">Тип оборудования</string>
+    <string name="create_action_type_label">Тип действия</string>
+    <string name="create_date_time_label">Дата и время следующего действия *</string>
+    <string name="create_comment_label">Комментарий</string>
+    <string name="create_validation_error">Заполните название, телефон и дату следующего действия.</string>
+    <string name="create_success_message">Заявка успешно создана!</string>
+    <string name="btn_create">Создать заявку</string>
+    <string name="btn_clear">Очистить форму</string>
 </resources>

@@ -33,4 +33,18 @@
     <string name="nav_create">Create</string>
     <string name="nav_active">Active</string>
     <string name="nav_history">History</string>
+
+    <!-- Create Request Form -->
+    <string name="create_title_label">Title *</string>
+    <string name="create_phone_label">Phone *</string>
+    <string name="create_client_name_label">Client Name</string>
+    <string name="create_address_label">Address</string>
+    <string name="create_equipment_type_label">Equipment Type</string>
+    <string name="create_action_type_label">Action Type</string>
+    <string name="create_date_time_label">Next Action Date &amp; Time *</string>
+    <string name="create_comment_label">Comment</string>
+    <string name="create_validation_error">Fill in title, phone and next action date.</string>
+    <string name="create_success_message">Request created successfully!</string>
+    <string name="btn_create">Create Request</string>
+    <string name="btn_clear">Clear Form</string>
 </resources>

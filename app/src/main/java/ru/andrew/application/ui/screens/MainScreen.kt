@@ -75,7 +75,7 @@ fun MainScreen(
                 .padding(innerPadding)
         ) {
             composable(Screen.Create.route) {
-                CreateRequestScreen()
+                CreateRequestScreen(navController = navController)
             }
             composable(Screen.Active.route) {
                 ActiveRequestsScreen()
