@@ -87,4 +87,5 @@
     <string name="history_edit_price_label">Final Price</string>
     <string name="history_edit_comment_label">Final Comment</string>
     <string name="history_edit_reason_label">Cancel Reason</string>
+    <string name="history_invalid_price_error">Invalid price format</string>
 </resources>

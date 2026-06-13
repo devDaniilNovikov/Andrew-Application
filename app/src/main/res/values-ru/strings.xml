@@ -88,4 +88,5 @@
     <string name="history_edit_price_label">Финальная стоимость (₽)</string>
     <string name="history_edit_comment_label">Итоговый комментарий</string>
     <string name="history_edit_reason_label">Причина отмены</string>
+    <string name="history_invalid_price_error">Неверный формат цены</string>
 </resources>

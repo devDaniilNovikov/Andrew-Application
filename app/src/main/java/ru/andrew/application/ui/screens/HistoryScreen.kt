@@ -23,6 +23,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +58,7 @@ fun HistoryScreen(
     val sortByStatus by viewModel.sortByStatus.collectAsStateWithLifecycle()
     val filterMode by viewModel.filterMode.collectAsStateWithLifecycle()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
+    var editingRequest by remember { mutableStateOf<Request?>(null) }
 
     Column(
         modifier = Modifier
@@ -138,7 +143,8 @@ fun HistoryScreen(
                 items(historyRequests, key = { it.id }) { request ->
                     HistoryRequestCard(
                         request = request,
-                        formatter = dateTimeFormatter
+                        formatter = dateTimeFormatter,
+                        onClick = { editingRequest = request }
                     )
                 }
 
@@ -151,6 +157,17 @@ fun HistoryScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }
+        }
+
+        editingRequest?.let { request ->
+            HistoryEditResultDialog(
+                request = request,
+                onDismiss = { editingRequest = null },
+                onConfirm = { finalPrice, finalComment, cancelReason ->
+                    viewModel.updateRequestResults(request.id, finalPrice, finalComment, cancelReason)
+                    editingRequest = null
+                }
+            )
         }
     }
 }
@@ -311,6 +328,7 @@ fun HistoryFilterRow(
 fun HistoryRequestCard(
     request: Request,
     formatter: DateTimeFormatter,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isCompleted = request.status == RequestStatus.COMPLETED
@@ -333,7 +351,9 @@ fun HistoryRequestCard(
     }
 
     OutlinedCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.outlinedCardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -677,4 +697,104 @@ private fun ThemeSelector(
             }
         }
     }
+}
+
+/**
+ * Interactive Dialog for editing completed or cancelled request results.
+ */
+@Composable
+fun HistoryEditResultDialog(
+    request: Request,
+    onDismiss: () -> Unit,
+    onConfirm: (finalPrice: Double?, finalComment: String?, cancelReason: String?) -> Unit
+) {
+    val isCompleted = request.status == RequestStatus.COMPLETED
+    
+    var priceText by remember { mutableStateOf(request.finalPrice?.toString() ?: "") }
+    var commentText by remember { mutableStateOf(request.finalComment ?: "") }
+    var reasonText by remember { mutableStateOf(request.cancelReason ?: "") }
+    
+    var priceError by remember { mutableStateOf<String?>(null) }
+    val invalidPriceMsg = stringResource(id = R.string.history_invalid_price_error)
+    
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(id = R.string.history_edit_dialog_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                if (isCompleted) {
+                    // Price Text Field
+                    OutlinedTextField(
+                        value = priceText,
+                        onValueChange = {
+                            priceText = it
+                            priceError = null
+                        },
+                        label = { Text(text = stringResource(id = R.string.history_edit_price_label)) },
+                        isError = priceError != null,
+                        supportingText = priceError?.let { error -> { Text(text = error) } },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    
+                    // Comment Text Field
+                    OutlinedTextField(
+                        value = commentText,
+                        onValueChange = { commentText = it },
+                        label = { Text(text = stringResource(id = R.string.history_edit_comment_label)) },
+                        minLines = 3,
+                        maxLines = 5,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    // Cancel Reason Text Field
+                    OutlinedTextField(
+                        value = reasonText,
+                        onValueChange = { reasonText = it },
+                        label = { Text(text = stringResource(id = R.string.history_edit_reason_label)) },
+                        minLines = 3,
+                        maxLines = 5,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (isCompleted) {
+                        val parsedPrice = priceText.trim().replace(",", ".").toDoubleOrNull()
+                        if (priceText.trim().isNotEmpty() && parsedPrice == null) {
+                            priceError = invalidPriceMsg
+                        } else {
+                            onConfirm(parsedPrice, commentText, null)
+                        }
+                    } else {
+                        onConfirm(null, null, reasonText)
+                    }
+                }
+            ) {
+                Text(text = stringResource(id = android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(id = android.R.string.cancel))
+            }
+        }
+    )
 }
