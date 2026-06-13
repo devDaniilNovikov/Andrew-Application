@@ -57,31 +57,45 @@ When reviewing the code changes (git diff):
    - `recommendations`: A list of suggestions for improvement."""
 
 def get_git_diff():
-    try:
-        result = subprocess.run(
-            ["git", "diff", "origin/dev...HEAD"],
-            capture_output=True, text=True, check=True
-        )
-        if result.stdout.strip():
-            return result.stdout
-    except Exception:
-        pass
+    # Exclude non-source, binary, or unrelated files to reduce prompt size and avoid model formatting errors
+    exclusions = [
+        "--", ".",
+        ":(exclude)*.jar",
+        ":(exclude)gradlew*",
+        ":(exclude)dashboard.html",
+        ":(exclude)scripts/*",
+        ":(exclude).github/*",
+        ":(exclude).gitignore",
+        ":(exclude)evaluations.json",
+    ]
+    
+    base_ref = os.environ.get("GITHUB_BASE_REF")
+    if base_ref:
+        print(f"Detected GitHub Actions pull request. Base branch: {base_ref}")
+        for base in [f"origin/{base_ref}", base_ref]:
+            try:
+                cmd = ["git", "diff", f"{base}...HEAD"] + exclusions
+                print(f"Executing: {' '.join(cmd)}")
+                result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                if result.stdout.strip():
+                    return result.stdout
+            except Exception as e:
+                print(f"Warning: git diff with base '{base}' failed: {e}", file=sys.stderr)
+
+    # Standard fallbacks with exclusions
+    targets = ["origin/dev", "dev", "origin/main", "main"]
+    for target in targets:
+        try:
+            cmd = ["git", "diff", f"{target}...HEAD"] + exclusions
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            if result.stdout.strip():
+                return result.stdout
+        except Exception:
+            pass
 
     try:
-        result = subprocess.run(
-            ["git", "diff", "dev...HEAD"],
-            capture_output=True, text=True, check=True
-        )
-        if result.stdout.strip():
-            return result.stdout
-    except Exception:
-        pass
-
-    try:
-        result = subprocess.run(
-            ["git", "diff", "HEAD~1"],
-            capture_output=True, text=True, check=True
-        )
+        cmd = ["git", "diff", "HEAD~1"] + exclusions
+        result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return result.stdout
     except Exception:
         return ""
@@ -235,7 +249,53 @@ async def main():
         )
         
         response = await agent.chat(prompt)
+        
+        # Drain the stream to ensure it is completed and fetch raw text
+        raw_text = ""
+        try:
+            raw_text = await response.text()
+            print("\n" + "="*50)
+            print("--- RAW MODEL RESPONSE TEXT ---")
+            print(raw_text)
+            print("="*50 + "\n")
+        except Exception as e:
+            print(f"Warning: Failed to fetch response text: {e}", file=sys.stderr)
+
         review_data = await response.structured_output()
+        
+        # Fallback manual parser if SDK structured_output failed but we have raw JSON text
+        if not review_data and raw_text:
+            print("Warning: structured_output() returned None. Attempting manual JSON extraction from raw text...", file=sys.stderr)
+            import re
+            # Find JSON block (from first { to last })
+            match = re.search(r"(\{.*\})", raw_text, re.DOTALL)
+            if match:
+                try:
+                    review_data = json.loads(match.group(1))
+                    print(" Successfully extracted and parsed JSON from raw response text manually!", file=sys.stderr)
+                except Exception as je:
+                    print(f"Failed to parse extracted JSON manually: {je}", file=sys.stderr)
+            else:
+                # Let's search for json block markdown
+                match_md = re.search(r"```json\s*(.*?)\s*```", raw_text, re.DOTALL)
+                if match_md:
+                    try:
+                        review_data = json.loads(match_md.group(1))
+                        print(" Successfully extracted and parsed Markdown JSON block manually!", file=sys.stderr)
+                    except Exception as je:
+                        print(f"Failed to parse Markdown JSON block manually: {je}", file=sys.stderr)
+
+        # Print conversation steps diagnostics if it still fails
+        if not review_data:
+            print("\nConversation Steps Diagnostic Details:", file=sys.stderr)
+            for i, step in enumerate(agent.conversation._steps):
+                print(f"Step {i}: type={step.type}, status={step.status}, error='{step.error}'", file=sys.stderr)
+                if step.content:
+                    print(f"  Step content (first 200 chars): {step.content[:200]}...", file=sys.stderr)
+                if step.structured_output:
+                    print(f"  Step structured_output found! Using it as fallback.", file=sys.stderr)
+                    review_data = step.structured_output
+                    break
 
     if not review_data:
         print("Error: Failed to obtain structured output from the reviewer agent.", file=sys.stderr)
