@@ -37,8 +37,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.activity.SystemBarStyle
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import ru.andrew.application.ui.theme.AndrewApplicationTheme
 import ru.andrew.application.ui.theme.AppTheme
 import ru.andrew.application.ui.viewmodel.ThemeViewModel
@@ -47,10 +52,43 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        
+        val themeViewModel = ViewModelProvider(this, ThemeViewModel.Factory)[ThemeViewModel::class.java]
+        
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                themeViewModel.themeState.collect { theme ->
+                    val darkTheme = when (theme) {
+                        AppTheme.LIGHT -> false
+                        AppTheme.DARK -> true
+                        AppTheme.SYSTEM -> {
+                            val uiMode = resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK
+                            uiMode == android.content.res.Configuration.UI_MODE_NIGHT_YES
+                        }
+                    }
+                    
+                    if (darkTheme) {
+                        enableEdgeToEdge(
+                            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+                            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                        )
+                    } else {
+                        enableEdgeToEdge(
+                            statusBarStyle = SystemBarStyle.light(
+                                android.graphics.Color.TRANSPARENT,
+                                android.graphics.Color.TRANSPARENT
+                            ),
+                            navigationBarStyle = SystemBarStyle.light(
+                                android.graphics.Color.TRANSPARENT,
+                                android.graphics.Color.TRANSPARENT
+                            )
+                        )
+                    }
+                }
+            }
+        }
         
         setContent {
-            val themeViewModel: ThemeViewModel = viewModel(factory = ThemeViewModel.Factory)
             val currentTheme by themeViewModel.themeState.collectAsStateWithLifecycle()
             
             AndrewApplicationTheme(theme = currentTheme) {
