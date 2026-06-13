@@ -1,10 +1,9 @@
 package ru.andrew.application.data.repository
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import ru.andrew.application.ui.theme.AppTheme
 
 interface ThemeRepository {
-    val themeFlow: Flow<AppTheme>
-    fun getTheme(): AppTheme
+    val themeFlow: StateFlow<AppTheme>
     fun setTheme(theme: AppTheme)
 }
