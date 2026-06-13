@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import ru.andrew.application.data.entity.Request
 import ru.andrew.application.data.repository.RequestRepository
 import ru.andrew.application.domain.ActionType
@@ -33,7 +35,6 @@ data class CreateRequestUiState(
     val nextActionDateTime: LocalDateTime? = null,
     val comment: String = "",
     val error: UiText? = null,
-    val isSuccess: Boolean = false,
     val isLoading: Boolean = false
 )
 
@@ -43,6 +44,13 @@ data class CreateRequestUiState(
 class CreateRequestViewModel(
     private val requestRepository: RequestRepository
 ) : ViewModel() {
+
+    sealed interface CreateRequestEvent {
+        object NavigationSuccess : CreateRequestEvent
+    }
+
+    private val _eventChannel = Channel<CreateRequestEvent>(Channel.BUFFERED)
+    val events = _eventChannel.receiveAsFlow()
 
     private val _uiState = MutableStateFlow(CreateRequestUiState())
     val uiState: StateFlow<CreateRequestUiState> = _uiState.asStateFlow()
@@ -86,13 +94,6 @@ class CreateRequestViewModel(
         _uiState.value = CreateRequestUiState()
     }
 
-    /**
-     * Сбросить флаг успешного завершения.
-     */
-    fun resetSuccess() {
-        _uiState.update { it.copy(isSuccess = false) }
-    }
-
     private fun isValidPhoneNumber(phone: String): Boolean {
         val cleanPhone = phone.replace(Regex("[\\s\\-\\(\\)]"), "")
         val phoneRegex = "^\\+?\\d{7,15}$".toRegex()
@@ -124,11 +125,12 @@ class CreateRequestViewModel(
         viewModelScope.launch {
             try {
                 val now = LocalDateTime.now()
+                val cleanedPhone = currentState.phone.replace(Regex("[\\s\\-\\(\\)]"), "")
                 val newRequest = Request(
                     id = 0L, // Автогенерация ID в БД
                     title = currentState.title.trim(),
                     clientName = currentState.clientName.trim().takeIf { it.isNotEmpty() },
-                    phone = currentState.phone.trim(),
+                    phone = cleanedPhone,
                     address = currentState.address.trim().takeIf { it.isNotEmpty() },
                     equipmentType = currentState.equipmentType,
                     actionType = currentState.actionType,
@@ -140,9 +142,9 @@ class CreateRequestViewModel(
                 )
                 
                 requestRepository.createRequest(newRequest)
+                _eventChannel.send(CreateRequestEvent.NavigationSuccess)
                 _uiState.update { 
                     it.copy(
-                        isSuccess = true,
                         error = null
                     )
                 }

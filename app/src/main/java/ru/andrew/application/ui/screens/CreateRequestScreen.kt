@@ -22,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -54,6 +55,7 @@ fun CreateRequestScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
 
@@ -63,10 +65,11 @@ fun CreateRequestScreen(
     // Состояния для нативных пикеров Material 3
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     var showTimePicker by rememberSaveable { mutableStateOf(false) }
+    var dialogSessionKey by rememberSaveable { mutableStateOf(0) }
 
     // Инициализируем пикеры текущим временем по умолчанию (предотвращает null и сокращает клики).
-    // Обернуто в key(uiState.nextActionDateTime == null), чтобы при сбросе формы (clearForm) состояния пикеров также сбрасывались.
-    val (datePickerState, timePickerState) = key(uiState.nextActionDateTime == null) {
+    // Обернуто в key(dialogSessionKey, uiState.nextActionDateTime == null), чтобы при сбросе формы (clearForm) или открытии диалога состояния пикеров сбрасывались.
+    val (datePickerState, timePickerState) = key(dialogSessionKey, uiState.nextActionDateTime == null) {
         val dateState = rememberDatePickerState(
             initialSelectedDateMillis = uiState.nextActionDateTime
                 ?.atZone(ZoneOffset.UTC)
@@ -82,6 +85,7 @@ fun CreateRequestScreen(
     }
 
     val showDateTimePicker = {
+        dialogSessionKey++
         showDatePicker = true
     }
 
@@ -154,20 +158,20 @@ fun CreateRequestScreen(
         )
     }
 
-    LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) {
-            android.widget.Toast.makeText(context, R.string.create_success_message, android.widget.Toast.LENGTH_SHORT).show()
-            kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
-                navController.navigate(Screen.Active.route) {
-                    popUpTo(navController.graph.findStartDestination().id) {
-                        saveState = true
+    LaunchedEffect(Unit) {
+        viewModel.clearForm()
+        viewModel.events.collect { event ->
+            when (event) {
+                is CreateRequestViewModel.CreateRequestEvent.NavigationSuccess -> {
+                    android.widget.Toast.makeText(context.applicationContext, R.string.create_success_message, android.widget.Toast.LENGTH_SHORT).show()
+                    navController.navigate(Screen.Active.route) {
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
                     }
-                    launchSingleTop = true
-                    restoreState = true
                 }
-                kotlinx.coroutines.delay(500)
-                viewModel.clearForm()
-                viewModel.resetSuccess()
             }
         }
     }
@@ -434,7 +438,10 @@ fun CreateRequestScreen(
                 }
 
                 Button(
-                    onClick = { viewModel.saveRequest() },
+                    onClick = {
+                        keyboardController?.hide()
+                        viewModel.saveRequest()
+                    },
                     modifier = Modifier
                         .weight(1.3f)
                         .height(50.dp),
