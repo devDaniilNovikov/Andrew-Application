@@ -35,7 +35,7 @@ async def main():
     async with Agent(config=config) as agent:
         print("Sending message...")
         response = await agent.chat("Say 'Antigravity is online!' in Russian.")
-        print(f"Response: {response.text}")
+        print(f"Response: {await response.text()}")
 
 if __name__ == "__main__":
     asyncio.run(main())

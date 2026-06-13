@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 
 class ThemePreferences(context: Context) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.applicationContext.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
 
     fun getTheme(): AppTheme {
         val themeName = prefs.getString("selected_theme", AppTheme.SYSTEM.name) ?: AppTheme.SYSTEM.name

@@ -39,6 +39,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.andrew.application.ui.theme.AndrewApplicationTheme
 import ru.andrew.application.ui.theme.AppTheme
 import ru.andrew.application.ui.theme.ThemePreferences
@@ -51,7 +53,15 @@ class MainActivity : ComponentActivity() {
         themePreferences = ThemePreferences(this)
 
         setContent {
-            var currentTheme by remember { mutableStateOf(themePreferences.getTheme()) }
+            var currentTheme by remember { mutableStateOf(AppTheme.SYSTEM) }
+
+            LaunchedEffect(Unit) {
+                val savedTheme = withContext(Dispatchers.IO) {
+                    themePreferences.getTheme()
+                }
+                currentTheme = savedTheme
+            }
+
             val darkTheme = when (currentTheme) {
                 AppTheme.LIGHT -> false
                 AppTheme.DARK -> true
@@ -118,7 +128,7 @@ private fun AppRoot(
             )
 
             Text(
-                text = "Выберите тему оформления",
+                text = stringResource(id = R.string.theme_selection_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f),
                 modifier = Modifier.padding(bottom = 16.dp)
@@ -139,9 +149,9 @@ private fun ThemeSelector(
     onThemeSelected: (AppTheme) -> Unit
 ) {
     val options = listOf(
-        ThemeOption(AppTheme.LIGHT, "☀️", "Светлая"),
-        ThemeOption(AppTheme.DARK, "🌙", "Темная"),
-        ThemeOption(AppTheme.SYSTEM, "⚙️", "Системная")
+        ThemeOption(AppTheme.LIGHT, "☀️", R.string.theme_light),
+        ThemeOption(AppTheme.DARK, "🌙", R.string.theme_dark),
+        ThemeOption(AppTheme.SYSTEM, "⚙️", R.string.theme_system)
     )
 
     Card(
@@ -219,7 +229,7 @@ private fun ThemeSelector(
                             modifier = Modifier.padding(bottom = 2.dp)
                         )
                         Text(
-                            text = option.title,
+                            text = stringResource(id = option.titleResId),
                             style = MaterialTheme.typography.labelMedium,
                             color = contentColor,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
@@ -234,5 +244,5 @@ private fun ThemeSelector(
 private data class ThemeOption(
     val theme: AppTheme,
     val icon: String,
-    val title: String
+    val titleResId: Int
 )
