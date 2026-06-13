@@ -16,6 +16,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.andrew.application.ui.components.RequestCard
 import ru.andrew.application.ui.viewmodel.ActiveRequestsUiState
 import ru.andrew.application.ui.viewmodel.ActiveRequestsViewModel
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import ru.andrew.application.ui.components.RequestDetailsBottomSheet
+import ru.andrew.application.data.entity.Request
 
 /**
  * Экран списка активных заявок.
@@ -26,6 +31,7 @@ fun ActiveRequestsScreen(
     viewModel: ActiveRequestsViewModel = viewModel(factory = ActiveRequestsViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var selectedRequest by remember { mutableStateOf<Request?>(null) }
 
     Scaffold(
         topBar = {
@@ -123,13 +129,26 @@ fun ActiveRequestsScreen(
                                 RequestCard(
                                     request = request,
                                     onClick = {
-                                        // Клик по карточке (будет обрабатываться на этапе 5)
+                                        selectedRequest = request
                                     }
                                 )
                             }
                         }
                     }
                 }
+            }
+
+            // Детальная карточка заявки в виде ModalBottomSheet
+            selectedRequest?.let { request ->
+                RequestDetailsBottomSheet(
+                    request = request,
+                    onDismissRequest = { selectedRequest = null },
+                    onCallClick = { /* Будет реализовано на этапе 5.2 */ },
+                    onEditClick = { /* Будет реализовано на этапе 5.3 */ },
+                    onRescheduleClick = { /* Будет реализовано на этапе 5.2 */ },
+                    onCompleteClick = { /* Будет реализовано на этапе 5.4 */ },
+                    onCancelClick = { /* Будет реализовано на этапе 5.4 */ }
+                )
             }
         }
     }
