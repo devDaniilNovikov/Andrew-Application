@@ -161,11 +161,10 @@ class CreateRequestViewModel(
                 try {
                     val existingRequest = requestRepository.getRequestByIdOneShot(editingRequestId!!)
                     if (existingRequest != null) {
-                        val cleanedPhone = currentState.phone.replace(Regex("[\\s\\-\\(\\)]"), "")
                         val updatedRequest = existingRequest.copy(
                             title = currentState.title.trim(),
                             clientName = currentState.clientName.trim().takeIf { it.isNotEmpty() },
-                            phone = cleanedPhone,
+                            phone = currentState.phone.trim(),
                             address = currentState.address.trim().takeIf { it.isNotEmpty() },
                             equipmentType = currentState.equipmentType,
                             actionType = currentState.actionType,
@@ -191,12 +190,11 @@ class CreateRequestViewModel(
         viewModelScope.launch {
             try {
                 val now = LocalDateTime.now()
-                val cleanedPhone = currentState.phone.replace(Regex("[\\s\\-\\(\\)]"), "")
                 val newRequest = Request(
                     id = 0L, // Автогенерация ID в БД
                     title = currentState.title.trim(),
                     clientName = currentState.clientName.trim().takeIf { it.isNotEmpty() },
-                    phone = cleanedPhone,
+                    phone = currentState.phone.trim(),
                     address = currentState.address.trim().takeIf { it.isNotEmpty() },
                     equipmentType = currentState.equipmentType,
                     actionType = currentState.actionType,
