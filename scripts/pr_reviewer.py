@@ -235,7 +235,7 @@ async def main():
 
     # 2. Configure the agent with structured response schema
     config = LocalAgentConfig(
-        model="gemini-2.5-flash",
+        model="gemini-3.1-pro-preview",
         system_instructions=SYSTEM_INSTRUCTIONS,
         workspaces=[workspace_dir],
         response_schema=PullRequestReview,

@@ -25,9 +25,9 @@ async def main():
 
     workspace_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     
-    print("Initializing test agent with model='gemini-2.5-flash'...")
+    print("Initializing test agent with model='gemini-3.1-pro-preview'...")
     config = LocalAgentConfig(
-        model="gemini-2.5-flash",
+        model="gemini-3.1-pro-preview",
         system_instructions="You are a helpful assistant.",
         workspaces=[workspace_dir],
     )
