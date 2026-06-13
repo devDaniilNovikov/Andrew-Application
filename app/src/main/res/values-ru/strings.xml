@@ -52,4 +52,7 @@
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Отмена</string>
     <string name="dialog_select_time">Выберите время</string>
+    <string name="edit_request_title">Редактирование заявки</string>
+    <string name="btn_save_changes">Сохранить изменения</string>
+    <string name="update_success_message">Изменения успешно сохранены!</string>
 </resources>

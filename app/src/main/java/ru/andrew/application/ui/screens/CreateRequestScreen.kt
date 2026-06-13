@@ -54,6 +54,7 @@ import androidx.compose.ui.text.input.KeyboardType
 @Composable
 fun CreateRequestScreen(
     navController: NavController,
+    requestId: Long = -1L,
     viewModel: CreateRequestViewModel = viewModel(factory = CreateRequestViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -61,6 +62,14 @@ fun CreateRequestScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
+
+    LaunchedEffect(requestId) {
+        if (requestId != -1L) {
+            viewModel.loadRequestForEditing(requestId)
+        } else {
+            viewModel.clearForm()
+        }
+    }
 
     var equipmentMenuExpanded by rememberSaveable { mutableStateOf(false) }
     var actionMenuExpanded by rememberSaveable { mutableStateOf(false) }
@@ -168,7 +177,8 @@ fun CreateRequestScreen(
             viewModel.events.collect { event ->
                 when (event) {
                     is CreateRequestViewModel.CreateRequestEvent.NavigationSuccess -> {
-                        android.widget.Toast.makeText(context.applicationContext, R.string.create_success_message, android.widget.Toast.LENGTH_SHORT).show()
+                        val messageResId = if (event.isEdit) R.string.update_success_message else R.string.create_success_message
+                        android.widget.Toast.makeText(context.applicationContext, messageResId, android.widget.Toast.LENGTH_SHORT).show()
                         navController.navigate(Screen.Active.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
@@ -187,7 +197,7 @@ fun CreateRequestScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = R.string.nav_create),
+                        text = stringResource(id = if (viewModel.editingRequestId != null) R.string.edit_request_title else R.string.nav_create),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
                     )
@@ -466,7 +476,11 @@ fun CreateRequestScreen(
                             contentDescription = null
                         )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(stringResource(id = R.string.btn_create))
+                        Text(
+                            stringResource(
+                                id = if (viewModel.editingRequestId != null) R.string.btn_save_changes else R.string.btn_create
+                            )
+                        )
                     }
                 }
             }

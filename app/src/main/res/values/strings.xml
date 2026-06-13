@@ -51,4 +51,7 @@
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_select_time">Select Time</string>
+    <string name="edit_request_title">Edit Request</string>
+    <string name="btn_save_changes">Save Changes</string>
+    <string name="update_success_message">Changes saved successfully!</string>
 </resources>

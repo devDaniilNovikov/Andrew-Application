@@ -12,7 +12,7 @@ sealed class Screen(
     val titleResId: Int,
     val icon: ImageVector
 ) {
-    object Create : Screen("create", R.string.nav_create, Icons.Default.Add)
+    object Create : Screen("create?requestId={requestId}", R.string.nav_create, Icons.Default.Add)
     object Active : Screen("active", R.string.nav_active, Icons.Default.List)
     object History : Screen("history", R.string.nav_history, Icons.Default.Refresh)
 }

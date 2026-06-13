@@ -12,10 +12,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import ru.andrew.application.ui.navigation.Screen
 import ru.andrew.application.ui.theme.AppTheme
 
@@ -39,11 +41,13 @@ fun MainScreen(
         bottomBar = {
             NavigationBar {
                 navigationItems.forEach { screen ->
-                    val isSelected = currentRoute == screen.route
+                    val isSelected = currentRoute?.substringBefore('?') == screen.route.substringBefore('?')
                     NavigationBarItem(
                         selected = isSelected,
                         onClick = {
-                            if (currentRoute != screen.route) {
+                            val baseRoute = screen.route.substringBefore('?')
+                            val currentBaseRoute = currentRoute?.substringBefore('?')
+                            if (currentBaseRoute != baseRoute) {
                                 navController.navigate(screen.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
                                         saveState = true
@@ -74,11 +78,20 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            composable(Screen.Create.route) {
-                CreateRequestScreen(navController = navController)
+            composable(
+                route = Screen.Create.route,
+                arguments = listOf(
+                    navArgument("requestId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    }
+                )
+            ) { backStackEntry ->
+                val requestId = backStackEntry.arguments?.getLong("requestId") ?: -1L
+                CreateRequestScreen(navController = navController, requestId = requestId)
             }
             composable(Screen.Active.route) {
-                ActiveRequestsScreen()
+                ActiveRequestsScreen(navController = navController)
             }
             composable(Screen.History.route) {
                 HistoryScreen(

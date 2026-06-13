@@ -26,6 +26,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
+import androidx.navigation.NavController
 
 /**
  * Экран списка активных заявок.
@@ -33,6 +34,7 @@ import java.time.ZoneOffset
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActiveRequestsScreen(
+    navController: NavController,
     viewModel: ActiveRequestsViewModel = viewModel(factory = ActiveRequestsViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -184,7 +186,10 @@ fun ActiveRequestsScreen(
                             Toast.makeText(context, "Номер телефона не указан", Toast.LENGTH_SHORT).show()
                         }
                     },
-                    onEditClick = { /* Будет реализовано на этапе 5.3 */ },
+                    onEditClick = {
+                        selectedRequest = null
+                        navController.navigate("create?requestId=${request.id}")
+                    },
                     onRescheduleClick = {
                         rescheduleTargetRequest = request
                         showDatePickerForReschedule = true

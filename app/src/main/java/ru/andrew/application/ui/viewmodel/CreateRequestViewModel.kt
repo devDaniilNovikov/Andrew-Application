@@ -46,7 +46,7 @@ class CreateRequestViewModel(
 ) : ViewModel() {
 
     sealed interface CreateRequestEvent {
-        object NavigationSuccess : CreateRequestEvent
+        data class NavigationSuccess(val isEdit: Boolean) : CreateRequestEvent
     }
 
     private val _eventChannel = Channel<CreateRequestEvent>(Channel.BUFFERED)
@@ -54,6 +54,39 @@ class CreateRequestViewModel(
 
     private val _uiState = MutableStateFlow(CreateRequestUiState())
     val uiState: StateFlow<CreateRequestUiState> = _uiState.asStateFlow()
+
+    var editingRequestId: Long? = null
+        private set
+
+    fun loadRequestForEditing(id: Long) {
+        if (editingRequestId == id) return
+        editingRequestId = id
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            try {
+                val request = requestRepository.getRequestByIdOneShot(id)
+                if (request != null) {
+                    _uiState.value = CreateRequestUiState(
+                        title = request.title,
+                        phone = request.phone,
+                        clientName = request.clientName ?: "",
+                        address = request.address ?: "",
+                        equipmentType = request.equipmentType,
+                        actionType = request.actionType,
+                        nextActionDateTime = request.nextActionDateTime,
+                        comment = request.comment ?: "",
+                        error = null,
+                        isLoading = false
+                    )
+                } else {
+                    _uiState.update { it.copy(isLoading = false, error = UiText.DynamicString("Заявка не найдена")) }
+                }
+            } catch (e: Exception) {
+                Log.e("CreateRequestViewModel", "Failed to load request for editing", e)
+                _uiState.update { it.copy(isLoading = false, error = UiText.DynamicString("Ошибка при загрузке заявки")) }
+            }
+        }
+    }
 
     fun updateTitle(title: String) {
         _uiState.update { it.copy(title = title, error = null) }
@@ -91,6 +124,7 @@ class CreateRequestViewModel(
      * Сбросить все поля формы в исходное состояние.
      */
     fun clearForm() {
+        editingRequestId = null
         _uiState.value = CreateRequestUiState()
     }
 
@@ -122,6 +156,38 @@ class CreateRequestViewModel(
 
         _uiState.update { it.copy(isLoading = true, error = null) }
 
+        if (editingRequestId != null) {
+            viewModelScope.launch {
+                try {
+                    val existingRequest = requestRepository.getRequestByIdOneShot(editingRequestId!!)
+                    if (existingRequest != null) {
+                        val cleanedPhone = currentState.phone.replace(Regex("[\\s\\-\\(\\)]"), "")
+                        val updatedRequest = existingRequest.copy(
+                            title = currentState.title.trim(),
+                            clientName = currentState.clientName.trim().takeIf { it.isNotEmpty() },
+                            phone = cleanedPhone,
+                            address = currentState.address.trim().takeIf { it.isNotEmpty() },
+                            equipmentType = currentState.equipmentType,
+                            actionType = currentState.actionType,
+                            nextActionDateTime = currentState.nextActionDateTime,
+                            comment = currentState.comment.trim().takeIf { it.isNotEmpty() }
+                        )
+                        requestRepository.updateRequest(updatedRequest)
+                        clearForm()
+                        _eventChannel.send(CreateRequestEvent.NavigationSuccess(isEdit = true))
+                    } else {
+                        _uiState.update { it.copy(error = UiText.DynamicString("Заявка для редактирования не найдена")) }
+                    }
+                } catch (e: Exception) {
+                    Log.e("CreateRequestViewModel", "Failed to update request", e)
+                    _uiState.update { it.copy(error = UiText.StringResource(R.string.create_db_error)) }
+                } finally {
+                    _uiState.update { it.copy(isLoading = false) }
+                }
+            }
+            return
+        }
+
         viewModelScope.launch {
             try {
                 val now = LocalDateTime.now()
@@ -143,7 +209,7 @@ class CreateRequestViewModel(
                 
                 requestRepository.createRequest(newRequest)
                 clearForm()
-                _eventChannel.send(CreateRequestEvent.NavigationSuccess)
+                _eventChannel.send(CreateRequestEvent.NavigationSuccess(isEdit = false))
                 _uiState.update { 
                     it.copy(
                         error = null
