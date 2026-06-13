@@ -74,7 +74,14 @@ def get_git_diff():
     base_ref = os.environ.get("GITHUB_BASE_REF")
     if base_ref:
         print(f"Detected GitHub Actions pull request. Base branch: {base_ref}")
-        for base in [f"origin/{base_ref}", base_ref]:
+        # Fetch the base branch from origin to ensure it exists locally in GHA environment
+        try:
+            print(f"Fetching base branch origin/{base_ref}...")
+            subprocess.run(["git", "fetch", "--depth=50", "origin", base_ref], capture_output=True, text=True)
+        except Exception as e:
+            print(f"Warning: git fetch for base_ref '{base_ref}' failed: {e}", file=sys.stderr)
+
+        for base in [f"origin/{base_ref}", "FETCH_HEAD", base_ref]:
             try:
                 cmd = ["git", "diff", f"{base}...HEAD"] + exclusions
                 print(f"Executing: {' '.join(cmd)}")
@@ -87,13 +94,21 @@ def get_git_diff():
     # Standard fallbacks with exclusions
     targets = ["origin/dev", "dev", "origin/main", "main"]
     for target in targets:
+        # Try to fetch origin branch before diffing
+        clean_target = target.replace("origin/", "")
         try:
-            cmd = ["git", "diff", f"{target}...HEAD"] + exclusions
-            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-            if result.stdout.strip():
-                return result.stdout
+            subprocess.run(["git", "fetch", "--depth=50", "origin", clean_target], capture_output=True, text=True)
         except Exception:
             pass
+
+        for ref in [target, f"origin/{clean_target}", "FETCH_HEAD"]:
+            try:
+                cmd = ["git", "diff", f"{ref}...HEAD"] + exclusions
+                result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+                if result.stdout.strip():
+                    return result.stdout
+            except Exception:
+                pass
 
     try:
         cmd = ["git", "diff", "HEAD~1"] + exclusions
