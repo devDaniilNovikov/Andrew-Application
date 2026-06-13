@@ -5,4 +5,28 @@
     <string name="theme_light">Светлая</string>
     <string name="theme_dark">Темная</string>
     <string name="theme_system">Системная</string>
+
+    <!-- RequestStatus -->
+    <string name="status_active">Активная</string>
+    <string name="status_completed">Выполнена</string>
+    <string name="status_cancelled">Отменена</string>
+
+    <!-- EquipmentType -->
+    <string name="equipment_domestic_refrigerator">бытовой холодильник</string>
+    <string name="equipment_commercial">торговое оборудование</string>
+    <string name="equipment_industrial">промышленное оборудование</string>
+    <string name="equipment_ice_generator">ледогенератор</string>
+    <string name="equipment_freezer_chamber">морозильная камера</string>
+    <string name="equipment_refrigerated_showcase">холодильная витрина</string>
+    <string name="equipment_split_system">сплит-система / кондиционер</string>
+    <string name="equipment_other">другое</string>
+
+    <!-- ActionType -->
+    <string name="action_call">позвонить</string>
+    <string name="action_visit">приехать</string>
+    <string name="action_diagnostics">диагностика</string>
+    <string name="action_repair">ремонт</string>
+    <string name="action_awaiting_parts">ожидание детали</string>
+    <string name="action_clarify_info">уточнить информацию</string>
+    <string name="action_other">другое</string>
 </resources>

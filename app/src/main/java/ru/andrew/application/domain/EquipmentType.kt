@@ -1,12 +1,15 @@
 package ru.andrew.application.domain
 
-enum class EquipmentType(val displayName: String) {
-    DOMESTIC_REFRIGERATOR("бытовой холодильник"),
-    COMMERCIAL_EQUIPMENT("торговое оборудование"),
-    INDUSTRIAL_EQUIPMENT("промышленное оборудование"),
-    ICE_GENERATOR("ледогенератор"),
-    FREEZER_CHAMBER("морозильная камера"),
-    REFRIGERATED_SHOWCASE("холодильная витрина"),
-    SPLIT_SYSTEM("сплит-система / кондиционер"),
-    OTHER("другое")
+import androidx.annotation.StringRes
+import ru.andrew.application.R
+
+enum class EquipmentType(@StringRes val displayNameResId: Int) {
+    DOMESTIC_REFRIGERATOR(R.string.equipment_domestic_refrigerator),
+    COMMERCIAL_EQUIPMENT(R.string.equipment_commercial),
+    INDUSTRIAL_EQUIPMENT(R.string.equipment_industrial),
+    ICE_GENERATOR(R.string.equipment_ice_generator),
+    FREEZER_CHAMBER(R.string.equipment_freezer_chamber),
+    REFRIGERATED_SHOWCASE(R.string.equipment_refrigerated_showcase),
+    SPLIT_SYSTEM(R.string.equipment_split_system),
+    OTHER(R.string.equipment_other)
 }
