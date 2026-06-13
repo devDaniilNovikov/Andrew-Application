@@ -139,9 +139,6 @@ fun AndrewApplicationTheme(
             val activity = view.context.findActivity()
             if (activity != null) {
                 val window = activity.window
-                window.statusBarColor = android.graphics.Color.TRANSPARENT
-                window.navigationBarColor = android.graphics.Color.TRANSPARENT
-                
                 val insetsController = WindowCompat.getInsetsController(window, view)
                 insetsController.isAppearanceLightStatusBars = !darkTheme
                 insetsController.isAppearanceLightNavigationBars = !darkTheme

@@ -10,4 +10,5 @@ externalNativeBuild/
 *.aab
 *.ap_
 *.dex
-
+.env
+evaluations.json

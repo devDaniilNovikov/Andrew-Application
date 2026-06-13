@@ -1,6 +1,7 @@
 package ru.andrew.application
 
 import android.os.Bundle
+import android.graphics.Color as AndroidColor
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -35,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,13 +53,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Initialize Edge-to-Edge once during Activity creation per standard Android guidelines
+        // Initialize Edge-to-Edge once during Activity creation per standard guidelines
         enableEdgeToEdge()
-
+        
         setContent {
             val themeViewModel: ThemeViewModel = viewModel(factory = ThemeViewModel.Factory)
             val currentTheme by themeViewModel.themeState.collectAsStateWithLifecycle()
-
+            
             AndrewApplicationTheme(theme = currentTheme) {
                 AppRoot(
                     currentTheme = currentTheme,
@@ -114,11 +117,13 @@ private fun ThemeSelector(
     currentTheme: AppTheme,
     onThemeSelected: (AppTheme) -> Unit
 ) {
-    val options = listOf(
-        ThemeOption(AppTheme.LIGHT, "☀️", R.string.theme_light),
-        ThemeOption(AppTheme.DARK, "🌙", R.string.theme_dark),
-        ThemeOption(AppTheme.SYSTEM, "⚙️", R.string.theme_system)
-    )
+    val options = remember {
+        listOf(
+            ThemeOption(AppTheme.LIGHT, "☀️", R.string.theme_light),
+            ThemeOption(AppTheme.DARK, "🌙", R.string.theme_dark),
+            ThemeOption(AppTheme.SYSTEM, "⚙️", R.string.theme_system)
+        )
+    }
 
     Card(
         modifier = Modifier
@@ -128,7 +133,7 @@ private fun ThemeSelector(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ),
-        border = androidx.compose.foundation.BorderStroke(
+        border = BorderStroke(
             1.dp,
             MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
         )
@@ -148,7 +153,7 @@ private fun ThemeSelector(
                     targetValue = if (isSelected) {
                         MaterialTheme.colorScheme.primary
                     } else {
-                        androidx.compose.ui.graphics.Color.Transparent
+                        Color.Transparent
                     },
                     animationSpec = tween(durationMillis = 300),
                     label = "bgColor"
