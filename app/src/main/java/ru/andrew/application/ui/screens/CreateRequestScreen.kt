@@ -57,8 +57,14 @@ fun CreateRequestScreen(
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     var showTimePicker by rememberSaveable { mutableStateOf(false) }
 
-    val datePickerState = rememberDatePickerState()
-    val timePickerState = rememberTimePickerState()
+    // Инициализируем пикеры текущим временем по умолчанию (предотвращает null и сокращает клики)
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = Instant.now().toEpochMilli()
+    )
+    val timePickerState = rememberTimePickerState(
+        initialHour = LocalDateTime.now().hour,
+        initialMinute = LocalDateTime.now().minute
+    )
 
     val showDateTimePicker = {
         showDatePicker = true
@@ -73,7 +79,8 @@ fun CreateRequestScreen(
                     onClick = {
                         showDatePicker = false
                         showTimePicker = true
-                    }
+                    },
+                    enabled = datePickerState.selectedDateMillis != null
                 ) {
                     Text("OK")
                 }
@@ -349,8 +356,12 @@ fun CreateRequestScreen(
             )
 
             // Сообщение об ошибке валидации
-            AnimatedVisibility(visible = uiState.errorMessage != null) {
-                uiState.errorMessage?.let { error ->
+            AnimatedVisibility(visible = uiState.error != null) {
+                uiState.error?.let { errorText ->
+                    val errorString = when (errorText) {
+                        is ru.andrew.application.ui.viewmodel.UiText.DynamicString -> errorText.value
+                        is ru.andrew.application.ui.viewmodel.UiText.StringResource -> stringResource(id = errorText.resId)
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -369,7 +380,7 @@ fun CreateRequestScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = error,
+                            text = errorString,
                             color = MaterialTheme.colorScheme.onErrorContainer,
                             style = MaterialTheme.typography.bodyMedium
                         )

@@ -18,6 +18,14 @@ import ru.andrew.application.di.DependencyProvider
 import java.time.LocalDateTime
 
 /**
+ * Обертка для поддержки локализованных строковых ресурсов и динамических строк во ViewModel.
+ */
+sealed class UiText {
+    data class DynamicString(val value: String) : UiText()
+    class StringResource(val resId: Int) : UiText()
+}
+
+/**
  * Состояние формы создания заявки.
  */
 data class CreateRequestUiState(
@@ -29,7 +37,7 @@ data class CreateRequestUiState(
     val actionType: ActionType = ActionType.OTHER,
     val nextActionDateTime: LocalDateTime? = null,
     val comment: String = "",
-    val errorMessage: String? = null,
+    val error: UiText? = null,
     val isSuccess: Boolean = false
 )
 
@@ -44,11 +52,11 @@ class CreateRequestViewModel(
     val uiState: StateFlow<CreateRequestUiState> = _uiState.asStateFlow()
 
     fun updateTitle(title: String) {
-        _uiState.update { it.copy(title = title, errorMessage = null) }
+        _uiState.update { it.copy(title = title, error = null) }
     }
 
     fun updatePhone(phone: String) {
-        _uiState.update { it.copy(phone = phone, errorMessage = null) }
+        _uiState.update { it.copy(phone = phone, error = null) }
     }
 
     fun updateClientName(clientName: String) {
@@ -68,7 +76,7 @@ class CreateRequestViewModel(
     }
 
     fun updateNextActionDateTime(dateTime: LocalDateTime?) {
-        _uiState.update { it.copy(nextActionDateTime = dateTime, errorMessage = null) }
+        _uiState.update { it.copy(nextActionDateTime = dateTime, error = null) }
     }
 
     fun updateComment(comment: String) {
@@ -109,7 +117,7 @@ class CreateRequestViewModel(
             currentState.nextActionDateTime == null
         ) {
             _uiState.update { 
-                it.copy(errorMessage = "Заполните название, телефон и дату следующего действия.") 
+                it.copy(error = UiText.StringResource(R.string.create_validation_error)) 
             }
             return
         }
@@ -133,12 +141,12 @@ class CreateRequestViewModel(
                 _uiState.update { 
                     it.copy(
                         isSuccess = true,
-                        errorMessage = null
+                        error = null
                     )
                 }
             } catch (e: Exception) {
                 _uiState.update { 
-                    it.copy(errorMessage = "Ошибка при сохранении заявки: ${e.localizedMessage}") 
+                    it.copy(error = UiText.DynamicString(e.localizedMessage ?: "Database error")) 
                 }
             }
         }
