@@ -1,19 +1,18 @@
 package ru.andrew.application.ui.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
+import androidx.lifecycle.viewmodel.CreationExtras
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.andrew.application.data.repository.ThemeRepository
-import ru.andrew.application.data.repository.ThemeRepositoryImpl
 import ru.andrew.application.ui.theme.AppTheme
+import ru.andrew.application.di.DependencyProvider
 
-class ThemeViewModel(application: Application) : AndroidViewModel(application) {
-    private val repository: ThemeRepository = ThemeRepositoryImpl(application)
+class ThemeViewModel(private val repository: ThemeRepository) : ViewModel() {
 
     val themeState: StateFlow<AppTheme> = repository.themeFlow
         .stateIn(
@@ -23,8 +22,19 @@ class ThemeViewModel(application: Application) : AndroidViewModel(application) {
         )
 
     fun selectTheme(theme: AppTheme) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             repository.setTheme(theme)
+        }
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                val application = checkNotNull(extras[ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY])
+                val repository = DependencyProvider.provideThemeRepository(application)
+                return ThemeViewModel(repository) as T
+            }
         }
     }
 }

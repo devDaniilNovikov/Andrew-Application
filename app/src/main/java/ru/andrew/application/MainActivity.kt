@@ -54,7 +54,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val themeViewModel: ThemeViewModel = viewModel()
+            val themeViewModel: ThemeViewModel = viewModel(factory = ThemeViewModel.Factory)
             val currentTheme by themeViewModel.themeState.collectAsStateWithLifecycle()
 
             AndrewApplicationTheme(theme = currentTheme) {

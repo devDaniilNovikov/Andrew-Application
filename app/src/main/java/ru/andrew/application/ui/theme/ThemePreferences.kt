@@ -2,6 +2,7 @@ package ru.andrew.application.ui.theme
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 class ThemePreferences(context: Context) {
     private val prefs: SharedPreferences = context.applicationContext.getSharedPreferences("theme_prefs", Context.MODE_PRIVATE)
@@ -16,6 +17,8 @@ class ThemePreferences(context: Context) {
     }
 
     fun setTheme(theme: AppTheme) {
-        prefs.edit().putString("selected_theme", theme.name).apply()
+        prefs.edit {
+            putString("selected_theme", theme.name)
+        }
     }
 }
