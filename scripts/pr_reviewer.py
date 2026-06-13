@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 # Bypasses local proxy routing for loopback websocket connections of the SDK
+# Triggering automated workflow runs on GitHub Actions
 os.environ["no_proxy"] = "localhost,127.0.0.1"
 
 import asyncio
