@@ -17,7 +17,7 @@
 ## Этап 1. Слой данных
 
 - [x] 1.1. Объявить enum’ы: `RequestStatus { ACTIVE, COMPLETED, CANCELLED }`, `EquipmentType`, `ActionType` (значения из PRD).
-- [ ] 1.2. Создать entity `Request` со всеми полями из PRD (`id`, `title`, `clientName`, `phone`, `address`, `equipmentType`, `actionType`, `nextActionDateTime`, `comment`, `status`, `finalPrice`, `finalComment`, `cancelReason`, `createdAt`, `updatedAt`, `closedAt`).
+- [x] 1.2. Создать entity `Request` со всеми полями из PRD (`id`, `title`, `clientName`, `phone`, `address`, `equipmentType`, `actionType`, `nextActionDateTime`, `comment`, `status`, `finalPrice`, `finalComment`, `cancelReason`, `createdAt`, `updatedAt`, `closedAt`).
 - [ ] 1.3. Написать `TypeConverters` для дат/времени и enum’ов.
 - [ ] 1.4. Создать `RequestDao`: вставка, обновление; поток активных `WHERE status = ACTIVE ORDER BY nextActionDateTime ASC`; поток истории `WHERE status != ACTIVE ORDER BY closedAt DESC`; вариант сортировки истории `ORDER BY status, closedAt DESC`; выборка по `id`.
 - [ ] 1.5. Создать `AppDatabase` (RoomDatabase) и предоставить singleton-инстанс.
