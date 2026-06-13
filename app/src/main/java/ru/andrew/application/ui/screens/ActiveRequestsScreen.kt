@@ -31,6 +31,13 @@ import androidx.compose.ui.res.stringResource
 import ru.andrew.application.R
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.graphics.Color
+import kotlinx.coroutines.launch
 
 /**
  * Экран списка активных заявок.
@@ -44,6 +51,8 @@ fun ActiveRequestsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var selectedRequest by remember { mutableStateOf<Request?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     // Состояния для переноса даты/времени (Подэтап 5.2)
     var showDatePickerForReschedule by remember { mutableStateOf(false) }
@@ -84,7 +93,8 @@ fun ActiveRequestsScreen(
                     containerColor = MaterialTheme.colorScheme.background
                 )
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
         Box(
             modifier = Modifier
@@ -163,10 +173,78 @@ fun ActiveRequestsScreen(
                                 items = uiState.requests,
                                 key = { request -> request.id }
                             ) { request ->
-                                RequestCard(
-                                    request = request,
-                                    onClick = {
-                                        selectedRequest = request
+                                val dismissState = rememberSwipeToDismissBoxState(
+                                    confirmValueChange = { dismissValue ->
+                                        when (dismissValue) {
+                                            SwipeToDismissBoxValue.StartToEnd -> {
+                                                scope.launch {
+                                                    viewModel.completeRequest(request.id)
+                                                    val result = snackbarHostState.showSnackbar(
+                                                        message = "Заявка успешно выполнена!",
+                                                        actionLabel = "Отменить",
+                                                        duration = SnackbarDuration.Short
+                                                    )
+                                                    if (result == SnackbarResult.ActionPerformed) {
+                                                        viewModel.restoreRequest(request.id)
+                                                    }
+                                                }
+                                                true
+                                            }
+                                            SwipeToDismissBoxValue.EndToStart -> {
+                                                cancelTargetRequest = request
+                                                showCancelDialog = true
+                                                false // false snaps the card back to Settled, so it does not get stuck in swiped state
+                                            }
+                                            SwipeToDismissBoxValue.Settled -> false
+                                        }
+                                    }
+                                )
+
+                                SwipeToDismissBox(
+                                    state = dismissState,
+                                    backgroundContent = {
+                                        val color by animateColorAsState(
+                                            targetValue = when (dismissState.targetValue) {
+                                                SwipeToDismissBoxValue.StartToEnd -> Color(0xFF2E7D32) // Мягкий зеленый для выполнения
+                                                SwipeToDismissBoxValue.EndToStart -> Color(0xFFC62828) // Мягкий красный для отмены
+                                                SwipeToDismissBoxValue.Settled -> Color.Transparent
+                                            },
+                                            label = "dismissColor"
+                                        )
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(vertical = 6.dp, horizontal = 12.dp)
+                                                .background(color, shape = RoundedCornerShape(16.dp))
+                                                .padding(horizontal = 20.dp),
+                                            contentAlignment = when (dismissState.dismissDirection) {
+                                                SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
+                                                SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
+                                                else -> Alignment.Center
+                                            }
+                                        ) {
+                                            when (dismissState.dismissDirection) {
+                                                SwipeToDismissBoxValue.StartToEnd -> Icon(
+                                                    imageVector = Icons.Default.Check,
+                                                    contentDescription = "Выполнено",
+                                                    tint = Color.White
+                                                )
+                                                SwipeToDismissBoxValue.EndToStart -> Icon(
+                                                    imageVector = Icons.Default.Close,
+                                                    contentDescription = "Отменить",
+                                                    tint = Color.White
+                                                )
+                                                else -> {}
+                                            }
+                                        }
+                                    },
+                                    content = {
+                                        RequestCard(
+                                            request = request,
+                                            onClick = {
+                                                selectedRequest = request
+                                            }
+                                        )
                                     }
                                 )
                             }
@@ -203,9 +281,19 @@ fun ActiveRequestsScreen(
                         showDatePickerForReschedule = true
                     },
                     onCompleteClick = {
-                        viewModel.completeRequest(request.id)
+                        val targetId = request.id
+                        viewModel.completeRequest(targetId)
                         selectedRequest = null // Закрываем шторку деталей
-                        Toast.makeText(context, R.string.toast_request_completed, Toast.LENGTH_SHORT).show()
+                        scope.launch {
+                            val result = snackbarHostState.showSnackbar(
+                                message = "Заявка успешно выполнена!",
+                                actionLabel = "Отменить",
+                                duration = SnackbarDuration.Short
+                            )
+                            if (result == SnackbarResult.ActionPerformed) {
+                                viewModel.restoreRequest(targetId)
+                            }
+                        }
                     },
                     onCancelClick = {
                         cancelTargetRequest = request
@@ -310,10 +398,20 @@ fun ActiveRequestsScreen(
                                 }
                                 val comment = if (selectedReasonIndex == 3) null else customComment.trim().takeIf { it.isNotEmpty() }
                                 
-                                viewModel.cancelRequest(cancelTargetRequest!!.id, finalReason, comment)
+                                val targetId = cancelTargetRequest!!.id
+                                viewModel.cancelRequest(targetId, finalReason, comment)
                                 showCancelDialog = false
                                 selectedRequest = null // Закрываем шторку деталей
-                                Toast.makeText(context, R.string.toast_request_cancelled, Toast.LENGTH_SHORT).show()
+                                scope.launch {
+                                    val result = snackbarHostState.showSnackbar(
+                                        message = "Заявка отменена.",
+                                        actionLabel = "Отменить",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        viewModel.restoreRequest(targetId)
+                                    }
+                                }
                             },
                             enabled = isConfirmEnabled,
                             colors = ButtonDefaults.buttonColors(

@@ -63,6 +63,12 @@ class ActiveRequestsViewModel(
         }
     }
 
+    fun restoreRequest(requestId: Long) {
+        viewModelScope.launch {
+            requestRepository.restoreToActive(requestId)
+        }
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
