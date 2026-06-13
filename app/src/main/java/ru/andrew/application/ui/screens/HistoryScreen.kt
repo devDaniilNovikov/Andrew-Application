@@ -37,6 +37,7 @@ import ru.andrew.application.data.entity.Request
 import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.ui.theme.AppTheme
 import ru.andrew.application.ui.util.formatPhoneNumber
+import ru.andrew.application.ui.viewmodel.HistoryFilter
 import ru.andrew.application.ui.viewmodel.HistoryViewModel
 import java.time.format.DateTimeFormatter
 
@@ -48,6 +49,8 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = viewModel(factory = HistoryViewModel.Factory)
 ) {
     val historyRequests by viewModel.historyRequests.collectAsStateWithLifecycle()
+    val sortByStatus by viewModel.sortByStatus.collectAsStateWithLifecycle()
+    val filterMode by viewModel.filterMode.collectAsStateWithLifecycle()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
 
     Column(
@@ -68,6 +71,28 @@ fun HistoryScreen(
                 containerColor = MaterialTheme.colorScheme.background
             )
         )
+
+        // Filter and Sort Controls Block
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // Premium segmented control for sorting
+            HistorySortControl(
+                sortByStatus = sortByStatus,
+                onSortChanged = { viewModel.toggleSortByStatus(it) }
+            )
+
+            // Horizontal chips for filtering
+            HistoryFilterRow(
+                currentFilter = filterMode,
+                onFilterSelected = { viewModel.setFilterMode(it) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         if (historyRequests.isEmpty()) {
             // Beautiful Empty State
@@ -123,6 +148,155 @@ fun HistoryScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Premium segmented sort switcher (By Date / By Status) with smooth animations.
+ */
+@Composable
+fun HistorySortControl(
+    sortByStatus: Boolean,
+    onSortChanged: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+        ),
+        border = BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Option 1: By Date
+            val isDateSelected = !sortByStatus
+            val dateBgColor by animateColorAsState(
+                targetValue = if (isDateSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0f),
+                animationSpec = tween(250),
+                label = "dateBg"
+            )
+            val dateContentColor by animateColorAsState(
+                targetValue = if (isDateSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                animationSpec = tween(250),
+                label = "dateContent"
+            )
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(dateBgColor)
+                    .clickable { onSortChanged(false) }
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(id = R.string.history_sort_by_date),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = if (isDateSelected) FontWeight.Bold else FontWeight.Medium,
+                    color = dateContentColor
+                )
+            }
+
+            // Option 2: By Status
+            val isStatusSelected = sortByStatus
+            val statusBgColor by animateColorAsState(
+                targetValue = if (isStatusSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0f),
+                animationSpec = tween(250),
+                label = "statusBg"
+            )
+            val statusContentColor by animateColorAsState(
+                targetValue = if (isStatusSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
+                animationSpec = tween(250),
+                label = "statusContent"
+            )
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(statusBgColor)
+                    .clickable { onSortChanged(true) }
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(id = R.string.history_sort_by_status),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = if (isStatusSelected) FontWeight.Bold else FontWeight.Medium,
+                    color = statusContentColor
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Horizontal row of filter chips (All / Completed / Cancelled).
+ */
+@Composable
+fun HistoryFilterRow(
+    currentFilter: HistoryFilter,
+    onFilterSelected: (HistoryFilter) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        HistoryFilter.values().forEach { filter ->
+            val isSelected = currentFilter == filter
+            val chipBgColor by animateColorAsState(
+                targetValue = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+                animationSpec = tween(200),
+                label = "chipBg"
+            )
+            val chipContentColor by animateColorAsState(
+                targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                animationSpec = tween(200),
+                label = "chipContent"
+            )
+            val chipBorderColor by animateColorAsState(
+                targetValue = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                animationSpec = tween(200),
+                label = "chipBorder"
+            )
+
+            val textResId = when (filter) {
+                HistoryFilter.ALL -> R.string.history_filter_all
+                HistoryFilter.COMPLETED -> R.string.history_filter_completed
+                HistoryFilter.CANCELLED -> R.string.history_filter_cancelled
+            }
+
+            Surface(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onFilterSelected(filter) },
+                color = chipBgColor,
+                border = BorderStroke(1.dp, chipBorderColor),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = stringResource(id = textResId),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                    color = chipContentColor,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 10.dp)
+                )
             }
         }
     }
