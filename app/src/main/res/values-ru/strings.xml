@@ -95,4 +95,9 @@
     <string name="notification_channel_description">Напоминания о запланированных действиях и звонках клиентам</string>
     <string name="notification_today">Сегодня</string>
     <string name="notification_tomorrow">Завтра</string>
+
+    <!-- Stage 10: Import Contact -->
+    <string name="create_import_contact_desc">Выбрать контакт из адресной книги</string>
+    <string name="import_contact_success">Контакт успешно импортирован!</string>
+    <string name="import_contact_error_no_phone">У выбранного контакта нет номера телефона или имени.</string>
 </resources>

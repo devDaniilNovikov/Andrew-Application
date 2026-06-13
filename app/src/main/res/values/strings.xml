@@ -94,4 +94,9 @@
     <string name="notification_channel_description">Reminders for scheduled customer actions and calls</string>
     <string name="notification_today">Today</string>
     <string name="notification_tomorrow">Tomorrow</string>
+
+    <!-- Stage 10: Import Contact -->
+    <string name="create_import_contact_desc">Select contact from address book</string>
+    <string name="import_contact_success">Contact imported successfully!</string>
+    <string name="import_contact_error_no_phone">Selected contact has no phone number or name.</string>
 </resources>

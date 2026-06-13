@@ -1,5 +1,11 @@
 package ru.andrew.application.ui.screens
 
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.provider.ContactsContract
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +22,8 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.ContactPage
+import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -62,6 +70,69 @@ fun CreateRequestScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val scrollState = rememberScrollState()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
+
+    val contactPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val contactUri: Uri? = result.data?.data
+            if (contactUri != null) {
+                val projection = arrayOf(
+                    ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                    ContactsContract.CommonDataKinds.Phone.NUMBER
+                )
+                try {
+                    context.contentResolver.query(contactUri, projection, null, null, null)?.use { cursor ->
+                        if (cursor.moveToFirst()) {
+                            val nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+                            val phoneIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                            
+                            val name = if (nameIndex >= 0) cursor.getString(nameIndex) else null
+                            val phone = if (phoneIndex >= 0) cursor.getString(phoneIndex) else null
+                            
+                            if (!name.isNullOrBlank() || !phone.isNullOrBlank()) {
+                                if (!name.isNullOrBlank()) {
+                                    viewModel.updateClientName(name)
+                                }
+                                if (!phone.isNullOrBlank()) {
+                                    viewModel.updatePhone(phone)
+                                }
+                                android.widget.Toast.makeText(
+                                    context,
+                                    context.getString(R.string.import_contact_success),
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                android.widget.Toast.makeText(
+                                    context,
+                                    context.getString(R.string.import_contact_error_no_phone),
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        } else {
+                            android.widget.Toast.makeText(
+                                context,
+                                context.getString(R.string.import_contact_error_no_phone),
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } ?: run {
+                        android.widget.Toast.makeText(
+                            context,
+                            context.getString(R.string.import_contact_error_no_phone),
+                            android.widget.Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } catch (e: Exception) {
+                    android.widget.Toast.makeText(
+                        context,
+                        context.getString(R.string.import_contact_error_no_phone),
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
 
     LaunchedEffect(requestId) {
         if (requestId != -1L) {
@@ -266,6 +337,20 @@ fun CreateRequestScreen(
                         imageVector = Icons.Default.Person,
                         contentDescription = null
                     )
+                },
+                trailingIcon = {
+                    IconButton(
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                            contactPickerLauncher.launch(intent)
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ContactPage,
+                            contentDescription = stringResource(id = R.string.create_import_contact_desc),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             )
 
