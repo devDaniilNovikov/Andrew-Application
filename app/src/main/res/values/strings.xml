@@ -47,4 +47,7 @@
     <string name="create_success_message">Request created successfully!</string>
     <string name="btn_create">Create Request</string>
     <string name="btn_clear">Clear Form</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_select_time">Select Time</string>
 </resources>

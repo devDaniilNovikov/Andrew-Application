@@ -35,10 +35,16 @@ import ru.andrew.application.ui.extensions.displayNameResId
 import ru.andrew.application.ui.navigation.Screen
 import ru.andrew.application.ui.viewmodel.CreateRequestViewModel
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +65,7 @@ fun CreateRequestScreen(
 
     // Инициализируем пикеры текущим временем по умолчанию (предотвращает null и сокращает клики)
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = Instant.now().toEpochMilli()
+        initialSelectedDateMillis = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
     )
     val timePickerState = rememberTimePickerState(
         initialHour = LocalDateTime.now().hour,
@@ -82,12 +88,12 @@ fun CreateRequestScreen(
                     },
                     enabled = datePickerState.selectedDateMillis != null
                 ) {
-                    Text("OK")
+                    Text(stringResource(id = R.string.dialog_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Отмена")
+                    Text(stringResource(id = R.string.dialog_cancel))
                 }
             }
         ) {
@@ -114,17 +120,17 @@ fun CreateRequestScreen(
                         }
                     }
                 ) {
-                    Text("OK")
+                    Text(stringResource(id = R.string.dialog_ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showTimePicker = false }) {
-                    Text("Отмена")
+                    Text(stringResource(id = R.string.dialog_cancel))
                 }
             },
             title = {
                 Text(
-                    text = "Выберите время",
+                    text = stringResource(id = R.string.dialog_select_time),
                     style = MaterialTheme.typography.titleMedium
                 )
             },
@@ -174,6 +180,7 @@ fun CreateRequestScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .imePadding()
                 .verticalScroll(scrollState)
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -186,6 +193,7 @@ fun CreateRequestScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Info,
@@ -202,6 +210,7 @@ fun CreateRequestScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Phone,
@@ -218,6 +227,7 @@ fun CreateRequestScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Person,
@@ -234,6 +244,7 @@ fun CreateRequestScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Place,
@@ -309,34 +320,29 @@ fun CreateRequestScreen(
             }
 
             // Выбор даты и времени действия *
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showDateTimePicker() }
-            ) {
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = uiState.nextActionDateTime?.format(dateTimeFormatter) ?: "",
-                    onValueChange = {},
-                    readOnly = true,
-                    enabled = false,
-                    label = { Text(stringResource(id = R.string.create_date_time_label)) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.DateRange,
-                            contentDescription = null
-                        )
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        disabledBorderColor = MaterialTheme.colorScheme.outline,
-                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                )
+            val dateInteractionSource = remember { MutableInteractionSource() }
+            val isDatePressed by dateInteractionSource.collectIsPressedAsState()
+            LaunchedEffect(isDatePressed) {
+                if (isDatePressed) {
+                    showDateTimePicker()
+                }
             }
+
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = uiState.nextActionDateTime?.format(dateTimeFormatter) ?: "",
+                onValueChange = {},
+                readOnly = true,
+                interactionSource = dateInteractionSource,
+                label = { Text(stringResource(id = R.string.create_date_time_label)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = null
+                    )
+                },
+                shape = RoundedCornerShape(12.dp)
+            )
 
             // Комментарий
             OutlinedTextField(
@@ -400,6 +406,7 @@ fun CreateRequestScreen(
                     modifier = Modifier
                         .weight(1f)
                         .height(50.dp),
+                    enabled = !uiState.isLoading,
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
@@ -415,14 +422,23 @@ fun CreateRequestScreen(
                     modifier = Modifier
                         .weight(1.3f)
                         .height(50.dp),
+                    enabled = !uiState.isLoading,
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Create,
-                        contentDescription = null
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(stringResource(id = R.string.btn_create))
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            strokeWidth = 2.5.dp
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Create,
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(stringResource(id = R.string.btn_create))
+                    }
                 }
             }
         }

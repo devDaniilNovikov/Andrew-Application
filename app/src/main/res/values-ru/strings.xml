@@ -48,4 +48,7 @@
     <string name="create_success_message">Заявка успешно создана!</string>
     <string name="btn_create">Создать заявку</string>
     <string name="btn_clear">Очистить форму</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_select_time">Выберите время</string>
 </resources>

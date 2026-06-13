@@ -17,13 +17,13 @@ class Converters {
     @TypeConverter
     fun fromTimestamp(value: Long?): LocalDateTime? {
         return value?.let { 
-            LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneOffset.UTC) 
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault()) 
         }
     }
 
     @TypeConverter
     fun dateToTimestamp(date: LocalDateTime?): Long? {
-        return date?.toInstant(ZoneOffset.UTC)?.toEpochMilli()
+        return date?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
     }
 
     @TypeConverter

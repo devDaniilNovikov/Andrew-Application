@@ -38,7 +38,8 @@ data class CreateRequestUiState(
     val nextActionDateTime: LocalDateTime? = null,
     val comment: String = "",
     val error: UiText? = null,
-    val isSuccess: Boolean = false
+    val isSuccess: Boolean = false,
+    val isLoading: Boolean = false
 )
 
 /**
@@ -109,6 +110,7 @@ class CreateRequestViewModel(
      */
     fun saveRequest() {
         val currentState = _uiState.value
+        if (currentState.isLoading) return
         
         // Валидация полей согласно PRD (название, телефон, дата следующего действия)
         if (currentState.title.trim().isEmpty() || 
@@ -121,6 +123,8 @@ class CreateRequestViewModel(
             }
             return
         }
+
+        _uiState.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
             try {
@@ -148,6 +152,8 @@ class CreateRequestViewModel(
                 _uiState.update { 
                     it.copy(error = UiText.DynamicString(e.localizedMessage ?: "Database error")) 
                 }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
             }
         }
     }
