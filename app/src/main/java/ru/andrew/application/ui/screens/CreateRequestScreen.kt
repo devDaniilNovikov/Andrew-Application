@@ -34,14 +34,13 @@ import ru.andrew.application.domain.EquipmentType
 import ru.andrew.application.ui.extensions.displayNameResId
 import ru.andrew.application.ui.navigation.Screen
 import ru.andrew.application.ui.viewmodel.CreateRequestViewModel
+import ru.andrew.application.ui.utils.UiText
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -63,14 +62,18 @@ fun CreateRequestScreen(
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     var showTimePicker by rememberSaveable { mutableStateOf(false) }
 
-    // Инициализируем пикеры текущим временем по умолчанию (предотвращает null и сокращает клики)
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
-    )
-    val timePickerState = rememberTimePickerState(
-        initialHour = LocalDateTime.now().hour,
-        initialMinute = LocalDateTime.now().minute
-    )
+    // Инициализируем пикеры текущим временем по умолчанию (предотвращает null и сокращает клики).
+    // Обернуто в key(uiState.nextActionDateTime == null), чтобы при сбросе формы (clearForm) состояния пикеров также сбрасывались.
+    val (datePickerState, timePickerState) = key(uiState.nextActionDateTime == null) {
+        val dateState = rememberDatePickerState(
+            initialSelectedDateMillis = LocalDate.now().atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli()
+        )
+        val timeState = rememberTimePickerState(
+            initialHour = LocalDateTime.now().hour,
+            initialMinute = LocalDateTime.now().minute
+        )
+        Pair(dateState, timeState)
+    }
 
     val showDateTimePicker = {
         showDatePicker = true
@@ -320,29 +323,27 @@ fun CreateRequestScreen(
             }
 
             // Выбор даты и времени действия *
-            val dateInteractionSource = remember { MutableInteractionSource() }
-            val isDatePressed by dateInteractionSource.collectIsPressedAsState()
-            LaunchedEffect(isDatePressed) {
-                if (isDatePressed) {
-                    showDateTimePicker()
-                }
+            Box(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = uiState.nextActionDateTime?.format(dateTimeFormatter) ?: "",
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text(stringResource(id = R.string.create_date_time_label)) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = null
+                        )
+                    },
+                    shape = RoundedCornerShape(12.dp)
+                )
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable { showDateTimePicker() }
+                )
             }
-
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = uiState.nextActionDateTime?.format(dateTimeFormatter) ?: "",
-                onValueChange = {},
-                readOnly = true,
-                interactionSource = dateInteractionSource,
-                label = { Text(stringResource(id = R.string.create_date_time_label)) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = null
-                    )
-                },
-                shape = RoundedCornerShape(12.dp)
-            )
 
             // Комментарий
             OutlinedTextField(
@@ -361,12 +362,17 @@ fun CreateRequestScreen(
                 }
             )
 
-            // Сообщение об ошибке валидации
+            // Сообщение об ошибке валидации с кэшированием последнего значения для плавной анимации закрытия
+            var lastNonNullError by remember { mutableStateOf<UiText?>(null) }
+            if (uiState.error != null) {
+                lastNonNullError = uiState.error
+            }
+
             AnimatedVisibility(visible = uiState.error != null) {
-                uiState.error?.let { errorText ->
+                lastNonNullError?.let { errorText ->
                     val errorString = when (errorText) {
-                        is ru.andrew.application.ui.viewmodel.UiText.DynamicString -> errorText.value
-                        is ru.andrew.application.ui.viewmodel.UiText.StringResource -> stringResource(id = errorText.resId)
+                        is UiText.DynamicString -> errorText.value
+                        is UiText.StringResource -> stringResource(id = errorText.resId)
                     }
                     Row(
                         modifier = Modifier

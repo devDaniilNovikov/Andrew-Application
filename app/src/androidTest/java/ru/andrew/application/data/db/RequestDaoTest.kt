@@ -100,7 +100,7 @@ class RequestDaoTest {
         val updated = requestDao.getRequestByIdOneShot(42L)
         assertNotNull(updated)
         assertEquals(RequestStatus.COMPLETED, updated!!.status)
-        assertEquals(2500.0, updated.finalPrice)
+        assertEquals(2500.0, updated.finalPrice ?: 0.0, 0.001)
         assertEquals("Успешно заправлен фреон", updated.finalComment)
         assertNull(updated.cancelReason)
         assertEquals(closedAt, updated.closedAt)

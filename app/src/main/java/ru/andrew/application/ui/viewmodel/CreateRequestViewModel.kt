@@ -16,14 +16,7 @@ import ru.andrew.application.domain.EquipmentType
 import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.di.DependencyProvider
 import java.time.LocalDateTime
-
-/**
- * Обертка для поддержки локализованных строковых ресурсов и динамических строк во ViewModel.
- */
-sealed class UiText {
-    data class DynamicString(val value: String) : UiText()
-    class StringResource(val resId: Int) : UiText()
-}
+import ru.andrew.application.ui.utils.UiText
 
 /**
  * Состояние формы создания заявки.
