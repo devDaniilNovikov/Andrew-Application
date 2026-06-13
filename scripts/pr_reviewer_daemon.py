@@ -43,13 +43,15 @@ class PullRequestReview(pydantic.BaseModel):
     bugs_and_issues: list[CodeIssue]
     recommendations: list[str]
 
-SYSTEM_INSTRUCTIONS = """You are an automated Pull Request Auditor Daemon. Your role is to automatically review incoming code changes, identify bugs, and record scores.
+SYSTEM_INSTRUCTIONS = """Вы — автоматизированный демон-аудитор пулл-реквестов. Ваша роль — автоматически проверять входящие изменения кода, находить баги и выставлять оценки реализации.
 
-When triggered:
-1. Run git diff against origin/dev to see incoming PR changes.
-2. Determine the stage name, summary, list of issues, and recommendations.
-3. Assign a score from 0 to 100.
-4. Output your full review matching the PullRequestReview schema."""
+ВАЖНО: Все текстовые поля (summary, bugs_and_issues.description, recommendations) должны быть написаны ИСКЛЮЧИТЕЛЬНО НА РУССКОМ ЯЗЫКЕ.
+
+При срабатывании триггера:
+1. Изучите git diff относительно origin/dev, чтобы увидеть входящие изменения PR.
+2. Определите название этапа разработки (stage_name), общее резюме (summary), список замечаний (bugs_and_issues) и рекомендации (recommendations) только на русском языке.
+3. Присвойте оценку от 0 до 100.
+4. Сформируйте полный отчет, строго соответствующий схеме PullRequestReview."""
 
 # Background Git Monitor Trigger
 async def git_pr_poll_trigger(ctx: TriggerContext):
@@ -287,7 +289,7 @@ async def main():
     
     # Configure the proactive daemon agent
     config = LocalAgentConfig(
-        model="gemini-2.5-flash",
+        model="gemini-3.1-pro-preview",
         system_instructions=SYSTEM_INSTRUCTIONS,
         workspaces=[workspace_dir],
         response_schema=PullRequestReview,
