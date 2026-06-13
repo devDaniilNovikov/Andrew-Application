@@ -31,6 +31,9 @@ import ru.andrew.application.domain.EquipmentType
 import ru.andrew.application.ui.extensions.displayNameResId
 import ru.andrew.application.ui.theme.urgentOrange
 import java.time.format.DateTimeFormatter
+import ru.andrew.application.data.util.TimeProvider
+import ru.andrew.application.data.util.SystemTimeProvider
+import ru.andrew.application.ui.util.formatPhoneNumber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +45,8 @@ fun RequestDetailsBottomSheet(
     onRescheduleClick: () -> Unit = {},
     onCompleteClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
-    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+    timeProvider: TimeProvider = SystemTimeProvider()
 ) {
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
     val formattedDateTime = remember(request.nextActionDateTime) {
@@ -51,7 +55,7 @@ fun RequestDetailsBottomSheet(
 
     val urgencyStatus = remember(request.nextActionDateTime) {
         val nextAction = request.nextActionDateTime
-        val now = java.time.LocalDateTime.now()
+        val now = timeProvider.getNow()
         when {
             nextAction == null -> UrgencyStatus.FUTURE
             nextAction.isBefore(now) -> UrgencyStatus.OVERDUE
@@ -61,9 +65,9 @@ fun RequestDetailsBottomSheet(
     }
 
     val (urgencyColor, urgencyLabel) = when (urgencyStatus) {
-        UrgencyStatus.OVERDUE -> MaterialTheme.colorScheme.error to "Просрочено"
-        UrgencyStatus.TODAY -> MaterialTheme.colorScheme.urgentOrange to "Сегодня"
-        UrgencyStatus.FUTURE -> MaterialTheme.colorScheme.primary to "Запланировано"
+        UrgencyStatus.OVERDUE -> MaterialTheme.colorScheme.error to stringResource(R.string.urgency_overdue)
+        UrgencyStatus.TODAY -> MaterialTheme.colorScheme.urgentOrange to stringResource(R.string.urgency_today)
+        UrgencyStatus.FUTURE -> MaterialTheme.colorScheme.primary to stringResource(R.string.urgency_planned)
     }
 
     ModalBottomSheet(
@@ -386,7 +390,7 @@ fun RequestDetailsBottomSheet(
                     contentPadding = PaddingValues(vertical = 14.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text(text = "Отменить", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.btn_cancel_action), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
             }
 
