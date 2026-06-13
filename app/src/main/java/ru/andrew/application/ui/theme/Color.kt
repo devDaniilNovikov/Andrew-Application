@@ -49,6 +49,7 @@ internal val AppSurfaceContainerHigh = Color(0xFFE6EEEB)
 internal val AppSurfaceContainerHighest = Color(0xFFDEE8E5)
 internal val AppSurfaceDim = Color(0xFFD8E2DF)
 internal val AppSurfaceBright = Color(0xFFFAFCFB)
+internal val UrgentOrange = Color(0xFFD65A00) // Оранжевый индикатор срочности ("Сегодня") для светлой темы
 
 // Premium Dark Theme Color Tokens (Изумрудно-хвойная палитра со светлым бирюзовым акцентом)
 internal val DarkAppBackground = Color(0xFF0B1513) // очень темный изумрудно-хвойный
@@ -85,4 +86,5 @@ internal val DarkAppSurfaceContainerHigh = Color(0xFF1F3230)
 internal val DarkAppSurfaceContainerHighest = Color(0xFF2A3D3A)
 internal val DarkAppSurfaceDim = Color(0xFF111D1B)
 internal val DarkAppSurfaceBright = Color(0xFF152523)
+internal val DarkUrgentOrange = Color(0xFFFFB066) // Оранжевый индикатор срочности ("Сегодня") для темной темы
 

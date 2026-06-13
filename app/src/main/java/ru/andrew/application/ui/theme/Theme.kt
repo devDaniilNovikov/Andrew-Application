@@ -133,3 +133,11 @@ fun AndrewApplicationTheme(
         content = content
     )
 }
+
+/**
+ * Пользовательское расширение для получения оранжевого индикатора срочности ("Сегодня")
+ * в зависимости от активной темы оформления.
+ */
+val androidx.compose.material3.ColorScheme.urgentOrange: androidx.compose.ui.graphics.Color
+    get() = if (this.error == DarkAppError) DarkUrgentOrange else UrgentOrange
+
