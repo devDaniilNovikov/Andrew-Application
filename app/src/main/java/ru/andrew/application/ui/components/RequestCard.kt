@@ -1,5 +1,6 @@
 package ru.andrew.application.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -20,8 +22,18 @@ import androidx.compose.ui.unit.dp
 import ru.andrew.application.R
 import ru.andrew.application.data.entity.Request
 import ru.andrew.application.ui.extensions.displayNameResId
+import ru.andrew.application.ui.theme.urgentOrange
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+
+/**
+ * Статусы срочности заявки.
+ */
+enum class UrgencyStatus {
+    OVERDUE, // Просрочено (красный)
+    TODAY,   // Сегодня (оранжевый)
+    FUTURE   // Будущее (нейтральный/первичный)
+}
 
 /**
  * Вспомогательная функция для красивого форматирования номера телефона.
@@ -41,7 +53,7 @@ fun formatPhoneNumber(phone: String): String {
 }
 
 /**
- * Премиальный компонент карточки заявки для отображения в списке.
+ * Премиальный компонент карточки заявки с адаптивной цветовой индикацией срочности.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +67,46 @@ fun RequestCard(
         request.nextActionDateTime?.format(dateTimeFormatter) ?: ""
     }
 
+    // Вычисление статуса срочности
+    val urgencyStatus = remember(request.nextActionDateTime) {
+        val nextAction = request.nextActionDateTime
+        val now = LocalDateTime.now()
+        when {
+            nextAction == null -> UrgencyStatus.FUTURE
+            nextAction.isBefore(now) -> UrgencyStatus.OVERDUE
+            nextAction.toLocalDate().isEqual(now.toLocalDate()) -> UrgencyStatus.TODAY
+            else -> UrgencyStatus.FUTURE
+        }
+    }
+
+    // Определение цветовой схемы в зависимости от срочности
+    val (cardBorderColor, dateContainerColor, dateContentColor, dateBadgeText) = when (urgencyStatus) {
+        UrgencyStatus.OVERDUE -> {
+            Quadruple(
+                MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
+                MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f),
+                MaterialTheme.colorScheme.error,
+                "Просрочено"
+            )
+        }
+        UrgencyStatus.TODAY -> {
+            Quadruple(
+                MaterialTheme.colorScheme.urgentOrange.copy(alpha = 0.6f),
+                MaterialTheme.colorScheme.urgentOrange.copy(alpha = 0.12f),
+                MaterialTheme.colorScheme.urgentOrange,
+                "Сегодня"
+            )
+        }
+        UrgencyStatus.FUTURE -> {
+            Quadruple(
+                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
+                MaterialTheme.colorScheme.primary,
+                "Запланировано"
+            )
+        }
+    }
+
     OutlinedCard(
         onClick = onClick,
         modifier = modifier
@@ -62,7 +114,8 @@ fun RequestCard(
             .padding(vertical = 6.dp, horizontal = 12.dp),
         shape = RoundedCornerShape(16.dp),
         border = CardDefaults.outlinedCardBorder().copy(
-            width = 1.dp
+            width = if (urgencyStatus != UrgencyStatus.FUTURE) 1.5.dp else 1.dp,
+            color = cardBorderColor
         ),
         colors = CardDefaults.outlinedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow
@@ -77,7 +130,7 @@ fun RequestCard(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = request.title,
@@ -158,24 +211,35 @@ fun RequestCard(
                 Spacer(modifier = Modifier.height(6.dp))
             }
 
-            // Дата и время следующего действия
+            // Премиальная плашка даты и времени с индикацией срочности
             if (formattedDateTime.isNotEmpty()) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(dateContainerColor)
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.DateRange,
                         contentDescription = "Дата следующего действия",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = dateContentColor,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = formattedDateTime,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium
+                        color = dateContentColor,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = dateBadgeText.uppercase(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = dateContentColor,
+                        fontWeight = FontWeight.Black
                     )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
@@ -244,3 +308,8 @@ fun RequestCard(
         }
     }
 }
+
+/**
+ * Вспомогательный кортеж для хранения четырех значений.
+ */
+data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)

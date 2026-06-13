@@ -83,20 +83,50 @@ fun ActiveRequestsScreen(
                     }
                 }
                 else -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(bottom = 16.dp)
-                    ) {
-                        items(
-                            items = uiState.requests,
-                            key = { request -> request.id }
-                        ) { request ->
-                            RequestCard(
-                                request = request,
-                                onClick = {
-                                    // Клик по карточке (будет обрабатываться на этапе 5)
-                                }
+                    if (uiState.requests.isEmpty()) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(32.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "📋",
+                                style = MaterialTheme.typography.displayLarge,
+                                modifier = Modifier.padding(bottom = 16.dp)
                             )
+                            Text(
+                                text = "Нет активных заявок",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Все задачи выполнены! Чтобы создать новую заявку, перейдите на вкладку «Создать» в нижнем меню.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(bottom = 16.dp)
+                        ) {
+                            items(
+                                items = uiState.requests,
+                                key = { request -> request.id }
+                            ) { request ->
+                                RequestCard(
+                                    request = request,
+                                    onClick = {
+                                        // Клик по карточке (будет обрабатываться на этапе 5)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
