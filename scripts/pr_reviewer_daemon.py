@@ -287,7 +287,7 @@ async def main():
     
     # Configure the proactive daemon agent
     config = LocalAgentConfig(
-        model="gemini-1.5-flash",
+        model="gemini-2.5-flash",
         system_instructions=SYSTEM_INSTRUCTIONS,
         workspaces=[workspace_dir],
         response_schema=PullRequestReview,
