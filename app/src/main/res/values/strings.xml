@@ -68,4 +68,24 @@
     <string name="urgency_today">Today</string>
     <string name="urgency_planned">Scheduled</string>
     <string name="btn_cancel_action">Cancel</string>
+
+    <!-- History Screen -->
+    <string name="history_title">History</string>
+    <string name="history_empty">No completed or cancelled requests yet.</string>
+    <string name="history_created_at">Created: %s</string>
+    <string name="history_closed_at">Closed: %s</string>
+    <string name="history_final_price">Cost: %s</string>
+    <string name="history_final_comment">Result: %s</string>
+    <string name="history_cancel_reason">Cancel reason: %s</string>
+    <string name="history_sort_title">Sort:</string>
+    <string name="history_sort_by_date">By Date</string>
+    <string name="history_sort_by_status">By Status</string>
+    <string name="history_filter_all">All</string>
+    <string name="history_filter_completed">Completed</string>
+    <string name="history_filter_cancelled">Cancelled</string>
+    <string name="history_edit_dialog_title">Edit Result</string>
+    <string name="history_edit_price_label">Final Price</string>
+    <string name="history_edit_comment_label">Final Comment</string>
+    <string name="history_edit_reason_label">Cancel Reason</string>
+    <string name="history_invalid_price_error">Invalid price format</string>
 </resources>
