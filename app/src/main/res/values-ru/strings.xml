@@ -89,4 +89,10 @@
     <string name="history_edit_comment_label">Итоговый комментарий</string>
     <string name="history_edit_reason_label">Причина отмены</string>
     <string name="history_invalid_price_error">Неверный формат цены</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Напоминания о действиях</string>
+    <string name="notification_channel_description">Напоминания о запланированных действиях и звонках клиентам</string>
+    <string name="notification_today">Сегодня</string>
+    <string name="notification_tomorrow">Завтра</string>
 </resources>
