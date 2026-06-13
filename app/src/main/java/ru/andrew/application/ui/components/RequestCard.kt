@@ -19,8 +19,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.BorderStroke
 import ru.andrew.application.R
 import ru.andrew.application.data.entity.Request
+import ru.andrew.application.domain.ActionType
+import ru.andrew.application.domain.EquipmentType
 import ru.andrew.application.ui.extensions.displayNameResId
 import ru.andrew.application.ui.theme.urgentOrange
 import java.time.LocalDateTime
@@ -113,7 +116,7 @@ fun RequestCard(
             .fillMaxWidth()
             .padding(vertical = 6.dp, horizontal = 12.dp),
         shape = RoundedCornerShape(16.dp),
-        border = CardDefaults.outlinedCardBorder().copy(
+        border = BorderStroke(
             width = if (urgencyStatus != UrgencyStatus.FUTURE) 1.5.dp else 1.dp,
             color = cardBorderColor
         ),
@@ -255,7 +258,7 @@ fun RequestCard(
                     onClick = {},
                     label = {
                         Text(
-                            text = stringResource(id = request.equipmentType.displayNameResId),
+                            text = stringResource(id = (request.equipmentType ?: EquipmentType.OTHER).displayNameResId),
                             style = MaterialTheme.typography.labelSmall
                         )
                     },
@@ -270,7 +273,7 @@ fun RequestCard(
                     onClick = {},
                     label = {
                         Text(
-                            text = stringResource(id = request.actionType.displayNameResId),
+                            text = stringResource(id = (request.actionType ?: ActionType.OTHER).displayNameResId),
                             style = MaterialTheme.typography.labelSmall
                         )
                     },

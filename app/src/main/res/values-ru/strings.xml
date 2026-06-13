@@ -55,4 +55,14 @@
     <string name="edit_request_title">Редактирование заявки</string>
     <string name="btn_save_changes">Сохранить изменения</string>
     <string name="update_success_message">Изменения успешно сохранены!</string>
+    <string name="cancel_dialog_title">Отмена заявки</string>
+    <string name="cancel_reason_client_refused">Клиент отказался</string>
+    <string name="cancel_reason_no_contact">Не удалось дозвониться</string>
+    <string name="cancel_reason_no_parts">Нет нужных деталей</string>
+    <string name="cancel_reason_other">Другое (укажите ниже)</string>
+    <string name="cancel_dialog_comment_placeholder">Опишите причину подробнее…</string>
+    <string name="cancel_dialog_confirm">Подтвердить отмену</string>
+    <string name="toast_request_completed">Заявка успешно выполнена!</string>
+    <string name="toast_request_cancelled">Заявка отменена.</string>
+    <string name="client_name_hint">Без имени</string>
 </resources>

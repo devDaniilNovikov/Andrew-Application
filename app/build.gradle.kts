@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
@@ -38,9 +37,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 
 dependencies {
@@ -56,6 +52,8 @@ dependencies {
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.material3)
+    implementation("androidx.compose.material:material-icons-core")
+    implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling.preview)
 

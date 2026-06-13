@@ -27,6 +27,10 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
 import androidx.navigation.NavController
+import androidx.compose.ui.res.stringResource
+import ru.andrew.application.R
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 
 /**
  * Экран списка активных заявок.
@@ -45,6 +49,10 @@ fun ActiveRequestsScreen(
     var showDatePickerForReschedule by remember { mutableStateOf(false) }
     var showTimePickerForReschedule by remember { mutableStateOf(false) }
     var rescheduleTargetRequest by remember { mutableStateOf<Request?>(null) }
+    
+    // Состояния для отмены заявки (Подэтап 5.4)
+    var showCancelDialog by remember { mutableStateOf(false) }
+    var cancelTargetRequest by remember { mutableStateOf<Request?>(null) }
 
     val (rescheduleDatePickerState, rescheduleTimePickerState) = key(rescheduleTargetRequest?.id) {
         val dateState = rememberDatePickerState(
@@ -194,8 +202,15 @@ fun ActiveRequestsScreen(
                         rescheduleTargetRequest = request
                         showDatePickerForReschedule = true
                     },
-                    onCompleteClick = { /* Будет реализовано на этапе 5.4 */ },
-                    onCancelClick = { /* Будет реализовано на этапе 5.4 */ }
+                    onCompleteClick = {
+                        viewModel.completeRequest(request.id)
+                        selectedRequest = null // Закрываем шторку деталей
+                        Toast.makeText(context, R.string.toast_request_completed, Toast.LENGTH_SHORT).show()
+                    },
+                    onCancelClick = {
+                        cancelTargetRequest = request
+                        showCancelDialog = true
+                    }
                 )
             }
 
@@ -266,6 +281,102 @@ fun ActiveRequestsScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             TimePicker(state = rescheduleTimePickerState)
+                        }
+                    }
+                )
+            }
+
+            // Диалог отмены заявки с выбором причин (Подэтап 5.4)
+            if (showCancelDialog && cancelTargetRequest != null) {
+                val presetReasons = listOf(
+                    stringResource(id = R.string.cancel_reason_client_refused),
+                    stringResource(id = R.string.cancel_reason_no_contact),
+                    stringResource(id = R.string.cancel_reason_no_parts),
+                    stringResource(id = R.string.cancel_reason_other)
+                )
+                var selectedReasonIndex by remember { mutableStateOf(0) }
+                var customComment by remember { mutableStateOf("") }
+
+                AlertDialog(
+                    onDismissRequest = { showCancelDialog = false },
+                    confirmButton = {
+                        val isConfirmEnabled = selectedReasonIndex != 3 || customComment.trim().isNotEmpty()
+                        Button(
+                            onClick = {
+                                val finalReason = if (selectedReasonIndex == 3) {
+                                    customComment.trim()
+                                } else {
+                                    presetReasons[selectedReasonIndex]
+                                }
+                                val comment = if (selectedReasonIndex == 3) null else customComment.trim().takeIf { it.isNotEmpty() }
+                                
+                                viewModel.cancelRequest(cancelTargetRequest!!.id, finalReason, comment)
+                                showCancelDialog = false
+                                selectedRequest = null // Закрываем шторку деталей
+                                Toast.makeText(context, R.string.toast_request_cancelled, Toast.LENGTH_SHORT).show()
+                            },
+                            enabled = isConfirmEnabled,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
+                            )
+                        ) {
+                            Text(stringResource(id = R.string.cancel_dialog_confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showCancelDialog = false }) {
+                            Text(stringResource(id = R.string.dialog_cancel))
+                        }
+                    },
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.cancel_dialog_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    text = {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            presetReasons.forEachIndexed { index, reason ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { selectedReasonIndex = index }
+                                        .padding(vertical = 4.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    RadioButton(
+                                        selected = selectedReasonIndex == index,
+                                        onClick = { selectedReasonIndex = index }
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(text = reason, style = MaterialTheme.typography.bodyLarge)
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            OutlinedTextField(
+                                value = customComment,
+                                onValueChange = { customComment = it },
+                                label = {
+                                    Text(
+                                        text = if (selectedReasonIndex == 3) {
+                                            "Укажите причину отмены *"
+                                        } else {
+                                            "Итоговый комментарий (необязательно)"
+                                        }
+                                    )
+                                },
+                                placeholder = { Text(stringResource(id = R.string.cancel_dialog_comment_placeholder)) },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                maxLines = 3
+                            )
                         }
                     }
                 )

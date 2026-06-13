@@ -54,4 +54,14 @@
     <string name="edit_request_title">Edit Request</string>
     <string name="btn_save_changes">Save Changes</string>
     <string name="update_success_message">Changes saved successfully!</string>
+    <string name="cancel_dialog_title">Cancel Request</string>
+    <string name="cancel_reason_client_refused">Client refused</string>
+    <string name="cancel_reason_no_contact">Couldn\'t reach client</string>
+    <string name="cancel_reason_no_parts">No required parts</string>
+    <string name="cancel_reason_other">Other (specify below)</string>
+    <string name="cancel_dialog_comment_placeholder">Provide reason details…</string>
+    <string name="cancel_dialog_confirm">Confirm Cancel</string>
+    <string name="toast_request_completed">Request completed successfully!</string>
+    <string name="toast_request_cancelled">Request cancelled.</string>
+    <string name="client_name_hint">No name</string>
 </resources>
