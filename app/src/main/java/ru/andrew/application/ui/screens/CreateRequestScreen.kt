@@ -157,16 +157,18 @@ fun CreateRequestScreen(
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
             android.widget.Toast.makeText(context, R.string.create_success_message, android.widget.Toast.LENGTH_SHORT).show()
-            navController.navigate(Screen.Active.route) {
-                popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
+            kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
+                navController.navigate(Screen.Active.route) {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
                 }
-                launchSingleTop = true
-                restoreState = true
+                kotlinx.coroutines.delay(500)
+                viewModel.clearForm()
+                viewModel.resetSuccess()
             }
-            kotlinx.coroutines.delay(500)
-            viewModel.clearForm()
-            viewModel.resetSuccess()
         }
     }
 
