@@ -26,6 +26,7 @@ import ru.andrew.application.domain.ActionType
 import ru.andrew.application.domain.EquipmentType
 import ru.andrew.application.ui.extensions.displayNameResId
 import ru.andrew.application.ui.theme.urgentOrange
+import ru.andrew.application.ui.util.formatPhoneNumber
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -36,23 +37,6 @@ enum class UrgencyStatus {
     OVERDUE, // Просрочено (красный)
     TODAY,   // Сегодня (оранжевый)
     FUTURE   // Будущее (нейтральный/первичный)
-}
-
-/**
- * Вспомогательная функция для красивого форматирования номера телефона.
- */
-fun formatPhoneNumber(phone: String): String {
-    val clean = phone.replace(Regex("[\\s\\-\\(\\)]"), "")
-    return when {
-        clean.length == 11 && (clean.startsWith("7") || clean.startsWith("8")) -> {
-            val prefix = if (clean.startsWith("7")) "+7" else "8"
-            "$prefix (${clean.substring(1, 4)}) ${clean.substring(4, 7)}-${clean.substring(7, 9)}-${clean.substring(9, 11)}"
-        }
-        clean.length == 12 && clean.startsWith("+7") -> {
-            "+7 (${clean.substring(2, 5)}) ${clean.substring(5, 8)}-${clean.substring(8, 10)}-${clean.substring(10, 12)}"
-        }
-        else -> phone
-    }
 }
 
 /**
@@ -89,7 +73,7 @@ fun RequestCard(
                 MaterialTheme.colorScheme.error.copy(alpha = 0.5f),
                 MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.25f),
                 MaterialTheme.colorScheme.error,
-                "Просрочено"
+                stringResource(R.string.urgency_overdue)
             )
         }
         UrgencyStatus.TODAY -> {
@@ -97,7 +81,7 @@ fun RequestCard(
                 MaterialTheme.colorScheme.urgentOrange.copy(alpha = 0.6f),
                 MaterialTheme.colorScheme.urgentOrange.copy(alpha = 0.12f),
                 MaterialTheme.colorScheme.urgentOrange,
-                "Сегодня"
+                stringResource(R.string.urgency_today)
             )
         }
         UrgencyStatus.FUTURE -> {
@@ -105,7 +89,7 @@ fun RequestCard(
                 MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
                 MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f),
                 MaterialTheme.colorScheme.primary,
-                "Запланировано"
+                stringResource(R.string.urgency_planned)
             )
         }
     }
