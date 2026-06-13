@@ -107,23 +107,61 @@ fun HistoryScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .padding(24.dp),
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterVertically)
             ) {
-                Text(
-                    text = "⏳",
-                    style = MaterialTheme.typography.displayMedium,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-                Text(
-                    text = stringResource(id = R.string.history_empty),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 24.dp)
-                )
-                Spacer(modifier = Modifier.height(48.dp))
+                Card(
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    ),
+                    border = BorderStroke(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 32.dp, horizontal = 24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(80.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
+                                    shape = RoundedCornerShape(20.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "⏳",
+                                style = MaterialTheme.typography.headlineLarge,
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            text = stringResource(id = R.string.history_empty),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(id = R.string.history_empty_desc),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
 
                 // Theme selector always accessible in empty state
                 ThemeSelectorCard(
@@ -217,7 +255,7 @@ fun HistorySortControl(
                     .clip(RoundedCornerShape(12.dp))
                     .background(dateBgColor)
                     .clickable { onSortChanged(false) }
-                    .padding(vertical = 10.dp),
+                    .heightIn(min = 48.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -247,7 +285,7 @@ fun HistorySortControl(
                     .clip(RoundedCornerShape(12.dp))
                     .background(statusBgColor)
                     .clickable { onSortChanged(true) }
-                    .padding(vertical = 10.dp),
+                    .heightIn(min = 48.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -303,19 +341,25 @@ fun HistoryFilterRow(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(12.dp))
-                    .clickable { onFilterSelected(filter) },
+                    .clickable { onFilterSelected(filter) }
+                    .heightIn(min = 48.dp),
                 color = chipBgColor,
                 border = BorderStroke(1.dp, chipBorderColor),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(
-                    text = stringResource(id = textResId),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                    color = chipContentColor,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 10.dp)
-                )
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(id = textResId),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = chipContentColor,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
+                    )
+                }
             }
         }
     }
@@ -434,7 +478,7 @@ fun HistoryRequestCard(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
             Spacer(modifier = Modifier.height(12.dp))
 
             // Dates Row (Created / Closed)

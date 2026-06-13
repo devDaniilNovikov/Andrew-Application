@@ -73,6 +73,9 @@
     <!-- History Screen -->
     <string name="history_title">История</string>
     <string name="history_empty">Нет выполненных или отмененных заявок.</string>
+    <string name="history_empty_desc">Здесь будут отображаться завершенные или отмененные заявки. Попробуйте выбрать другой фильтр или добавьте новую заявку.</string>
+    <string name="active_empty_title">Нет активных заявок</string>
+    <string name="active_empty_desc">Все задачи выполнены! Чтобы создать новую заявку, перейдите на вкладку «Создать» в нижнем меню.</string>
     <string name="history_created_at">Создана: %s</string>
     <string name="history_closed_at">Закрыта: %s</string>
     <string name="history_final_price">Стоимость: %s ₽</string>
