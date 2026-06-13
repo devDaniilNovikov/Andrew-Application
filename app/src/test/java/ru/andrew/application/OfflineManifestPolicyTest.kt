@@ -134,8 +134,7 @@ class OfflineManifestPolicyTest {
             "android.permission.CHANGE_WIFI_STATE",
             "android.permission.NEARBY_WIFI_DEVICES",
             "android.permission.CALL_PHONE",
-            "android.permission.READ_CONTACTS",
-            "android.permission.POST_NOTIFICATIONS"
+            "android.permission.READ_CONTACTS"
         )
     }
 }

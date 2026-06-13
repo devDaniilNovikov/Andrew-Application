@@ -9,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -18,14 +19,32 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
 import ru.andrew.application.ui.navigation.Screen
 import ru.andrew.application.ui.theme.AppTheme
 
 @Composable
 fun MainScreen(
     currentTheme: AppTheme,
-    onThemeSelected: (AppTheme) -> Unit
+    deepLinkRequestId: Long = -1L,
+    onThemeSelected: (AppTheme) -> Unit,
+    onDeepLinkHandled: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+            onResult = { _ -> }
+        )
+        LaunchedEffect(Unit) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -35,6 +54,19 @@ fun MainScreen(
         Screen.Active,
         Screen.History
     )
+
+    LaunchedEffect(deepLinkRequestId) {
+        if (deepLinkRequestId != -1L) {
+            navController.navigate("active?deepLinkRequestId=$deepLinkRequestId") {
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+            onDeepLinkHandled()
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -90,8 +122,20 @@ fun MainScreen(
                 val requestId = backStackEntry.arguments?.getLong("requestId") ?: -1L
                 CreateRequestScreen(navController = navController, requestId = requestId)
             }
-            composable(Screen.Active.route) {
-                ActiveRequestsScreen(navController = navController)
+            composable(
+                route = "active?deepLinkRequestId={deepLinkRequestId}",
+                arguments = listOf(
+                    navArgument("deepLinkRequestId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    }
+                )
+            ) { backStackEntry ->
+                val deepLinkRequestIdArg = backStackEntry.arguments?.getLong("deepLinkRequestId") ?: -1L
+                ActiveRequestsScreen(
+                    navController = navController,
+                    deepLinkRequestId = deepLinkRequestIdArg
+                )
             }
             composable(Screen.History.route) {
                 HistoryScreen(

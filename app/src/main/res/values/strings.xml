@@ -88,4 +88,10 @@
     <string name="history_edit_comment_label">Final Comment</string>
     <string name="history_edit_reason_label">Cancel Reason</string>
     <string name="history_invalid_price_error">Invalid price format</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Action Reminders</string>
+    <string name="notification_channel_description">Reminders for scheduled customer actions and calls</string>
+    <string name="notification_today">Today</string>
+    <string name="notification_tomorrow">Tomorrow</string>
 </resources>

@@ -47,11 +47,21 @@ import kotlinx.coroutines.launch
 @Composable
 fun ActiveRequestsScreen(
     navController: NavController,
+    deepLinkRequestId: Long = -1L,
     viewModel: ActiveRequestsViewModel = viewModel(factory = ActiveRequestsViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var selectedRequest by remember { mutableStateOf<Request?>(null) }
+
+    LaunchedEffect(uiState.requests, deepLinkRequestId) {
+        if (deepLinkRequestId != -1L && uiState.requests.isNotEmpty()) {
+            val matchingRequest = uiState.requests.find { it.id == deepLinkRequestId }
+            if (matchingRequest != null) {
+                selectedRequest = matchingRequest
+            }
+        }
+    }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val cancelActionLabel = stringResource(R.string.btn_cancel_action)
