@@ -22,7 +22,7 @@
 - [x] 1.4. Создать `RequestDao`: вставка, обновление; поток активных `WHERE status = ACTIVE ORDER BY nextActionDateTime ASC`; поток истории `WHERE status != ACTIVE ORDER BY closedAt DESC`; вариант сортировки истории `ORDER BY status, closedAt DESC`; выборка по `id`.
 - [x] 1.5. Создать `AppDatabase` (RoomDatabase) и предоставить singleton-инстанс.
 - [x] 1.6. Реализовать `RequestRepository` поверх Room DAO (создание, закрытие, отмена, undo).
-- [ ] 1.7. Тесты DAO: проверка сортировок активного списка и истории, смены статусов, заполнения `closedAt`/`updatedAt`.
+- [x] 1.7. Тесты DAO: проверка сортировок активного списка и истории, смены статусов, заполнения `closedAt`/`updatedAt`.
 
 ## Этап 2. Навигация и каркас экранов
 
