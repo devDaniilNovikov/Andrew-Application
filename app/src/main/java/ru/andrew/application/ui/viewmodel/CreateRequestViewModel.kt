@@ -17,6 +17,8 @@ import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.di.DependencyProvider
 import java.time.LocalDateTime
 import ru.andrew.application.ui.utils.UiText
+import ru.andrew.application.R
+import android.util.Log
 
 /**
  * Состояние формы создания заявки.
@@ -142,10 +144,9 @@ class CreateRequestViewModel(
                     )
                 }
             } catch (e: Exception) {
+                Log.e("CreateRequestViewModel", "Failed to save request", e)
                 _uiState.update { 
-                    val errorText = e.localizedMessage?.takeIf { it.isNotBlank() }?.let { UiText.DynamicString(it) }
-                        ?: UiText.StringResource(ru.andrew.application.R.string.create_db_error)
-                    it.copy(error = errorText) 
+                    it.copy(error = UiText.StringResource(R.string.create_db_error)) 
                 }
             } finally {
                 _uiState.update { it.copy(isLoading = false) }

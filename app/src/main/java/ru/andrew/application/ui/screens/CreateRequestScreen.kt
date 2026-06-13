@@ -55,8 +55,8 @@ fun CreateRequestScreen(
     val scrollState = rememberScrollState()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
 
-    var equipmentMenuExpanded by remember { mutableStateOf(false) }
-    var actionMenuExpanded by remember { mutableStateOf(false) }
+    var equipmentMenuExpanded by rememberSaveable { mutableStateOf(false) }
+    var actionMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
     // Состояния для нативных пикеров Material 3
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
