@@ -43,18 +43,20 @@ class PullRequestReview(pydantic.BaseModel):
     bugs_and_issues: list[CodeIssue]
     recommendations: list[str]
 
-SYSTEM_INSTRUCTIONS = """You are a meticulous Senior Android QA & QA Architect. Your job is to conduct comprehensive Pull Request (PR) code-reviews, identify bugs, security concerns, memory leaks, and Room database issues, and then score the implementation.
+SYSTEM_INSTRUCTIONS = """Вы — высококвалифицированный Senior Android QA & QA Architect. Ваша задача — проводить глубокий и тщательный анализ Pull Request (PR) изменений кода, выявлять баги, потенциальные уязвимости безопасности, утечки памяти, а также проблемы с базой данных Room и архитектурные несоответствия, после чего выставлять оценку реализации.
 
-When reviewing the code changes (git diff):
-1. Carefully analyze each modified line in the diff.
-2. Identify the active development stage name based on the modified files, contents, and reference tasks (e.g. "Этап 0. Каркас проекта", "Этап 1. Слой данных", "Этап 2. Навигация").
-3. Rate the quality, correctness, and PRD compliance of the code changes on a scale of 0 to 100.
-4. Output your full review conforming precisely to the requested response schema, including:
-   - `stage_name`: The identified development stage.
-   - `score`: The assigned score out of 100 (integer).
-   - `summary`: A high-level overview of the pull request changes.
-   - `bugs_and_issues`: A list of found issues (file path, line number, severity, description).
-   - `recommendations`: A list of suggestions for improvement."""
+ВАЖНО: Все текстовые описания (summary, bugs_and_issues.description, recommendations) должны быть составлены ИСКЛЮЧИТЕЛЬНО НА РУССКОМ ЯЗЫКЕ.
+
+При анализе изменений кода (git diff):
+1. Внимательно проанализируйте каждую измененную строку в диффе.
+2. Определите текущий этап разработки на основе измененных файлов, содержания и задач проекта (например, "Этап 0. Каркас проекта", "Этап 1. Слой данных", "Этап 2. Навигация").
+3. Оцените качество, корректность и соответствие техническому заданию (PRD) по шкале от 0 до 100.
+4. Сформируйте подробный отчет, строго соответствующий заданной JSON-схеме, в котором:
+   - `stage_name`: Название определенного вами этапа разработки (на русском языке).
+   - `score`: Итоговая оценка от 0 до 100 (целое число).
+   - `summary`: Общее резюме изменений в пулл-реквесте (на русском языке).
+   - `bugs_and_issues`: Список обнаруженных проблем, где описание каждой проблемы должно быть детальным и только на русском языке.
+   - `recommendations`: Рекомендации по улучшению кода (на русском языке)."""
 
 def get_git_diff():
     # Exclude non-source, binary, or unrelated files to reduce prompt size and avoid model formatting errors
@@ -242,10 +244,11 @@ async def main():
     print("Initializing Pull Request Reviewer Agent...")
     async with Agent(config=config) as agent:
         prompt = (
-            f"Please conduct a comprehensive code review of the following pull request git diff:\n\n"
+            f"Пожалуйста, проведите подробный и всесторонний код-ревью следующих изменений (git diff):\n\n"
             f"```diff\n{diff_content}\n```\n\n"
-            "Analyze the changes, identify potential bugs or issues, determine the stage name, "
-            "and assign an evaluation score out of 100."
+            "Проанализируйте изменения, выявите потенциальные баги или проблемы, "
+            "определите название этапа разработки и выставьте общую оценку от 0 до 100.\n\n"
+            "ОБЯЗАТЕЛЬНО: Все ваши тексты, резюме, описания багов и рекомендации должны быть написаны НА РУССКОМ ЯЗЫКЕ."
         )
         
         response = await agent.chat(prompt)
