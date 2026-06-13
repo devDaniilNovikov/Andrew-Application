@@ -28,5 +28,8 @@
     <string name="action_repair">Repair</string>
     <string name="action_awaiting_parts">Awaiting Parts</string>
     <string name="action_clarify_info">Clarify Information</string>
-    <string name="action_other">Other</string>
+    <!-- Navigation -->
+    <string name="nav_create">Create</string>
+    <string name="nav_active">Active</string>
+    <string name="nav_history">History</string>
 </resources>

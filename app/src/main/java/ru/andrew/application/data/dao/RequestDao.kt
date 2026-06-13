@@ -29,20 +29,24 @@ interface RequestDao {
     /**
      * Поток активных заявок. Сортировка от ближайших к дальним по времени следующего действия.
      */
-    @Query("SELECT * FROM requests WHERE status = 'ACTIVE' ORDER BY nextActionDateTime ASC")
-    fun getActiveRequests(): Flow<List<Request>>
+    @Query("SELECT * FROM requests WHERE status = :status ORDER BY nextActionDateTime ASC")
+    fun getActiveRequests(status: ru.andrew.application.domain.RequestStatus): Flow<List<Request>>
 
     /**
      * Поток истории заявок (выполненные и отмененные) с дефолтной сортировкой по дате закрытия (closedAt) по убыванию.
      */
-    @Query("SELECT * FROM requests WHERE status != 'ACTIVE' ORDER BY closedAt DESC")
-    fun getHistoryRequestsByClosedAt(): Flow<List<Request>>
+    @Query("SELECT * FROM requests WHERE status != :activeStatus ORDER BY closedAt DESC")
+    fun getHistoryRequestsByClosedAt(activeStatus: ru.andrew.application.domain.RequestStatus): Flow<List<Request>>
 
     /**
      * Поток истории заявок с сортировкой сначала по статусу, затем по дате закрытия (closedAt) по убыванию.
      */
-    @Query("SELECT * FROM requests WHERE status != 'ACTIVE' ORDER BY CASE WHEN status = 'COMPLETED' THEN 1 WHEN status = 'CANCELLED' THEN 2 ELSE 3 END ASC, closedAt DESC")
-    fun getHistoryRequestsByStatusAndClosedAt(): Flow<List<Request>>
+    @Query("SELECT * FROM requests WHERE status != :activeStatus ORDER BY CASE WHEN status = :completedStatus THEN 1 WHEN status = :cancelledStatus THEN 2 ELSE 3 END ASC, closedAt DESC")
+    fun getHistoryRequestsByStatusAndClosedAt(
+        activeStatus: ru.andrew.application.domain.RequestStatus,
+        completedStatus: ru.andrew.application.domain.RequestStatus,
+        cancelledStatus: ru.andrew.application.domain.RequestStatus
+    ): Flow<List<Request>>
 
     /**
      * Атомарный SQL-запрос для обновления статуса и результатов заявки в обход read-modify-write гонок.

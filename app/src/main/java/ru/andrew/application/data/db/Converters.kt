@@ -1,8 +1,9 @@
 package ru.andrew.application.data.db
 
 import androidx.room.TypeConverter
+import java.time.Instant
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.time.ZoneId
 import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.domain.EquipmentType
 import ru.andrew.application.domain.ActionType
@@ -11,16 +12,17 @@ import ru.andrew.application.domain.ActionType
  * Конвертеры типов Room для сериализации сложных объектов (дат и перечислений) в SQLite.
  */
 class Converters {
-    private val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
     @TypeConverter
-    fun fromTimestamp(value: String?): LocalDateTime? {
-        return value?.let { LocalDateTime.parse(it, formatter) }
+    fun fromTimestamp(value: Long?): LocalDateTime? {
+        return value?.let { 
+            LocalDateTime.ofInstant(Instant.ofEpochMilli(it), ZoneId.systemDefault()) 
+        }
     }
 
     @TypeConverter
-    fun dateToTimestamp(date: LocalDateTime?): String? {
-        return date?.format(formatter)
+    fun dateToTimestamp(date: LocalDateTime?): Long? {
+        return date?.atZone(ZoneId.systemDefault())?.toInstant()?.toEpochMilli()
     }
 
     @TypeConverter

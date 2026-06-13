@@ -16,20 +16,11 @@ class ThemeRepositoryImpl(
     context: Context
 ) : ThemeRepository {
     private val themePreferences = ThemePreferences(context)
-    private val _themeFlow = MutableStateFlow(AppTheme.SYSTEM)
+    private val _themeFlow = MutableStateFlow(themePreferences.getTheme())
     
     override val themeFlow: StateFlow<AppTheme> = _themeFlow.asStateFlow()
     
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-
-    init {
-        repositoryScope.launch {
-            val savedTheme = withContext(Dispatchers.IO) {
-                themePreferences.getTheme()
-            }
-            _themeFlow.value = savedTheme
-        }
-    }
 
     override fun setTheme(theme: AppTheme) {
         repositoryScope.launch {

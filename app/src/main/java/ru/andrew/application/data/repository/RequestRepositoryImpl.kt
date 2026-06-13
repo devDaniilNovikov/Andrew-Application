@@ -20,19 +20,23 @@ class RequestRepositoryImpl(
         return requestDao.getRequestById(id)
     }
 
-    override suspend fun getRequestByIdOneShot(id: Long): Request? = withContext(Dispatchers.IO) {
-        requestDao.getRequestByIdOneShot(id)
+    override suspend fun getRequestByIdOneShot(id: Long): Request? {
+        return requestDao.getRequestByIdOneShot(id)
     }
 
     override fun getActiveRequests(): Flow<List<Request>> {
-        return requestDao.getActiveRequests()
+        return requestDao.getActiveRequests(RequestStatus.ACTIVE)
     }
 
     override fun getHistoryRequests(sortByStatus: Boolean): Flow<List<Request>> {
         return if (sortByStatus) {
-            requestDao.getHistoryRequestsByStatusAndClosedAt()
+            requestDao.getHistoryRequestsByStatusAndClosedAt(
+                activeStatus = RequestStatus.ACTIVE,
+                completedStatus = RequestStatus.COMPLETED,
+                cancelledStatus = RequestStatus.CANCELLED
+            )
         } else {
-            requestDao.getHistoryRequestsByClosedAt()
+            requestDao.getHistoryRequestsByClosedAt(RequestStatus.ACTIVE)
         }
     }
 
