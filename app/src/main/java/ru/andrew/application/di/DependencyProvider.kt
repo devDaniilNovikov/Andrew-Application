@@ -48,5 +48,9 @@ object DependencyProvider {
             }
         }
     }
+
+    fun provideTimeProvider(): TimeProvider {
+        return timeProvider
+    }
 }
 
