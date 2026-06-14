@@ -67,13 +67,18 @@ object NotificationHelper {
         // Форматируем время выполнения напоминания
         val formattedTime = formatNotificationDateTime(context, request.nextActionDateTime)
         
-        // Формируем текст уведомления: время следующего действия и телефон клиента
-        val contentText = "$formattedTime\n${request.phone}"
+        // Маскируем номер телефона клиента для защиты персональных данных (PII)
+        val maskedPhone = maskPhoneNumber(request.phone)
+        val contentText = "$formattedTime\n$maskedPhone"
 
-        // Настраиваем Intent для запуска MainActivity с передачей ID заявки для глубокой ссылки
+        // Генерируем одноразовый криптографический токен безопасности для защиты от Intent Redirection
+        val token = SecureTokenManager.generateAndSaveToken(request.id)
+
+        // Настраиваем Intent для запуска MainActivity с передачей ID заявки и защитного токена
         val intent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             putExtra("requestId", request.id)
+            putExtra("secure_token", token)
         }
         
         // Создаем PendingIntent для обработки тапа по уведомлению
@@ -92,12 +97,27 @@ object NotificationHelper {
             .setStyle(NotificationCompat.BigTextStyle().bigText(contentText))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setVisibility(NotificationCompat.VISIBILITY_PRIVATE) // Скрывать подробности на экране блокировки
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
             .build()
 
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(request.id.toInt(), notification)
+    }
+
+    /**
+     * Маскирует номер телефона (например, +7 (999) 123-45-67 -> +7 (999) ***-45-67) для защиты PII.
+     */
+    private fun maskPhoneNumber(phone: String): String {
+        val trimmed = phone.trim()
+        return if (trimmed.length >= 7) {
+            val start = trimmed.length - 7
+            val end = trimmed.length - 4
+            trimmed.substring(0, start) + "***" + trimmed.substring(end)
+        } else {
+            trimmed
+        }
     }
 
     /**
