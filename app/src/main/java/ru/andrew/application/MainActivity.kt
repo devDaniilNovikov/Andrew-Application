@@ -44,15 +44,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.mutableStateOf
 import ru.andrew.application.ui.theme.AndrewApplicationTheme
 import ru.andrew.application.ui.theme.AppTheme
 import ru.andrew.application.ui.viewmodel.ThemeViewModel
 import ru.andrew.application.ui.screens.MainScreen
+import android.content.Intent
 
 class MainActivity : ComponentActivity() {
 
+    private val deepLinkRequestId = mutableStateOf(-1L)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        handleIntent(intent)
         
         val themeViewModel = ViewModelProvider(this, ThemeViewModel.Factory)[ThemeViewModel::class.java]
         
@@ -91,15 +97,33 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             val currentTheme by themeViewModel.themeState.collectAsStateWithLifecycle()
+            val deepLinkId by deepLinkRequestId
             
             AndrewApplicationTheme(theme = currentTheme) {
                 MainScreen(
                     currentTheme = currentTheme,
+                    deepLinkRequestId = deepLinkId,
                     onThemeSelected = { newTheme ->
                         themeViewModel.selectTheme(newTheme)
+                    },
+                    onDeepLinkHandled = {
+                        deepLinkRequestId.value = -1L
                     }
                 )
             }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        val requestId = intent?.getLongExtra("requestId", -1L) ?: -1L
+        if (requestId != -1L) {
+            deepLinkRequestId.value = requestId
+            intent?.removeExtra("requestId")
         }
     }
 }
