@@ -51,7 +51,7 @@ fun RequestCard(
 ) {
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
     val formattedDateTime = remember(request.nextActionDateTime) {
-        request.nextActionDateTime?.format(dateTimeFormatter) ?: ""
+        request.nextActionDateTime.format(dateTimeFormatter)
     }
 
     // Вычисление статуса срочности
@@ -59,7 +59,6 @@ fun RequestCard(
         val nextAction = request.nextActionDateTime
         val now = LocalDateTime.now()
         when {
-            nextAction == null -> UrgencyStatus.FUTURE
             nextAction.isBefore(now) -> UrgencyStatus.OVERDUE
             nextAction.toLocalDate().isEqual(now.toLocalDate()) -> UrgencyStatus.TODAY
             else -> UrgencyStatus.FUTURE
