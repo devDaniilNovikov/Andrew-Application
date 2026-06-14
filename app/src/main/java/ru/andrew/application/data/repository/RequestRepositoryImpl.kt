@@ -128,5 +128,13 @@ class RequestRepositoryImpl(
             updatedAt = now
         )
     }
+
+    override fun getClosedRequestsInPeriod(start: LocalDateTime, end: LocalDateTime): Flow<List<Request>> {
+        return requestDao.getClosedRequestsInPeriod(start, end)
+    }
+
+    override fun getCreatedRequestsInPeriod(start: LocalDateTime, end: LocalDateTime): Flow<List<Request>> {
+        return requestDao.getCreatedRequestsInPeriod(start, end)
+    }
 }
 

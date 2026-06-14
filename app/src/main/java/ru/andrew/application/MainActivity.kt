@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
         val themeViewModel = ViewModelProvider(this, ThemeViewModel.Factory)[ThemeViewModel::class.java]
         
         setContent {
-            val currentTheme by themeViewModel.theme.collectAsStateWithLifecycle()
+            val currentTheme by themeViewModel.themeState.collectAsStateWithLifecycle()
             val deepLinkId by deepLinkRequestId
             val darkTheme = when (currentTheme) {
                 AppTheme.LIGHT -> false
