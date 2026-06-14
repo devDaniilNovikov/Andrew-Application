@@ -316,6 +316,9 @@ async def main():
                         print(f"  Step structured_output found! Using it as fallback.", file=sys.stderr)
                         review_data = step.structured_output
                         break
+
+        if not review_data:
+            raise ValueError("Agent chat succeeded but returned no structured output or valid steps.")
     except Exception as exc:
         print("\n" + "!"*60, file=sys.stderr)
         print(f"WARNING: Reviewer Agent execution failed: {exc}", file=sys.stderr)
