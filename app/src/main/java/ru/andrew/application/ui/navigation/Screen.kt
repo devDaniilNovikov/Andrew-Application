@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.TrendingUp
 import ru.andrew.application.R
 
 sealed class Screen(
@@ -15,4 +16,5 @@ sealed class Screen(
     object Create : Screen("create?requestId={requestId}", R.string.nav_create, Icons.Default.Add)
     object Active : Screen("active", R.string.nav_active, Icons.Default.List)
     object History : Screen("history", R.string.nav_history, Icons.Default.Refresh)
+    object Statistics : Screen("statistics", R.string.nav_statistics, Icons.Default.TrendingUp)
 }

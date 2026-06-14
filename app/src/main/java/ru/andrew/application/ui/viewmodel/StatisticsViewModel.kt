@@ -67,7 +67,10 @@ class StatisticsViewModel(
     private fun getEndOfPeriod(period: StatisticsPeriod, now: LocalDateTime): LocalDateTime {
         return when (period) {
             StatisticsPeriod.DAY -> now.toLocalDate().atTime(LocalTime.MAX)
-            StatisticsPeriod.WEEK -> now.toLocalDate().atTime(LocalTime.MAX)
+            StatisticsPeriod.WEEK -> {
+                val dayOfWeek = now.dayOfWeek.value
+                now.toLocalDate().plusDays((7 - dayOfWeek).toLong()).atTime(LocalTime.MAX)
+            }
             StatisticsPeriod.MONTH -> now.toLocalDate().withDayOfMonth(now.toLocalDate().lengthOfMonth()).atTime(LocalTime.MAX)
             StatisticsPeriod.YEAR -> now.toLocalDate().withMonth(12).withDayOfMonth(31).atTime(LocalTime.MAX)
         }

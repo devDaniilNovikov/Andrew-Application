@@ -52,7 +52,8 @@ fun MainScreen(
     val navigationItems = listOf(
         Screen.Create,
         Screen.Active,
-        Screen.History
+        Screen.History,
+        Screen.Statistics
     )
 
     LaunchedEffect(deepLinkRequestId) {
@@ -142,6 +143,9 @@ fun MainScreen(
                     currentTheme = currentTheme,
                     onThemeSelected = onThemeSelected
                 )
+            }
+            composable(Screen.Statistics.route) {
+                StatisticsScreen()
             }
         }
     }
