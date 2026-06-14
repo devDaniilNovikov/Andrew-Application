@@ -56,8 +56,9 @@ object DependencyProvider {
     fun provideRequestRepository(context: Context): RequestRepository {
         return requestRepository ?: synchronized(this) {
             requestRepository ?: RequestRepositoryImpl(
-                AppDatabase.getInstance(context.applicationContext).requestDao(),
-                timeProvider
+                requestDao = AppDatabase.getInstance(context.applicationContext).requestDao(),
+                notificationScheduler = provideNotificationScheduler(context),
+                timeProvider = timeProvider
             ).also {
                 requestRepository = it
             }

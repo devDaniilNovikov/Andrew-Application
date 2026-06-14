@@ -6,6 +6,7 @@ import ru.andrew.application.data.entity.Request
 import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.data.util.TimeProvider
 import ru.andrew.application.data.util.SystemTimeProvider
+import ru.andrew.application.notifications.NotificationScheduler
 import java.time.LocalDateTime
 
 /**
@@ -14,6 +15,7 @@ import java.time.LocalDateTime
  */
 class RequestRepositoryImpl(
     private val requestDao: RequestDao,
+    private val notificationScheduler: NotificationScheduler,
     private val timeProvider: TimeProvider = SystemTimeProvider()
 ) : RequestRepository {
 
@@ -49,7 +51,9 @@ class RequestRepositoryImpl(
             createdAt = now,
             updatedAt = now
         )
-        return requestDao.insertRequest(finalRequest)
+        val newId = requestDao.insertRequest(finalRequest)
+        notificationScheduler.scheduleNotification(finalRequest.copy(id = newId))
+        return newId
     }
 
     override suspend fun updateRequest(request: Request) {
@@ -57,6 +61,11 @@ class RequestRepositoryImpl(
             updatedAt = timeProvider.getNow()
         )
         requestDao.updateRequest(finalRequest)
+        if (finalRequest.status == RequestStatus.ACTIVE) {
+            notificationScheduler.scheduleNotification(finalRequest)
+        } else {
+            notificationScheduler.cancelNotification(finalRequest.id)
+        }
     }
 
     override suspend fun completeRequest(id: Long, finalPrice: Double?, finalComment: String?) {
@@ -70,6 +79,7 @@ class RequestRepositoryImpl(
             cancelReason = null,
             updatedAt = now
         )
+        notificationScheduler.cancelNotification(id)
     }
 
     override suspend fun cancelRequest(id: Long, cancelReason: String, finalComment: String?) {
@@ -83,6 +93,7 @@ class RequestRepositoryImpl(
             cancelReason = cancelReason,
             updatedAt = now
         )
+        notificationScheduler.cancelNotification(id)
     }
 
     override suspend fun restoreToActive(id: Long) {
@@ -96,6 +107,10 @@ class RequestRepositoryImpl(
             cancelReason = null,
             updatedAt = now
         )
+        val request = requestDao.getRequestByIdOneShot(id)
+        if (request != null) {
+            notificationScheduler.scheduleNotification(request)
+        }
     }
 
     override suspend fun updateRequestResults(
