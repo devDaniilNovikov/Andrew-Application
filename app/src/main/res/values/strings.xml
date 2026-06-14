@@ -72,6 +72,9 @@
     <!-- History Screen -->
     <string name="history_title">History</string>
     <string name="history_empty">No completed or cancelled requests yet.</string>
+    <string name="history_empty_desc">Here you will see completed or cancelled requests. Try choosing a different filter or create a new request first.</string>
+    <string name="active_empty_title">No active requests</string>
+    <string name="active_empty_desc">All tasks are completed! To create a new request, go to the \"Create\" tab in the bottom menu.</string>
     <string name="history_created_at">Created: %s</string>
     <string name="history_closed_at">Closed: %s</string>
     <string name="history_final_price">Cost: %s</string>
