@@ -103,4 +103,46 @@
     <string name="create_import_contact_desc">Выбрать контакт из адресной книги</string>
     <string name="import_contact_success">Контакт успешно импортирован!</string>
     <string name="import_contact_error_no_phone">У выбранного контакта нет номера телефона или имени.</string>
+
+    <!-- Statistics -->
+    <string name="nav_statistics">Статистика</string>
+    <string name="stats_revenue">Выручка</string>
+    <string name="stats_accepted">Принято</string>
+    <string name="stats_completed">Выполнено</string>
+    <string name="stats_cancelled">Отменено</string>
+    <string name="stats_efficiency">Эффективность работы</string>
+    <string name="stats_cancel_reasons">Причины отмен</string>
+    <string name="stats_period_day">День</string>
+    <string name="stats_period_week">Неделя</string>
+    <string name="stats_period_month">Месяц</string>
+    <string name="stats_period_year">Год</string>
+    <string name="stats_no_data">Нет данных за выбранный период</string>
+
+    <!-- UI Localization (Active Requests, Bottom Sheet, Cards) -->
+    <string name="details_active_badge">АКТИВНАЯ</string>
+    <string name="details_section_contact">Контактные данные</string>
+    <string name="details_section_address">Адрес проведения работ</string>
+    <string name="details_section_action">Детали запланированного действия</string>
+    <string name="details_section_comment">Комментарий к заявке</string>
+    <string name="btn_call">Позвонить</string>
+    <string name="btn_edit">Изменить</string>
+    <string name="btn_reschedule">Перенести</string>
+    <string name="btn_complete">Выполнено</string>
+    <string name="active_requests_title">Активные заявки</string>
+    <string name="active_error_loading">Ошибка при загрузке данных</string>
+    <string name="active_unknown_error">Неизвестная ошибка</string>
+    <string name="active_toast_dial_error">Не удалось открыть номеронабиратель</string>
+    <string name="active_toast_no_phone">Номер телефона не указан</string>
+    <string name="active_toast_rescheduled">Заявка успешно перенесена</string>
+    <string name="active_reschedule_time_title">Выберите время действия</string>
+    <string name="active_cancel_reason_required">Укажите причину отмены *</string>
+    <string name="active_cancel_optional_comment">Итоговый комментарий (необязательно)</string>
+
+    <!-- Accessibility / TalkBack -->
+    <string name="desc_client">Клиент</string>
+    <string name="desc_phone">Телефон</string>
+    <string name="desc_address">Адрес</string>
+    <string name="desc_next_action_date">Дата следующего действия</string>
+    <string name="desc_comment">Комментарий</string>
+    <string name="desc_close">Закрыть</string>
 </resources>
