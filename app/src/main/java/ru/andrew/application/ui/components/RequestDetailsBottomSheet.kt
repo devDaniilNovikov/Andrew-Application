@@ -140,7 +140,7 @@ fun RequestDetailsBottomSheet(
             }
 
             Spacer(modifier = Modifier.height(20.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
             Spacer(modifier = Modifier.height(16.dp))
 
             // Client Name & Phone
@@ -306,7 +306,7 @@ fun RequestDetailsBottomSheet(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
             Spacer(modifier = Modifier.height(20.dp))
 
             // Quick Actions: Позвонить, Изменить, Перенести

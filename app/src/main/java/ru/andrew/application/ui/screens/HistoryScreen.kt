@@ -478,7 +478,7 @@ fun HistoryRequestCard(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
             Spacer(modifier = Modifier.height(12.dp))
 
             // Dates Row (Created / Closed)
