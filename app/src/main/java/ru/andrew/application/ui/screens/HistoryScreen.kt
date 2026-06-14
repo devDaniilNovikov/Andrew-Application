@@ -217,7 +217,7 @@ fun HistorySortControl(
                     .clip(RoundedCornerShape(12.dp))
                     .background(dateBgColor)
                     .clickable { onSortChanged(false) }
-                    .padding(vertical = 10.dp),
+                    .heightIn(min = 48.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -247,7 +247,7 @@ fun HistorySortControl(
                     .clip(RoundedCornerShape(12.dp))
                     .background(statusBgColor)
                     .clickable { onSortChanged(true) }
-                    .padding(vertical = 10.dp),
+                    .heightIn(min = 48.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -303,19 +303,25 @@ fun HistoryFilterRow(
                 modifier = Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(12.dp))
-                    .clickable { onFilterSelected(filter) },
+                    .clickable { onFilterSelected(filter) }
+                    .heightIn(min = 48.dp),
                 color = chipBgColor,
                 border = BorderStroke(1.dp, chipBorderColor),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text(
-                    text = stringResource(id = textResId),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                    color = chipContentColor,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(vertical = 10.dp)
-                )
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(id = textResId),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = chipContentColor,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
+                    )
+                }
             }
         }
     }

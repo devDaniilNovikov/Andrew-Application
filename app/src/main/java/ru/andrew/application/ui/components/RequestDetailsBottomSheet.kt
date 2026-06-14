@@ -316,8 +316,10 @@ fun RequestDetailsBottomSheet(
             ) {
                 OutlinedButton(
                     onClick = onCallClick,
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(vertical = 12.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(50.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
@@ -331,8 +333,10 @@ fun RequestDetailsBottomSheet(
 
                 OutlinedButton(
                     onClick = onEditClick,
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(vertical = 12.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(50.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
@@ -346,8 +350,10 @@ fun RequestDetailsBottomSheet(
 
                 OutlinedButton(
                     onClick = onRescheduleClick,
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(vertical = 12.dp),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(50.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Icon(
@@ -369,12 +375,14 @@ fun RequestDetailsBottomSheet(
             ) {
                 Button(
                     onClick = onCompleteClick,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(50.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
-                    contentPadding = PaddingValues(vertical = 14.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(text = "Выполнено", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -382,12 +390,14 @@ fun RequestDetailsBottomSheet(
 
                 Button(
                     onClick = onCancelClick,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(50.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError
                     ),
-                    contentPadding = PaddingValues(vertical = 14.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Text(text = stringResource(R.string.btn_cancel_action), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)

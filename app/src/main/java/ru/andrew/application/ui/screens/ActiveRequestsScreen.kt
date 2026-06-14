@@ -456,7 +456,7 @@ fun ActiveRequestsScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable { selectedReasonIndex = index }
-                                        .padding(vertical = 4.dp),
+                                        .padding(vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     RadioButton(
