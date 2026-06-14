@@ -121,9 +121,15 @@ class MainActivity : ComponentActivity() {
 
     private fun handleIntent(intent: Intent?) {
         val requestId = intent?.getLongExtra("requestId", -1L) ?: -1L
+        val token = intent?.getStringExtra("secure_token")
+        
         if (requestId != -1L) {
-            deepLinkRequestId.value = requestId
+            // Валидируем одноразовый токен безопасности перед раскрытием деталей заявки
+            if (ru.andrew.application.notifications.SecureTokenManager.validateAndConsumeToken(requestId, token)) {
+                deepLinkRequestId.value = requestId
+            }
             intent?.removeExtra("requestId")
+            intent?.removeExtra("secure_token")
         }
     }
 }
