@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import ru.andrew.application.R
 import java.util.Locale
 
 /**
@@ -45,7 +47,7 @@ fun RevenueLineChart(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Нет данных для отображения графика",
+                text = stringResource(R.string.stats_no_chart_data),
                 style = MaterialTheme.typography.bodyMedium,
                 color = textColor,
                 textAlign = TextAlign.Center
@@ -76,6 +78,89 @@ fun RevenueLineChart(
     val surfaceColor = MaterialTheme.colorScheme.surface
     val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
 
+    val yAxisTextStyle = remember(textColor, labelFont) {
+        TextStyle(
+            color = textColor,
+            fontSize = 10.sp,
+            fontFamily = labelFont
+        )
+    }
+
+    val xAxisTextStyle = remember(textColor, labelFont) {
+        TextStyle(
+            color = textColor,
+            fontSize = 10.sp,
+            fontFamily = labelFont,
+            textAlign = TextAlign.Center
+        )
+    }
+
+    // Предварительное вычисление подписей по оси Y
+    val yLabels = remember(displayMax, yAxisTextStyle) {
+        val list = mutableListOf<Pair<Float, TextLayoutResult>>()
+        val gridLinesCount = 3
+        for (i in 0..gridLinesCount) {
+            val fraction = i.toFloat() / gridLinesCount
+            val gridVal = displayMax * fraction
+            val formattedVal = String.format(java.util.Locale.getDefault(), "%,.0f ₽", gridVal)
+            val textLayoutResult = textMeasurer.measure(
+                text = AnnotatedString(formattedVal),
+                style = yAxisTextStyle
+            )
+            list.add(fraction to textLayoutResult)
+        }
+        list
+    }
+
+    // Предварительное вычисление подписей по оси X
+    val skipStep = remember(points.size) {
+        when {
+            points.size > 12 -> 2
+            points.size > 7 -> 1
+            else -> 1
+        }
+    }
+    val xLabels = remember(points, xAxisTextStyle) {
+        points.mapIndexedNotNull { index, pair ->
+            if (index % skipStep == 0) {
+                val label = pair.first
+                val textLayoutResult = textMeasurer.measure(
+                    text = AnnotatedString(label),
+                    style = xAxisTextStyle
+                )
+                index to textLayoutResult
+            } else {
+                null
+            }
+        }
+    }
+
+    // Предварительное вычисление тултипов для точек
+    val tooltipTextStyle = remember(onPrimaryColor, labelFont) {
+        TextStyle(
+            color = onPrimaryColor,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Bold,
+            fontFamily = labelFont
+        )
+    }
+    
+    val tooltips = remember(points, tooltipTextStyle) {
+        points.map { point ->
+            val tooltipValue = String.format(java.util.Locale.getDefault(), "%,.0f ₽", point.second)
+            val tooltipText = "${point.first}: $tooltipValue"
+            textMeasurer.measure(
+                text = AnnotatedString(tooltipText),
+                style = tooltipTextStyle
+            )
+        }
+    }
+
+    val leftPaddingDp = 40.dp
+    val bottomPaddingDp = 24.dp
+    val topPaddingDp = 16.dp
+    val rightPaddingDp = 16.dp
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -92,8 +177,8 @@ fun RevenueLineChart(
                     detectTapGestures(
                         onTap = { offset ->
                             val width = size.width.toFloat()
-                            val leftPadding = 120f
-                            val rightPadding = 40f
+                            val leftPadding = leftPaddingDp.toPx()
+                            val rightPadding = rightPaddingDp.toPx()
                             val chartWidth = width - leftPadding - rightPadding
                             val stepX = chartWidth / (points.size - 1).coerceAtLeast(1)
 
@@ -107,8 +192,8 @@ fun RevenueLineChart(
                     detectHorizontalDragGestures(
                         onDragStart = { offset ->
                             val width = size.width.toFloat()
-                            val leftPadding = 120f
-                            val rightPadding = 40f
+                            val leftPadding = leftPaddingDp.toPx()
+                            val rightPadding = rightPaddingDp.toPx()
                             val chartWidth = width - leftPadding - rightPadding
                             val stepX = chartWidth / (points.size - 1).coerceAtLeast(1)
 
@@ -124,8 +209,8 @@ fun RevenueLineChart(
                         },
                         onHorizontalDrag = { change, _ ->
                             val width = size.width.toFloat()
-                            val leftPadding = 120f
-                            val rightPadding = 40f
+                            val leftPadding = leftPaddingDp.toPx()
+                            val rightPadding = rightPaddingDp.toPx()
                             val chartWidth = width - leftPadding - rightPadding
                             val stepX = chartWidth / (points.size - 1).coerceAtLeast(1)
 
@@ -139,10 +224,10 @@ fun RevenueLineChart(
             val width = size.width
             val height = size.height
 
-            val leftPadding = 120f
-            val bottomPadding = 60f
-            val topPadding = 40f
-            val rightPadding = 40f
+            val leftPadding = leftPaddingDp.toPx()
+            val bottomPadding = bottomPaddingDp.toPx()
+            val topPadding = topPaddingDp.toPx()
+            val rightPadding = rightPaddingDp.toPx()
 
             val chartWidth = width - leftPadding - rightPadding
             val chartHeight = height - bottomPadding - topPadding
@@ -150,36 +235,20 @@ fun RevenueLineChart(
             if (chartWidth <= 0 || chartHeight <= 0) return@Canvas
 
             // 1. Рисуем сетку координат и подписи по оси Y (3 горизонтальные линии)
-            val gridLinesCount = 3
-            val yAxisTextStyle = TextStyle(
-                color = textColor,
-                fontSize = 10.sp,
-                fontFamily = labelFont
-            )
-
-            for (i in 0..gridLinesCount) {
-                val fraction = i.toFloat() / gridLinesCount
+            yLabels.forEach { (fraction, textLayoutResult) ->
                 val y = topPadding + chartHeight * (1f - fraction)
-                val gridVal = displayMax * fraction
-
                 // Даш-линия сетки
                 drawLine(
                     color = gridColor,
                     start = Offset(leftPadding, y),
                     end = Offset(width - rightPadding, y),
-                    strokeWidth = 2f,
-                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(15f, 15f), 0f)
+                    strokeWidth = 1.dp.toPx(),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(5.dp.toPx(), 5.dp.toPx()), 0f)
                 )
-
                 // Текст по оси Y
-                val formattedVal = String.format(Locale.getDefault(), "%,.0f ₽", gridVal)
-                val textLayoutResult = textMeasurer.measure(
-                    text = AnnotatedString(formattedVal),
-                    style = yAxisTextStyle
-                )
                 drawText(
                     textLayoutResult = textLayoutResult,
-                    topLeft = Offset(10f, y - textLayoutResult.size.height / 2f)
+                    topLeft = Offset(4.dp.toPx(), y - textLayoutResult.size.height / 2f)
                 )
             }
 
@@ -261,122 +330,89 @@ fun RevenueLineChart(
                 drawPath(
                     path = linePath,
                     color = primaryColor,
-                    style = Stroke(width = 4f, cap = StrokeCap.Round)
+                    style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
                 )
 
                 // Рисуем точки на стыках
+                val outerRadius = 3.dp.toPx()
+                val innerRadius = 2.dp.toPx()
                 coords.forEachIndexed { index, offset ->
                     if (index * stepX <= (chartWidth * animatedProgress)) {
                         drawCircle(
                             color = surfaceColor,
-                            radius = 6f,
+                            radius = outerRadius,
                             center = offset
                         )
                         drawCircle(
                             color = primaryColor,
-                            radius = 4f,
+                            radius = innerRadius,
                             center = offset,
-                            style = Stroke(width = 3f)
+                            style = Stroke(width = 1.dp.toPx())
                         )
                     }
                 }
             }
 
             // 4. Подписи по оси X (под каждой точкой)
-            val xAxisTextStyle = TextStyle(
-                color = textColor,
-                fontSize = 10.sp,
-                fontFamily = labelFont,
-                textAlign = TextAlign.Center
-            )
-
-            // Отображаем подписи оси X с пропуском, если точек слишком много (например, для года)
-            val skipStep = when {
-                points.size > 12 -> 2
-                points.size > 7 -> 1
-                else -> 1
-            }
-
-            points.forEachIndexed { index, pair ->
-                if (index % skipStep == 0) {
-                    val label = pair.first
-                    val textLayoutResult = textMeasurer.measure(
-                        text = AnnotatedString(label),
-                        style = xAxisTextStyle
-                    )
-                    val x = leftPadding + index * stepX - textLayoutResult.size.width / 2f
-                    val y = height - bottomPadding + 15f
-                    drawText(
-                        textLayoutResult = textLayoutResult,
-                        topLeft = Offset(x, y)
-                    )
-                }
+            xLabels.forEach { (index, textLayoutResult) ->
+                val x = leftPadding + index * stepX - textLayoutResult.size.width / 2f
+                val y = height - bottomPadding + 8.dp.toPx()
+                drawText(
+                    textLayoutResult = textLayoutResult,
+                    topLeft = Offset(x, y)
+                )
             }
 
             // 5. Отрисовка выбранной точки (интерактивность)
             if (selectedIndex in coords.indices && selectedIndex != -1) {
                 val selectedCoord = coords[selectedIndex]
-                val selectedPoint = points[selectedIndex]
 
                 // Рисуем вертикальную направляющую линию
                 drawLine(
                     color = primaryColor.copy(alpha = 0.6f),
                     start = Offset(selectedCoord.x, topPadding),
                     end = Offset(selectedCoord.x, topPadding + chartHeight),
-                    strokeWidth = 3f,
-                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
+                    strokeWidth = 1.dp.toPx(),
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 4.dp.toPx()), 0f)
                 )
 
                 // Подсвечиваем точку увеличенным радиусом
                 drawCircle(
                     color = primaryColor,
-                    radius = 10f,
+                    radius = 5.dp.toPx(),
                     center = selectedCoord
                 )
                 drawCircle(
                     color = surfaceColor,
-                    radius = 5f,
+                    radius = 2.5.dp.toPx(),
                     center = selectedCoord
                 )
 
                 // Рисуем красивое всплывающее окно (tooltip) с информацией
-                val tooltipValue = String.format(Locale.getDefault(), "%,.0f ₽", selectedPoint.second)
-                val tooltipText = "${selectedPoint.first}: $tooltipValue"
-                
-                val tooltipTextStyle = TextStyle(
-                    color = onPrimaryColor,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = labelFont
-                )
-                
-                val tooltipLayoutResult = textMeasurer.measure(
-                    text = AnnotatedString(tooltipText),
-                    style = tooltipTextStyle
-                )
+                val tooltipLayoutResult = tooltips[selectedIndex]
 
-                val tooltipWidth = tooltipLayoutResult.size.width + 24f
-                val tooltipHeight = tooltipLayoutResult.size.height + 16f
+                val tooltipWidth = tooltipLayoutResult.size.width + 16.dp.toPx()
+                val tooltipHeight = tooltipLayoutResult.size.height + 8.dp.toPx()
                 
                 // Позиционируем тултип сверху над точкой, со сдвигом влево/вправо у границ
                 var tooltipX = selectedCoord.x - tooltipWidth / 2f
                 if (tooltipX < leftPadding) tooltipX = leftPadding
                 if (tooltipX + tooltipWidth > width - rightPadding) tooltipX = width - rightPadding - tooltipWidth
 
-                val tooltipY = (selectedCoord.y - tooltipHeight - 15f).coerceAtLeast(10f)
+                val tooltipY = (selectedCoord.y - tooltipHeight - 8.dp.toPx()).coerceAtLeast(4.dp.toPx())
 
                 // Рисуем фон тултипа со скругленными краями
                 drawRoundRect(
                     color = primaryColor,
                     topLeft = Offset(tooltipX, tooltipY),
                     size = Size(tooltipWidth, tooltipHeight),
-                    cornerRadius = CornerRadius(12f, 12f)
+                    cornerRadius = CornerRadius(6.dp.toPx(), 6.dp.toPx())
                 )
 
                 // Отрисовываем текст внутри тултипа
                 drawText(
                     textLayoutResult = tooltipLayoutResult,
-                    topLeft = Offset(tooltipX + 12f, tooltipY + 8f)
+                    topLeft = Offset(tooltipX + 8.dp.toPx(), tooltipY + 4.dp.toPx())
                 )
             }
         }
@@ -475,7 +511,7 @@ fun EfficiencyDonutChart(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "Успешно",
+                    text = stringResource(R.string.stats_success),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -491,13 +527,13 @@ fun EfficiencyDonutChart(
         ) {
             LegendItem(
                 color = completedColor,
-                title = "Выполнено",
+                title = stringResource(R.string.stats_completed),
                 count = completed,
                 percentage = if (total > 0) successRate.toInt() else 0
             )
             LegendItem(
                 color = cancelledColor,
-                title = "Отменено",
+                title = stringResource(R.string.stats_cancelled),
                 count = cancelled,
                 percentage = if (total > 0) (100f - successRate).toInt() else 0
             )
@@ -529,7 +565,7 @@ private fun LegendItem(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "$count заяв. ($percentage%)",
+                text = stringResource(id = R.string.stats_legend_format, count, percentage),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

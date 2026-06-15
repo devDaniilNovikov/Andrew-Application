@@ -12,7 +12,7 @@ import ru.andrew.application.data.entity.Request
  * Локальная база данных Room.
  * Использует конвертеры типов для сохранения LocalDateTime и enum-значений.
  */
-@Database(entities = [Request::class], version = 1, exportSchema = false)
+@Database(entities = [Request::class], version = 2, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
@@ -22,6 +22,12 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
+        private val MIGRATION_1_2 = object : androidx.room.migration.Migration(1, 2) {
+            override fun migrate(database: androidx.sqlite.db.SupportSQLiteDatabase) {
+                database.execSQL("CREATE INDEX IF NOT EXISTS `index_requests_createdAt` ON `requests` (`createdAt`)")
+            }
+        }
+
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: Room.databaseBuilder(
@@ -29,6 +35,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "andrew_application.db"
                 )
+                .addMigrations(MIGRATION_1_2)
                 .build()
                 .also { INSTANCE = it }
             }
