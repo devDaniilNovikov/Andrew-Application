@@ -5,7 +5,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -104,7 +104,7 @@ fun RevenueLineChart(
                     )
                 }
                 .pointerInput(points) {
-                    detectDragGestures(
+                    detectHorizontalDragGestures(
                         onDragStart = { offset ->
                             val width = size.width.toFloat()
                             val leftPadding = 120f
@@ -122,7 +122,7 @@ fun RevenueLineChart(
                         onDragCancel = {
                             selectedIndex = -1
                         },
-                        onDrag = { change, _ ->
+                        onHorizontalDrag = { change, _ ->
                             val width = size.width.toFloat()
                             val leftPadding = 120f
                             val rightPadding = 40f

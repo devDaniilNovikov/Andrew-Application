@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.activity.SystemBarStyle
 import androidx.lifecycle.ViewModelProvider
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
                 AppTheme.SYSTEM -> isSystemInDarkTheme()
             }
             
-            DisposableEffect(darkTheme) {
+            LaunchedEffect(darkTheme) {
                 if (darkTheme) {
                     enableEdgeToEdge(
                         statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
@@ -55,7 +55,6 @@ class MainActivity : ComponentActivity() {
                         )
                     )
                 }
-                onDispose {}
             }
             
             AndrewApplicationTheme(theme = currentTheme) {

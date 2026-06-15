@@ -22,7 +22,8 @@ class NotificationSchedulerImpl(
     }
 
     override fun scheduleNotification(request: Request) {
-        val triggerAtMillis = request.nextActionDateTime
+        val nextAction = request.nextActionDateTime ?: return
+        val triggerAtMillis = nextAction
             .atZone(ZoneId.systemDefault())
             .toInstant()
             .toEpochMilli()
