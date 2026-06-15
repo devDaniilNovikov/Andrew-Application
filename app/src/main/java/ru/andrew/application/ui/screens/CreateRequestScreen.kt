@@ -530,16 +530,19 @@ fun CreateRequestScreen(
                     onClick = { viewModel.clearForm() },
                     modifier = Modifier
                         .weight(1f)
-                        .height(50.dp),
+                        .height(60.dp),
                     enabled = !uiState.isLoading,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(stringResource(id = R.string.btn_clear))
+                    Text(
+                        stringResource(id = R.string.btn_clear),
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
 
                 Button(
@@ -549,9 +552,9 @@ fun CreateRequestScreen(
                     },
                     modifier = Modifier
                         .weight(1.3f)
-                        .height(50.dp),
+                        .height(60.dp),
                     enabled = !uiState.isLoading,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     if (uiState.isLoading) {
                         CircularProgressIndicator(
@@ -566,9 +569,10 @@ fun CreateRequestScreen(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            stringResource(
+                            text = stringResource(
                                 id = if (viewModel.editingRequestId != null) R.string.btn_save_changes else R.string.btn_create
-                            )
+                            ),
+                            style = MaterialTheme.typography.titleMedium
                         )
                     }
                 }
