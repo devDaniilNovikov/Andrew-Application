@@ -46,15 +46,15 @@
     <string name="create_comment_label">Comment</string>
     <string name="create_validation_error">Fill in the title, phone and next action date.</string>
     <string name="create_db_error">Database error</string>
-    <string name="create_success_message">Request successfully created!</string>
+    <string name="create_success_message">Request created</string>
     <string name="btn_create">Create Request</string>
     <string name="btn_clear">Clear Form</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_select_time">Select time</string>
     <string name="edit_request_title">Edit Request</string>
-    <string name="btn_save_changes">Save Changes</string>
-    <string name="update_success_message">Changes saved successfully!</string>
+    <string name="btn_save_changes">Save</string>
+    <string name="update_success_message">Changes saved</string>
     <string name="cancel_dialog_title">Request Cancellation</string>
     <string name="cancel_reason_client_refused">Client refused</string>
     <string name="cancel_reason_no_contact">Could not reach client</string>
@@ -62,8 +62,8 @@
     <string name="cancel_reason_other">Other (specify below)</string>
     <string name="cancel_dialog_comment_placeholder">Describe the reason in more detail…</string>
     <string name="cancel_dialog_confirm">Confirm cancellation</string>
-    <string name="toast_request_completed">Request successfully completed!</string>
-    <string name="toast_request_cancelled">Request cancelled.</string>
+    <string name="toast_request_completed">Request moved to history</string>
+    <string name="toast_request_cancelled">Request moved to history</string>
     <string name="client_name_hint">No name</string>
     <string name="urgency_overdue">Overdue</string>
     <string name="urgency_today">Today</string>
@@ -72,10 +72,10 @@
 
     <!-- History Screen -->
     <string name="history_title">History</string>
-    <string name="history_empty">No completed or cancelled requests.</string>
-    <string name="history_empty_desc">Completed or cancelled requests will be displayed here. Try selecting another filter or add a new request.</string>
+    <string name="history_empty">No completed or cancelled requests</string>
+    <string name="history_empty_desc">Completed or cancelled requests will be displayed here. Try selecting another filter.</string>
     <string name="active_empty_title">No active requests</string>
-    <string name="active_empty_desc">All tasks completed! To create a new request, go to the "Create" tab in the bottom menu.</string>
+    <string name="active_empty_desc">All tasks completed. To create a new request, go to the "Create" tab.</string>
     <string name="history_created_at">Created: %s</string>
     <string name="history_closed_at">Closed: %s</string>
     <string name="history_final_price">Cost: %s ₽</string>
@@ -102,7 +102,7 @@
 
     <!-- Stage 10: Import Contact -->
     <string name="create_import_contact_desc">Choose contact from address book</string>
-    <string name="import_contact_success">Contact successfully imported!</string>
+    <string name="import_contact_success">Contact imported</string>
     <string name="import_contact_error_no_phone">Selected contact has no phone number or name.</string>
 
     <!-- Statistics -->
@@ -134,7 +134,7 @@
     <string name="active_unknown_error">Unknown error</string>
     <string name="active_toast_dial_error">Failed to open dialer</string>
     <string name="active_toast_no_phone">Phone number not specified</string>
-    <string name="active_toast_rescheduled">Request rescheduled successfully</string>
+    <string name="active_toast_rescheduled">Request rescheduled</string>
     <string name="active_reschedule_time_title">Select action time</string>
     <string name="active_cancel_reason_required">Specify cancel reason *</string>
     <string name="active_cancel_optional_comment">Final comment (optional)</string>
