@@ -250,12 +250,16 @@ fun CreateRequestScreen(
                     is CreateRequestViewModel.CreateRequestEvent.NavigationSuccess -> {
                         val messageResId = if (event.isEdit) R.string.update_success_message else R.string.create_success_message
                         android.widget.Toast.makeText(context.applicationContext, messageResId, android.widget.Toast.LENGTH_SHORT).show()
-                        navController.navigate(Screen.Active.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                        if (event.isEdit) {
+                            navController.popBackStack()
+                        } else {
+                            navController.navigate(Screen.Active.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
                     }
                 }
