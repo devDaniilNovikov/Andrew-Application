@@ -94,6 +94,7 @@
     <string name="history_invalid_price_error">Invalid price format</string>
 
     <!-- Notifications -->
+    <string name="not_assigned">Не назначено</string>
     <string name="notification_channel_name">Action Reminders</string>
     <string name="notification_channel_description">Reminders of scheduled actions and client calls</string>
     <string name="notification_today">Today</string>

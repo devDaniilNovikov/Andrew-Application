@@ -28,6 +28,32 @@ class MainActivity : ComponentActivity() {
         
         val themeViewModel = ViewModelProvider(this, ThemeViewModel.Factory)[ThemeViewModel::class.java]
         
+        val initialTheme = themeViewModel.themeState.value
+        val isSystemDark = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) == android.content.res.Configuration.UI_MODE_NIGHT_YES
+        val initialDarkTheme = when (initialTheme) {
+            AppTheme.LIGHT -> false
+            AppTheme.DARK -> true
+            AppTheme.SYSTEM -> isSystemDark
+        }
+        
+        if (initialDarkTheme) {
+            enableEdgeToEdge(
+                statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+                navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            )
+        } else {
+            enableEdgeToEdge(
+                statusBarStyle = SystemBarStyle.light(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT
+                ),
+                navigationBarStyle = SystemBarStyle.light(
+                    android.graphics.Color.TRANSPARENT,
+                    android.graphics.Color.TRANSPARENT
+                )
+            )
+        }
+        
         setContent {
             val currentTheme by themeViewModel.themeState.collectAsStateWithLifecycle()
             val deepLinkId by deepLinkRequestId
@@ -37,7 +63,7 @@ class MainActivity : ComponentActivity() {
                 AppTheme.SYSTEM -> isSystemInDarkTheme()
             }
             
-            LaunchedEffect(darkTheme) {
+            androidx.compose.runtime.DisposableEffect(darkTheme) {
                 if (darkTheme) {
                     enableEdgeToEdge(
                         statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
@@ -55,6 +81,7 @@ class MainActivity : ComponentActivity() {
                         )
                     )
                 }
+                onDispose {}
             }
             
             AndrewApplicationTheme(theme = currentTheme) {

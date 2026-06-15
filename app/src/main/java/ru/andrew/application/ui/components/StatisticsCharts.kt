@@ -18,6 +18,8 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.*
@@ -102,7 +104,7 @@ fun RevenueLineChart(
         for (i in 0..gridLinesCount) {
             val fraction = i.toFloat() / gridLinesCount
             val gridVal = displayMax * fraction
-            val formattedVal = String.format(java.util.Locale.getDefault(), "%,.0f ₽", gridVal)
+            val formattedVal = String.format(java.util.Locale("ru", "RU"), "%,.0f ₽", gridVal)
             val textLayoutResult = textMeasurer.measure(
                 text = AnnotatedString(formattedVal),
                 style = yAxisTextStyle
@@ -147,7 +149,7 @@ fun RevenueLineChart(
     
     val tooltips = remember(points, tooltipTextStyle) {
         points.map { point ->
-            val tooltipValue = String.format(java.util.Locale.getDefault(), "%,.0f ₽", point.second)
+            val tooltipValue = String.format(java.util.Locale("ru", "RU"), "%,.0f ₽", point.second)
             val tooltipText = "${point.first}: $tooltipValue"
             textMeasurer.measure(
                 text = AnnotatedString(tooltipText),
@@ -170,7 +172,7 @@ fun RevenueLineChart(
             )
             .padding(16.dp)
     ) {
-        Canvas(
+        Spacer(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(points) {
@@ -220,19 +222,54 @@ fun RevenueLineChart(
                         }
                     )
                 }
-        ) {
-            val width = size.width
-            val height = size.height
+                .drawWithCache {
+                    val width = size.width
+                    val height = size.height
 
-            val leftPadding = leftPaddingDp.toPx()
-            val bottomPadding = bottomPaddingDp.toPx()
-            val topPadding = topPaddingDp.toPx()
-            val rightPadding = rightPaddingDp.toPx()
+                    val leftPadding = leftPaddingDp.toPx()
+                    val bottomPadding = bottomPaddingDp.toPx()
+                    val topPadding = topPaddingDp.toPx()
+                    val rightPadding = rightPaddingDp.toPx()
 
-            val chartWidth = width - leftPadding - rightPadding
-            val chartHeight = height - bottomPadding - topPadding
+                    val chartWidth = width - leftPadding - rightPadding
+                    val chartHeight = height - bottomPadding - topPadding
 
-            if (chartWidth <= 0 || chartHeight <= 0) return@Canvas
+                    val stepX = if (chartWidth > 0f) chartWidth / (points.size - 1).coerceAtLeast(1).toFloat() else 0f
+                    val coords = if (chartWidth > 0f && chartHeight > 0f) {
+                        points.mapIndexed { index, pair ->
+                            val x = leftPadding + index * stepX
+                            val yFraction = pair.second / displayMax
+                            val y = topPadding + chartHeight * (1f - yFraction)
+                            Offset(x, y)
+                        }
+                    } else emptyList()
+
+                    val staticLinePath = Path()
+                    val staticGradientPath = Path()
+
+                    if (coords.isNotEmpty() && chartWidth > 0f && chartHeight > 0f) {
+                        staticLinePath.moveTo(coords[0].x, coords[0].y)
+                        for (i in 0 until coords.size - 1) {
+                            val p1 = coords[i]
+                            val p2 = coords[i + 1]
+                            val cx = p1.x + (p2.x - p1.x) / 2f
+                            staticLinePath.cubicTo(cx, p1.y, cx, p2.y, p2.x, p2.y)
+                        }
+
+                        staticGradientPath.moveTo(coords[0].x, topPadding + chartHeight)
+                        staticGradientPath.lineTo(coords[0].x, coords[0].y)
+                        for (i in 0 until coords.size - 1) {
+                            val p1 = coords[i]
+                            val p2 = coords[i + 1]
+                            val cx = p1.x + (p2.x - p1.x) / 2f
+                            staticGradientPath.cubicTo(cx, p1.y, cx, p2.y, p2.x, p2.y)
+                        }
+                        staticGradientPath.lineTo(coords.last().x, topPadding + chartHeight)
+                        staticGradientPath.close()
+                    }
+
+                    onDrawBehind {
+                        if (chartWidth <= 0 || chartHeight <= 0) return@onDrawBehind
 
             // 1. Рисуем сетку координат и подписи по оси Y (3 горизонтальные линии)
             yLabels.forEach { (fraction, textLayoutResult) ->
@@ -252,69 +289,56 @@ fun RevenueLineChart(
                 )
             }
 
-            // 2. Рассчитываем координаты точек
-            val stepX = chartWidth / (points.size - 1).coerceAtLeast(1)
-            val coords = points.mapIndexed { index, pair ->
-                val x = leftPadding + index * stepX
-                val yFraction = pair.second / displayMax
-                val y = topPadding + chartHeight * (1f - yFraction)
-                Offset(x, y)
-            }
+            // 2. Координаты вычислены в кэше
 
             // 3. Строим плавный Bezier Path и заполняем градиентом
             if (coords.isNotEmpty()) {
                 val animatedProgress = animationProgress.value
 
-                // Линейный путь графика
-                val linePath = Path()
-                linePath.moveTo(coords[0].x, coords[0].y)
+                val activeLinePath: Path
+                val activeGradientPath: Path
 
-                for (i in 0 until coords.size - 1) {
-                    val p1 = coords[i]
-                    val p2 = coords[i + 1]
-
-                    // Контрольные точки для кубического сплайна Безье
-                    val controlX1 = p1.x + (p2.x - p1.x) / 2f
-                    val controlY1 = p1.y
-                    val controlX2 = p1.x + (p2.x - p1.x) / 2f
-                    val controlY2 = p2.y
-
-                    val animatedP2 = Offset(
-                        p1.x + (p2.x - p1.x) * animatedProgress,
-                        p1.y + (p2.y - p1.y) * animatedProgress
-                    )
-
-                    linePath.cubicTo(
-                        p1.x + (controlX1 - p1.x) * animatedProgress,
-                        p1.y + (controlY1 - p1.y) * animatedProgress,
-                        p1.x + (controlX2 - p1.x) * animatedProgress,
-                        p1.y + (controlY2 - p1.y) * animatedProgress,
-                        animatedP2.x,
-                        animatedP2.y
-                    )
-                }
-
-                // Для красивого градиента строим вспомогательный путь заливки
-                val lastIndex = coords.size - 1
-                val gradientPath = Path().apply {
-                    moveTo(coords[0].x, topPadding + chartHeight)
-                    lineTo(coords[0].x, coords[0].y)
-                    
+                if (animatedProgress >= 1f) {
+                    activeLinePath = staticLinePath
+                    activeGradientPath = staticGradientPath
+                } else {
+                    activeLinePath = Path().apply { moveTo(coords[0].x, coords[0].y) }
                     for (i in 0 until coords.size - 1) {
                         val p1 = coords[i]
                         val p2 = coords[i + 1]
-                        val cx1 = p1.x + (p2.x - p1.x) / 2f
-                        val cx2 = p1.x + (p2.x - p1.x) / 2f
-                        cubicTo(cx1, p1.y, cx2, p2.y, p2.x, p2.y)
+                        val cx = p1.x + (p2.x - p1.x) / 2f
+                        val animatedP2 = Offset(
+                            p1.x + (p2.x - p1.x) * animatedProgress,
+                            p1.y + (p2.y - p1.y) * animatedProgress
+                        )
+                        activeLinePath.cubicTo(
+                            p1.x + (cx - p1.x) * animatedProgress,
+                            p1.y + (p1.y - p1.y) * animatedProgress,
+                            p1.x + (cx - p1.x) * animatedProgress,
+                            p1.y + (p2.y - p1.y) * animatedProgress,
+                            animatedP2.x,
+                            animatedP2.y
+                        )
                     }
-                    lineTo(coords[lastIndex].x, topPadding + chartHeight)
-                    close()
+
+                    activeGradientPath = Path().apply {
+                        moveTo(coords[0].x, topPadding + chartHeight)
+                        lineTo(coords[0].x, coords[0].y)
+                        for (i in 0 until coords.size - 1) {
+                            val p1 = coords[i]
+                            val p2 = coords[i + 1]
+                            val cx = p1.x + (p2.x - p1.x) / 2f
+                            cubicTo(cx, p1.y, cx, p2.y, p2.x, p2.y)
+                        }
+                        lineTo(coords.last().x, topPadding + chartHeight)
+                        close()
+                    }
                 }
 
                 // Рисуем градиент под кривой
                 if (animatedProgress > 0.05f) {
                     drawPath(
-                        path = gradientPath,
+                        path = activeGradientPath,
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 primaryColor.copy(alpha = 0.25f * animatedProgress),
@@ -328,7 +352,7 @@ fun RevenueLineChart(
 
                 // Рисуем саму линию графика
                 drawPath(
-                    path = linePath,
+                    path = activeLinePath,
                     color = primaryColor,
                     style = Stroke(width = 2.dp.toPx(), cap = StrokeCap.Round)
                 )
@@ -416,6 +440,8 @@ fun RevenueLineChart(
                 )
             }
         }
+    }
+    )
     }
 }
 

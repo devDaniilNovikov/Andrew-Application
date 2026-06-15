@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -318,7 +319,7 @@ fun RequestDetailsBottomSheet(
                     onClick = onCallClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(60.dp),
+                        .height(dimensionResource(id = R.dimen.button_height)),
                     contentPadding = PaddingValues(horizontal = 8.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -335,7 +336,7 @@ fun RequestDetailsBottomSheet(
                     onClick = onEditClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(60.dp),
+                        .height(dimensionResource(id = R.dimen.button_height)),
                     contentPadding = PaddingValues(horizontal = 8.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -352,7 +353,7 @@ fun RequestDetailsBottomSheet(
                     onClick = onRescheduleClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(60.dp),
+                        .height(dimensionResource(id = R.dimen.button_height)),
                     contentPadding = PaddingValues(horizontal = 8.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -377,7 +378,7 @@ fun RequestDetailsBottomSheet(
                     onClick = onCompleteClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(60.dp),
+                        .height(dimensionResource(id = R.dimen.button_height)),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
@@ -392,7 +393,7 @@ fun RequestDetailsBottomSheet(
                     onClick = onCancelClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(60.dp),
+                        .height(dimensionResource(id = R.dimen.button_height)),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError
