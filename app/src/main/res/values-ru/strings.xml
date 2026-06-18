@@ -12,13 +12,11 @@
     <string name="status_cancelled">Отменена</string>
 
     <!-- EquipmentType -->
-    <string name="equipment_domestic_refrigerator">бытовой холодильник</string>
-    <string name="equipment_commercial">торговое оборудование</string>
-    <string name="equipment_industrial">промышленное оборудование</string>
+    <string name="equipment_cabin">бытовка</string>
+    <string name="equipment_commercial">торговая</string>
+    <string name="equipment_industrial">промка</string>
+    <string name="equipment_air_conditioner">кондеи</string>
     <string name="equipment_ice_generator">ледогенератор</string>
-    <string name="equipment_freezer_chamber">морозильная камера</string>
-    <string name="equipment_refrigerated_showcase">холодильная витрина</string>
-    <string name="equipment_split_system">сплит-система / кондиционер</string>
     <string name="equipment_other">другое</string>
 
     <!-- ActionType -->
@@ -40,7 +38,7 @@
     <string name="create_phone_label">Телефон *</string>
     <string name="create_client_name_label">Имя клиента</string>
     <string name="create_address_label">Адрес</string>
-    <string name="create_equipment_type_label">Тип оборудования</string>
+    <string name="create_equipment_type_label">Тип заявки</string>
     <string name="create_action_type_label">Тип действия</string>
     <string name="create_date_time_label">Дата и время следующего действия *</string>
     <string name="create_comment_label">Комментарий</string>

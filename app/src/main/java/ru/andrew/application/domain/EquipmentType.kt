@@ -4,12 +4,10 @@ import androidx.annotation.Keep
 
 @Keep
 enum class EquipmentType {
-    DOMESTIC_REFRIGERATOR,
-    COMMERCIAL_EQUIPMENT,
-    INDUSTRIAL_EQUIPMENT,
+    CABIN,
+    COMMERCIAL,
+    INDUSTRIAL,
+    AIR_CONDITIONER,
     ICE_GENERATOR,
-    FREEZER_CHAMBER,
-    REFRIGERATED_SHOWCASE,
-    SPLIT_SYSTEM,
     OTHER
 }

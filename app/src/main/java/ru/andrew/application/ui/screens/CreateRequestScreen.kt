@@ -395,7 +395,7 @@ fun CreateRequestScreen(
                     expanded = equipmentMenuExpanded,
                     onDismissRequest = { equipmentMenuExpanded = false }
                 ) {
-                    EquipmentType.entries.forEach { type ->
+                    EquipmentType.entries.filter { it != EquipmentType.OTHER }.forEach { type ->
                         DropdownMenuItem(
                             text = { Text(stringResource(id = type.displayNameResId)) },
                             onClick = {

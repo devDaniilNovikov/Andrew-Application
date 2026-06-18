@@ -12,13 +12,11 @@
     <string name="status_cancelled">Cancelled</string>
 
     <!-- EquipmentType -->
-    <string name="equipment_domestic_refrigerator">domestic refrigerator</string>
-    <string name="equipment_commercial">commercial equipment</string>
-    <string name="equipment_industrial">industrial equipment</string>
+    <string name="equipment_cabin">cabin</string>
+    <string name="equipment_commercial">commercial</string>
+    <string name="equipment_industrial">industrial</string>
+    <string name="equipment_air_conditioner">air conditioners</string>
     <string name="equipment_ice_generator">ice generator</string>
-    <string name="equipment_freezer_chamber">freezer chamber</string>
-    <string name="equipment_refrigerated_showcase">refrigerated showcase</string>
-    <string name="equipment_split_system">split system / air conditioner</string>
     <string name="equipment_other">other</string>
 
     <!-- ActionType -->
@@ -40,7 +38,7 @@
     <string name="create_phone_label">Phone *</string>
     <string name="create_client_name_label">Client Name</string>
     <string name="create_address_label">Address</string>
-    <string name="create_equipment_type_label">Equipment Type</string>
+    <string name="create_equipment_type_label">Request Type</string>
     <string name="create_action_type_label">Action Type</string>
     <string name="create_date_time_label">Date and time of next action *</string>
     <string name="create_comment_label">Comment</string>
