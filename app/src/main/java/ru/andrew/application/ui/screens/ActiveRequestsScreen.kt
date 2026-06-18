@@ -42,6 +42,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 
 /**
  * Экран списка активных заявок.
@@ -79,6 +81,10 @@ fun ActiveRequestsScreen(
     // Состояния для отмены заявки (Подэтап 5.4)
     var showCancelDialog by remember { mutableStateOf(false) }
     var cancelTargetRequest by remember { mutableStateOf<Request?>(null) }
+
+    // Состояния для выполнения заявки с вводом цены (fix-add-money)
+    var showCompleteDialog by remember { mutableStateOf(false) }
+    var completeTargetRequest by remember { mutableStateOf<Request?>(null) }
 
     val (rescheduleDatePickerState, rescheduleTimePickerState) = key(rescheduleTargetRequest?.id) {
         val dateState = rememberDatePickerState(
@@ -232,18 +238,9 @@ fun ActiveRequestsScreen(
                                     confirmValueChange = { dismissValue ->
                                         when (dismissValue) {
                                             SwipeToDismissBoxValue.StartToEnd -> {
-                                                scope.launch {
-                                                    viewModel.completeRequest(request.id)
-                                                    val result = snackbarHostState.showSnackbar(
-                                                        message = context.getString(R.string.toast_request_completed),
-                                                        actionLabel = cancelActionLabel,
-                                                        duration = SnackbarDuration.Short
-                                                    )
-                                                    if (result == SnackbarResult.ActionPerformed) {
-                                                        viewModel.restoreRequest(request.id)
-                                                    }
-                                                }
-                                                true
+                                                completeTargetRequest = request
+                                                showCompleteDialog = true
+                                                false // snaps card back, dialog takes over
                                             }
                                             SwipeToDismissBoxValue.EndToStart -> {
                                                 cancelTargetRequest = request
@@ -336,19 +333,9 @@ fun ActiveRequestsScreen(
                         showDatePickerForReschedule = true
                     },
                     onCompleteClick = {
-                        val targetId = request.id
-                        viewModel.completeRequest(targetId)
+                        completeTargetRequest = request
+                        showCompleteDialog = true
                         selectedRequest = null // Закрываем шторку деталей
-                        scope.launch {
-                            val result = snackbarHostState.showSnackbar(
-                                message = context.getString(R.string.toast_request_completed),
-                                actionLabel = cancelActionLabel,
-                                duration = SnackbarDuration.Short
-                            )
-                            if (result == SnackbarResult.ActionPerformed) {
-                                viewModel.restoreRequest(targetId)
-                            }
-                        }
                     },
                     onCancelClick = {
                         cancelTargetRequest = request
@@ -534,6 +521,109 @@ fun ActiveRequestsScreen(
                     }
                 )
             }
+
+            // Диалог выполнения заявки с вводом стоимости (fix-add-money)
+            if (showCompleteDialog && completeTargetRequest != null) {
+                CompleteRequestDialog(
+                    request = completeTargetRequest!!,
+                    onDismiss = { showCompleteDialog = false },
+                    onConfirm = { parsedPrice, commentText ->
+                        val targetId = completeTargetRequest!!.id
+                        viewModel.completeRequest(targetId, parsedPrice, commentText)
+                        showCompleteDialog = false
+                        scope.launch {
+                            val result = snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.toast_request_completed),
+                                actionLabel = cancelActionLabel,
+                                duration = SnackbarDuration.Short
+                            )
+                            if (result == SnackbarResult.ActionPerformed) {
+                                viewModel.restoreRequest(targetId)
+                            }
+                        }
+                    }
+                )
+            }
         }
     }
+}
+
+/**
+ * Диалог завершения заявки с вводом стоимости и итогового комментария.
+ */
+@Composable
+fun CompleteRequestDialog(
+    request: Request,
+    onDismiss: () -> Unit,
+    onConfirm: (finalPrice: Double?, finalComment: String?) -> Unit
+) {
+    var priceText by remember { mutableStateOf("") }
+    var commentText by remember { mutableStateOf("") }
+    var priceError by remember { mutableStateOf<String?>(null) }
+    val invalidPriceMsg = stringResource(id = R.string.history_invalid_price_error)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(id = R.string.complete_dialog_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Поле ввода цены
+                OutlinedTextField(
+                    value = priceText,
+                    onValueChange = {
+                        priceText = it
+                        priceError = null
+                    },
+                    label = { Text(text = stringResource(id = R.string.complete_dialog_price_label)) },
+                    isError = priceError != null,
+                    supportingText = priceError?.let { error -> { Text(text = error) } },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                // Поле ввода комментария
+                OutlinedTextField(
+                    value = commentText,
+                    onValueChange = { commentText = it },
+                    label = { Text(text = stringResource(id = R.string.complete_dialog_comment_label)) },
+                    minLines = 3,
+                    maxLines = 5,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val parsedPrice = priceText.trim().replace(",", ".").toDoubleOrNull()
+                    if (priceText.trim().isNotEmpty() && parsedPrice == null) {
+                        priceError = invalidPriceMsg
+                    } else {
+                        onConfirm(parsedPrice, commentText.trim().takeIf { it.isNotEmpty() })
+                    }
+                }
+            ) {
+                Text(text = stringResource(id = R.string.complete_dialog_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(id = R.string.dialog_cancel))
+            }
+        }
+    )
 }

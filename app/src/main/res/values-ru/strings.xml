@@ -92,6 +92,10 @@
     <string name="history_edit_comment_label">Итоговый комментарий</string>
     <string name="history_edit_reason_label">Причина отмены</string>
     <string name="history_invalid_price_error">Неверный формат цены</string>
+    <string name="complete_dialog_title">Завершение заявки</string>
+    <string name="complete_dialog_price_label">Итоговая стоимость (₽)</string>
+    <string name="complete_dialog_comment_label">Итоговый комментарий (необязательно)</string>
+    <string name="complete_dialog_confirm">Подтвердить выполнение</string>
 
     <!-- Notifications -->
     <string name="notification_channel_name">Напоминания о действиях</string>

@@ -92,6 +92,10 @@
     <string name="history_edit_comment_label">Final Comment</string>
     <string name="history_edit_reason_label">Cancel Reason</string>
     <string name="history_invalid_price_error">Invalid price format</string>
+    <string name="complete_dialog_title">Complete Request</string>
+    <string name="complete_dialog_price_label">Final Cost (₽)</string>
+    <string name="complete_dialog_comment_label">Final Comment (optional)</string>
+    <string name="complete_dialog_confirm">Confirm Completion</string>
 
     <!-- Notifications -->
     <string name="not_assigned">Не назначено</string>
