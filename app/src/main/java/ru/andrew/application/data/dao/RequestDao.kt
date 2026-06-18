@@ -73,17 +73,5 @@ interface RequestDao {
         cancelReason: String?,
         updatedAt: java.time.LocalDateTime
     )
-
-    /**
-     * Поток заявок, закрытых в указанный период (включая границы).
-     */
-    @Query("SELECT * FROM requests WHERE closedAt BETWEEN :start AND :end")
-    fun getClosedRequestsInPeriod(start: java.time.LocalDateTime, end: java.time.LocalDateTime): Flow<List<Request>>
-
-    /**
-     * Поток заявок, созданных в указанный период (включая границы).
-     */
-    @Query("SELECT * FROM requests WHERE createdAt BETWEEN :start AND :end")
-    fun getCreatedRequestsInPeriod(start: java.time.LocalDateTime, end: java.time.LocalDateTime): Flow<List<Request>>
 }
 

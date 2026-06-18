@@ -20,8 +20,5 @@ interface RequestRepository {
     suspend fun cancelRequest(id: Long, cancelReason: String, finalComment: String?)
     suspend fun restoreToActive(id: Long)
     suspend fun updateRequestResults(id: Long, finalPrice: Double?, finalComment: String?, cancelReason: String?)
-    
-    fun getClosedRequestsInPeriod(start: LocalDateTime, end: LocalDateTime): Flow<List<Request>>
-    fun getCreatedRequestsInPeriod(start: LocalDateTime, end: LocalDateTime): Flow<List<Request>>
 }
 

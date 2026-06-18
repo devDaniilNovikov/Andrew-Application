@@ -29,6 +29,8 @@ import java.time.ZoneOffset
 import androidx.navigation.NavController
 import androidx.compose.ui.res.stringResource
 import ru.andrew.application.R
+import ru.andrew.application.ui.theme.AppTheme
+import ru.andrew.application.ui.components.ThemeIconButton
 import ru.andrew.application.ui.util.cleanPhoneNumber
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -48,6 +50,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ActiveRequestsScreen(
     navController: NavController,
+    currentTheme: AppTheme,
+    onThemeSelected: (AppTheme) -> Unit,
     deepLinkRequestId: Long = -1L,
     viewModel: ActiveRequestsViewModel = viewModel(factory = ActiveRequestsViewModel.Factory)
 ) {
@@ -100,6 +104,12 @@ fun ActiveRequestsScreen(
                         text = stringResource(R.string.active_requests_title),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
+                    )
+                },
+                actions = {
+                    ThemeIconButton(
+                        currentTheme = currentTheme,
+                        onThemeSelected = onThemeSelected
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(

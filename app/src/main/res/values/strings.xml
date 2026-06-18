@@ -105,20 +105,6 @@
     <string name="import_contact_success">Contact imported</string>
     <string name="import_contact_error_no_phone">Selected contact has no phone number or name.</string>
 
-    <!-- Statistics -->
-    <string name="nav_statistics">Statistics</string>
-    <string name="stats_revenue">Revenue</string>
-    <string name="stats_accepted">Accepted</string>
-    <string name="stats_completed">Completed</string>
-    <string name="stats_cancelled">Cancelled</string>
-    <string name="stats_efficiency">Work Efficiency</string>
-    <string name="stats_cancel_reasons">Cancel Reasons</string>
-    <string name="stats_period_day">Day</string>
-    <string name="stats_period_week">Week</string>
-    <string name="stats_period_month">Month</string>
-    <string name="stats_period_year">Year</string>
-    <string name="stats_no_data">No data for selected period</string>
-
     <!-- UI Localization (Active Requests, Bottom Sheet, Cards) -->
     <string name="details_active_badge">ACTIVE</string>
     <string name="details_section_contact">Contact Details</string>
