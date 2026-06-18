@@ -29,6 +29,8 @@ import java.time.ZoneOffset
 import androidx.navigation.NavController
 import androidx.compose.ui.res.stringResource
 import ru.andrew.application.R
+import ru.andrew.application.ui.theme.AppTheme
+import ru.andrew.application.ui.components.ThemeIconButton
 import ru.andrew.application.ui.util.cleanPhoneNumber
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -48,6 +50,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ActiveRequestsScreen(
     navController: NavController,
+    currentTheme: AppTheme,
+    onThemeSelected: (AppTheme) -> Unit,
     deepLinkRequestId: Long = -1L,
     viewModel: ActiveRequestsViewModel = viewModel(factory = ActiveRequestsViewModel.Factory)
 ) {
@@ -97,9 +101,15 @@ fun ActiveRequestsScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Активные заявки",
+                        text = stringResource(R.string.active_requests_title),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
+                    )
+                },
+                actions = {
+                    ThemeIconButton(
+                        currentTheme = currentTheme,
+                        onThemeSelected = onThemeSelected
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -134,14 +144,14 @@ fun ActiveRequestsScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Ошибка при загрузке данных",
+                            text = stringResource(R.string.active_error_loading),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = uiState.error ?: "Неизвестная ошибка",
+                            text = uiState.error ?: stringResource(R.string.active_unknown_error),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -225,7 +235,7 @@ fun ActiveRequestsScreen(
                                                 scope.launch {
                                                     viewModel.completeRequest(request.id)
                                                     val result = snackbarHostState.showSnackbar(
-                                                        message = "Заявка успешно выполнена!",
+                                                        message = context.getString(R.string.toast_request_completed),
                                                         actionLabel = cancelActionLabel,
                                                         duration = SnackbarDuration.Short
                                                     )
@@ -271,7 +281,7 @@ fun ActiveRequestsScreen(
                                             when (dismissState.dismissDirection) {
                                                 SwipeToDismissBoxValue.StartToEnd -> Icon(
                                                     imageVector = Icons.Default.Check,
-                                                    contentDescription = "Выполнено",
+                                                    contentDescription = stringResource(R.string.btn_complete),
                                                     tint = Color.White
                                                 )
                                                 SwipeToDismissBoxValue.EndToStart -> Icon(
@@ -311,10 +321,10 @@ fun ActiveRequestsScreen(
                                 }
                                 context.startActivity(intent)
                             } catch (e: Exception) {
-                                Toast.makeText(context, "Не удалось открыть номеронабиратель", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.active_toast_dial_error), Toast.LENGTH_SHORT).show()
                             }
                         } else {
-                            Toast.makeText(context, "Номер телефона не указан", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.active_toast_no_phone), Toast.LENGTH_SHORT).show()
                         }
                     },
                     onEditClick = {
@@ -331,7 +341,7 @@ fun ActiveRequestsScreen(
                         selectedRequest = null // Закрываем шторку деталей
                         scope.launch {
                             val result = snackbarHostState.showSnackbar(
-                                message = "Заявка успешно выполнена!",
+                                message = context.getString(R.string.toast_request_completed),
                                 actionLabel = cancelActionLabel,
                                 duration = SnackbarDuration.Short
                             )
@@ -359,12 +369,12 @@ fun ActiveRequestsScreen(
                             },
                             enabled = rescheduleDatePickerState.selectedDateMillis != null
                         ) {
-                            Text("ОК")
+                            Text(stringResource(R.string.dialog_ok))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showDatePickerForReschedule = false }) {
-                            Text("Отмена")
+                            Text(stringResource(R.string.dialog_cancel))
                         }
                     }
                 ) {
@@ -390,21 +400,21 @@ fun ActiveRequestsScreen(
                                     
                                     viewModel.rescheduleRequest(rescheduleTargetRequest!!, selectedDateTime)
                                     selectedRequest = null // Закрываем шторку деталей
-                                    Toast.makeText(context, "Заявка успешно перенесена", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.active_toast_rescheduled), Toast.LENGTH_SHORT).show()
                                 }
                             }
                         ) {
-                            Text("ОК")
+                            Text(stringResource(R.string.dialog_ok))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showTimePickerForReschedule = false }) {
-                            Text("Отмена")
+                            Text(stringResource(R.string.dialog_cancel))
                         }
                     },
                     title = {
                         Text(
-                            text = "Выберите время действия",
+                            text = stringResource(R.string.active_reschedule_time_title),
                             style = MaterialTheme.typography.titleMedium
                         )
                     },
@@ -449,7 +459,7 @@ fun ActiveRequestsScreen(
                                 selectedRequest = null // Закрываем шторку деталей
                                 scope.launch {
                                     val result = snackbarHostState.showSnackbar(
-                                        message = "Заявка отменена.",
+                                        message = context.getString(R.string.toast_request_cancelled),
                                         actionLabel = cancelActionLabel,
                                         duration = SnackbarDuration.Short
                                     )
@@ -509,9 +519,9 @@ fun ActiveRequestsScreen(
                                 label = {
                                     Text(
                                         text = if (selectedReasonIndex == 3) {
-                                            "Укажите причину отмены *"
+                                            stringResource(R.string.active_cancel_reason_required)
                                         } else {
-                                            "Итоговый комментарий (необязательно)"
+                                            stringResource(R.string.active_cancel_optional_comment)
                                         }
                                     )
                                 },

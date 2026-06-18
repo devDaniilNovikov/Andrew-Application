@@ -46,15 +46,15 @@
     <string name="create_comment_label">Комментарий</string>
     <string name="create_validation_error">Заполните название, телефон и дату следующего действия.</string>
     <string name="create_db_error">Ошибка базы данных</string>
-    <string name="create_success_message">Заявка успешно создана!</string>
+    <string name="create_success_message">Заявка создана</string>
     <string name="btn_create">Создать заявку</string>
     <string name="btn_clear">Очистить форму</string>
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Отмена</string>
     <string name="dialog_select_time">Выберите время</string>
     <string name="edit_request_title">Редактирование заявки</string>
-    <string name="btn_save_changes">Сохранить изменения</string>
-    <string name="update_success_message">Изменения успешно сохранены!</string>
+    <string name="btn_save_changes">Сохранить</string>
+    <string name="update_success_message">Изменения сохранены</string>
     <string name="cancel_dialog_title">Отмена заявки</string>
     <string name="cancel_reason_client_refused">Клиент отказался</string>
     <string name="cancel_reason_no_contact">Не удалось дозвониться</string>
@@ -62,8 +62,8 @@
     <string name="cancel_reason_other">Другое (укажите ниже)</string>
     <string name="cancel_dialog_comment_placeholder">Опишите причину подробнее…</string>
     <string name="cancel_dialog_confirm">Подтвердить отмену</string>
-    <string name="toast_request_completed">Заявка успешно выполнена!</string>
-    <string name="toast_request_cancelled">Заявка отменена.</string>
+    <string name="toast_request_completed">Заявка перенесена в историю</string>
+    <string name="toast_request_cancelled">Заявка перенесена в историю</string>
     <string name="client_name_hint">Без имени</string>
     <string name="urgency_overdue">Просрочено</string>
     <string name="urgency_today">Сегодня</string>
@@ -72,10 +72,10 @@
 
     <!-- History Screen -->
     <string name="history_title">История</string>
-    <string name="history_empty">Нет выполненных или отмененных заявок.</string>
-    <string name="history_empty_desc">Здесь будут отображаться завершенные или отмененные заявки. Попробуйте выбрать другой фильтр или добавьте новую заявку.</string>
+    <string name="history_empty">Нет выполненных или отмененных заявок</string>
+    <string name="history_empty_desc">Здесь будут отображаться завершённые и отменённые заявки. Попробуйте выбрать другой фильтр.</string>
     <string name="active_empty_title">Нет активных заявок</string>
-    <string name="active_empty_desc">Все задачи выполнены! Чтобы создать новую заявку, перейдите на вкладку «Создать» в нижнем меню.</string>
+    <string name="active_empty_desc">Все задачи выполнены. Чтобы добавить новую, перейдите во вкладку «Создать».</string>
     <string name="history_created_at">Создана: %s</string>
     <string name="history_closed_at">Закрыта: %s</string>
     <string name="history_final_price">Стоимость: %s ₽</string>
@@ -101,6 +101,38 @@
 
     <!-- Stage 10: Import Contact -->
     <string name="create_import_contact_desc">Выбрать контакт из адресной книги</string>
-    <string name="import_contact_success">Контакт успешно импортирован!</string>
+    <string name="import_contact_success">Контакт импортирован</string>
     <string name="import_contact_error_no_phone">У выбранного контакта нет номера телефона или имени.</string>
+
+    <!-- UI Localization (Active Requests, Bottom Sheet, Cards) -->
+    <string name="details_active_badge">АКТИВНАЯ</string>
+    <string name="details_section_contact">Контактные данные</string>
+    <string name="details_section_address">Адрес проведения работ</string>
+    <string name="details_section_action">Детали запланированного действия</string>
+    <string name="details_section_comment">Комментарий к заявке</string>
+    <string name="btn_call">Позвонить</string>
+    <string name="btn_edit">Изменить</string>
+    <string name="btn_reschedule">Перенести</string>
+    <string name="btn_complete">Выполнено</string>
+    <string name="active_requests_title">Активные заявки</string>
+    <string name="active_error_loading">Ошибка при загрузке данных</string>
+    <string name="active_unknown_error">Неизвестная ошибка</string>
+    <string name="active_toast_dial_error">Не удалось открыть номеронабиратель</string>
+    <string name="active_toast_no_phone">Номер телефона не указан</string>
+    <string name="active_toast_rescheduled">Заявка перенесена</string>
+    <string name="active_reschedule_time_title">Выберите время действия</string>
+    <string name="active_cancel_reason_required">Укажите причину отмены *</string>
+    <string name="active_cancel_optional_comment">Итоговый комментарий (необязательно)</string>
+
+    <!-- Accessibility / TalkBack -->
+    <string name="desc_client">Клиент</string>
+    <string name="desc_phone">Телефон</string>
+    <string name="desc_address">Адрес</string>
+    <string name="desc_next_action_date">Дата следующего действия</string>
+    <string name="desc_comment">Комментарий</string>
+    <string name="desc_close">Закрыть</string>
+    <string name="stats_no_chart_data">Нет данных для отображения графика</string>
+    <string name="stats_success">Успешно</string>
+    <string name="stats_legend_format">%1$d заяв. (%2$d%%)</string>
+
 </resources>

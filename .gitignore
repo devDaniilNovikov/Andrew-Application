@@ -12,3 +12,4 @@ externalNativeBuild/
 *.dex
 .env
 evaluations.json
+**/.DS_Store
