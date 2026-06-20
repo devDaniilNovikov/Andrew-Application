@@ -160,7 +160,6 @@ fun HistoryScreen(
                             color = MaterialTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = stringResource(id = R.string.history_empty_desc),
                             style = MaterialTheme.typography.bodyMedium,
@@ -169,12 +168,6 @@ fun HistoryScreen(
                         )
                     }
                 }
-
-                // Theme selector always accessible in empty state
-                ThemeSelectorCard(
-                    currentTheme = currentTheme,
-                    onThemeSelected = onThemeSelected
-                )
             }
         } else {
             // LazyColumn with historical cards
@@ -191,15 +184,6 @@ fun HistoryScreen(
                         formatter = dateTimeFormatter,
                         onClick = { editingRequest = request }
                     )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ThemeSelectorCard(
-                        currentTheme = currentTheme,
-                        onThemeSelected = onThemeSelected
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
