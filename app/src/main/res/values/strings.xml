@@ -1,141 +1,141 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Request Tracker</string>
-    <string name="theme_selection_title">Select Theme</string>
-    <string name="theme_light">Light</string>
-    <string name="theme_dark">Dark</string>
-    <string name="theme_system">System</string>
+    <string name="app_name">Контроль заявок</string>
+    <string name="theme_selection_title">Выберите тему оформления</string>
+    <string name="theme_light">Светлая</string>
+    <string name="theme_dark">Темная</string>
+    <string name="theme_system">Системная</string>
 
     <!-- RequestStatus -->
-    <string name="status_active">Active</string>
-    <string name="status_completed">Completed</string>
-    <string name="status_cancelled">Cancelled</string>
+    <string name="status_active">Активная</string>
+    <string name="status_completed">Выполнена</string>
+    <string name="status_cancelled">Отменена</string>
 
     <!-- EquipmentType -->
-    <string name="equipment_cabin">cabin</string>
-    <string name="equipment_commercial">commercial</string>
-    <string name="equipment_industrial">industrial</string>
-    <string name="equipment_air_conditioner">air conditioners</string>
-    <string name="equipment_ice_generator">ice generator</string>
-    <string name="equipment_other">other</string>
+    <string name="equipment_cabin">бытовка</string>
+    <string name="equipment_commercial">торговая</string>
+    <string name="equipment_industrial">промка</string>
+    <string name="equipment_air_conditioner">кондеи</string>
+    <string name="equipment_ice_generator">ледогенератор</string>
+    <string name="equipment_other">другое</string>
 
     <!-- ActionType -->
-    <string name="action_call">call</string>
-    <string name="action_visit">visit</string>
-    <string name="action_diagnostics">diagnostics</string>
-    <string name="action_repair">repair</string>
-    <string name="action_awaiting_parts">awaiting parts</string>
-    <string name="action_clarify_info">clarify info</string>
-    <string name="action_other">other</string>
+    <string name="action_call">позвонить</string>
+    <string name="action_visit">приехать</string>
+    <string name="action_diagnostics">диагностика</string>
+    <string name="action_repair">ремонт</string>
+    <string name="action_awaiting_parts">ожидание детали</string>
+    <string name="action_clarify_info">уточнить информацию</string>
+    <string name="action_other">другое</string>
 
     <!-- Navigation -->
-    <string name="nav_create">Create</string>
-    <string name="nav_active">Active</string>
-    <string name="nav_history">History</string>
+    <string name="nav_create">Создание</string>
+    <string name="nav_active">Список</string>
+    <string name="nav_history">История</string>
 
     <!-- Create Request Form -->
-    <string name="create_title_label">Request Title *</string>
-    <string name="create_phone_label">Phone *</string>
-    <string name="create_client_name_label">Client Name</string>
-    <string name="create_address_label">Address</string>
-    <string name="create_equipment_type_label">Request Type</string>
-    <string name="create_action_type_label">Action Type</string>
-    <string name="create_date_time_label">Date and time of next action *</string>
-    <string name="create_comment_label">Comment</string>
-    <string name="create_validation_error">Fill in the title, phone and next action date.</string>
-    <string name="create_db_error">Database error</string>
-    <string name="create_success_message">Request created</string>
-    <string name="btn_create">Create Request</string>
-    <string name="btn_clear">Clear Form</string>
+    <string name="create_title_label">Название заявки *</string>
+    <string name="create_phone_label">Телефон *</string>
+    <string name="create_client_name_label">Имя клиента</string>
+    <string name="create_address_label">Адрес</string>
+    <string name="create_equipment_type_label">Тип заявки</string>
+    <string name="create_action_type_label">Тип действия</string>
+    <string name="create_date_time_label">Дата и время следующего действия *</string>
+    <string name="create_comment_label">Комментарий</string>
+    <string name="create_validation_error">Заполните название, телефон и дату следующего действия.</string>
+    <string name="create_db_error">Ошибка базы данных</string>
+    <string name="create_success_message">Заявка создана</string>
+    <string name="btn_create">Создать заявку</string>
+    <string name="btn_clear">Очистить форму</string>
     <string name="dialog_ok">OK</string>
-    <string name="dialog_cancel">Cancel</string>
-    <string name="dialog_select_time">Select time</string>
-    <string name="edit_request_title">Edit Request</string>
-    <string name="btn_save_changes">Save</string>
-    <string name="update_success_message">Changes saved</string>
-    <string name="cancel_dialog_title">Request Cancellation</string>
-    <string name="cancel_reason_client_refused">Client refused</string>
-    <string name="cancel_reason_no_contact">Could not reach client</string>
-    <string name="cancel_reason_no_parts">No parts available</string>
-    <string name="cancel_reason_other">Other (specify below)</string>
-    <string name="cancel_dialog_comment_placeholder">Describe the reason in more detail…</string>
-    <string name="cancel_dialog_confirm">Confirm cancellation</string>
-    <string name="toast_request_completed">Request moved to history</string>
-    <string name="toast_request_cancelled">Request moved to history</string>
-    <string name="client_name_hint">No name</string>
-    <string name="urgency_overdue">Overdue</string>
-    <string name="urgency_today">Today</string>
-    <string name="urgency_planned">Planned</string>
-    <string name="btn_cancel_action">Cancel</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_select_time">Выберите время</string>
+    <string name="edit_request_title">Редактирование заявки</string>
+    <string name="btn_save_changes">Сохранить</string>
+    <string name="update_success_message">Изменения сохранены</string>
+    <string name="cancel_dialog_title">Отмена заявки</string>
+    <string name="cancel_reason_client_refused">Клиент отказался</string>
+    <string name="cancel_reason_no_contact">Не удалось дозвониться</string>
+    <string name="cancel_reason_no_parts">Нет нужных деталей</string>
+    <string name="cancel_reason_other">Другое (укажите ниже)</string>
+    <string name="cancel_dialog_comment_placeholder">Опишите причину подробнее…</string>
+    <string name="cancel_dialog_confirm">Подтвердить отмену</string>
+    <string name="toast_request_completed">Заявка перенесена в историю</string>
+    <string name="toast_request_cancelled">Заявка перенесена в историю</string>
+    <string name="client_name_hint">Без имени</string>
+    <string name="urgency_overdue">Просрочено</string>
+    <string name="urgency_today">Сегодня</string>
+    <string name="urgency_planned">Запланировано</string>
+    <string name="btn_cancel_action">Отменить</string>
 
     <!-- History Screen -->
-    <string name="history_title">History</string>
-    <string name="history_empty">No completed or cancelled requests</string>
-    <string name="history_empty_desc">Completed or cancelled requests will be displayed here. Try selecting another filter.</string>
-    <string name="active_empty_title">No active requests</string>
-    <string name="active_empty_desc">All tasks completed. To create a new request, go to the "Create" tab.</string>
-    <string name="history_created_at">Created: %s</string>
-    <string name="history_closed_at">Closed: %s</string>
-    <string name="history_final_price">Cost: %s ₽</string>
-    <string name="history_final_comment">Result: %s</string>
-    <string name="history_cancel_reason">Cancel Reason: %s</string>
-    <string name="history_sort_title">Sort:</string>
-    <string name="history_sort_by_date">By date</string>
-    <string name="history_sort_by_status">By status</string>
-    <string name="history_filter_all">All</string>
-    <string name="history_filter_completed">Completed</string>
-    <string name="history_filter_cancelled">Cancelled</string>
-    <string name="history_edit_dialog_title">Edit Outcome</string>
-    <string name="history_edit_price_label">Final Cost (₽)</string>
-    <string name="history_edit_comment_label">Final Comment</string>
-    <string name="history_edit_reason_label">Cancel Reason</string>
-    <string name="history_invalid_price_error">Invalid price format</string>
-    <string name="complete_dialog_title">Complete Request</string>
-    <string name="complete_dialog_price_label">Final Cost (₽)</string>
-    <string name="complete_dialog_comment_label">Final Comment (optional)</string>
-    <string name="complete_dialog_confirm">Confirm Completion</string>
+    <string name="history_title">История</string>
+    <string name="history_empty">Нет выполненных или отмененных заявок</string>
+    <string name="history_empty_desc">Здесь будут отображаться завершённые и отменённые заявки. Попробуйте выбрать другой фильтр.</string>
+    <string name="active_empty_title">Нет активных заявок</string>
+    <string name="active_empty_desc">Все задачи выполнены. Чтобы добавить новую, перейдите во вкладку «Создать».</string>
+    <string name="history_created_at">Создана: %s</string>
+    <string name="history_closed_at">Закрыта: %s</string>
+    <string name="history_final_price">Стоимость: %s ₽</string>
+    <string name="history_final_comment">Результат: %s</string>
+    <string name="history_cancel_reason">Причина отмены: %s</string>
+    <string name="history_sort_title">Сортировка:</string>
+    <string name="history_sort_by_date">По дате</string>
+    <string name="history_sort_by_status">По статусу</string>
+    <string name="history_filter_all">Все</string>
+    <string name="history_filter_completed">Выполненные</string>
+    <string name="history_filter_cancelled">Отмененные</string>
+    <string name="history_edit_dialog_title">Редактирование итога</string>
+    <string name="history_edit_price_label">Финальная стоимость (₽)</string>
+    <string name="history_edit_comment_label">Итоговый комментарий</string>
+    <string name="history_edit_reason_label">Причина отмены</string>
+    <string name="history_invalid_price_error">Неверный формат цены</string>
+    <string name="complete_dialog_title">Завершение заявки</string>
+    <string name="complete_dialog_price_label">Итоговая стоимость (₽)</string>
+    <string name="complete_dialog_comment_label">Итоговый комментарий (необязательно)</string>
+    <string name="complete_dialog_confirm">Подтвердить выполнение</string>
 
     <!-- Notifications -->
     <string name="not_assigned">Не назначено</string>
-    <string name="notification_channel_name">Action Reminders</string>
-    <string name="notification_channel_description">Reminders of scheduled actions and client calls</string>
-    <string name="notification_today">Today</string>
-    <string name="notification_tomorrow">Tomorrow</string>
+    <string name="notification_channel_name">Напоминания о действиях</string>
+    <string name="notification_channel_description">Напоминания о запланированных действиях и звонках клиентам</string>
+    <string name="notification_today">Сегодня</string>
+    <string name="notification_tomorrow">Завтра</string>
 
     <!-- Stage 10: Import Contact -->
-    <string name="create_import_contact_desc">Choose contact from address book</string>
-    <string name="import_contact_success">Contact imported</string>
-    <string name="import_contact_error_no_phone">Selected contact has no phone number or name.</string>
+    <string name="create_import_contact_desc">Выбрать контакт из адресной книги</string>
+    <string name="import_contact_success">Контакт импортирован</string>
+    <string name="import_contact_error_no_phone">У выбранного контакта нет номера телефона или имени.</string>
 
     <!-- UI Localization (Active Requests, Bottom Sheet, Cards) -->
-    <string name="details_active_badge">ACTIVE</string>
-    <string name="details_section_contact">Contact Details</string>
-    <string name="details_section_address">Work Address</string>
-    <string name="details_section_action">Scheduled Action Details</string>
-    <string name="details_section_comment">Request Comment</string>
-    <string name="btn_call">Call</string>
-    <string name="btn_edit">Edit</string>
-    <string name="btn_reschedule">Reschedule</string>
-    <string name="btn_complete">Completed</string>
-    <string name="active_requests_title">Active Requests</string>
-    <string name="active_error_loading">Error loading data</string>
-    <string name="active_unknown_error">Unknown error</string>
-    <string name="active_toast_dial_error">Failed to open dialer</string>
-    <string name="active_toast_no_phone">Phone number not specified</string>
-    <string name="active_toast_rescheduled">Request rescheduled</string>
-    <string name="active_reschedule_time_title">Select action time</string>
-    <string name="active_cancel_reason_required">Specify cancel reason *</string>
-    <string name="active_cancel_optional_comment">Final comment (optional)</string>
+    <string name="details_active_badge">АКТИВНАЯ</string>
+    <string name="details_section_contact">Контактные данные</string>
+    <string name="details_section_address">Адрес проведения работ</string>
+    <string name="details_section_action">Детали запланированного действия</string>
+    <string name="details_section_comment">Комментарий к заявке</string>
+    <string name="btn_call">Позвонить</string>
+    <string name="btn_edit">Изменить</string>
+    <string name="btn_reschedule">Перенести</string>
+    <string name="btn_complete">Выполнено</string>
+    <string name="active_requests_title">Активные заявки</string>
+    <string name="active_error_loading">Ошибка при загрузке данных</string>
+    <string name="active_unknown_error">Неизвестная ошибка</string>
+    <string name="active_toast_dial_error">Не удалось открыть номеронабиратель</string>
+    <string name="active_toast_no_phone">Номер телефона не указан</string>
+    <string name="active_toast_rescheduled">Заявка перенесена</string>
+    <string name="active_reschedule_time_title">Выберите время действия</string>
+    <string name="active_cancel_reason_required">Укажите причину отмены *</string>
+    <string name="active_cancel_optional_comment">Итоговый комментарий (необязательно)</string>
 
     <!-- Accessibility / TalkBack -->
-    <string name="desc_client">Client</string>
-    <string name="desc_phone">Phone</string>
-    <string name="desc_address">Address</string>
-    <string name="desc_next_action_date">Next action date</string>
-    <string name="desc_comment">Comment</string>
-    <string name="desc_close">Close</string>
-    <string name="stats_no_chart_data">No data to display the chart</string>
-    <string name="stats_success">Successful</string>
-    <string name="stats_legend_format">%1$d req. (%2$d%%)</string>
+    <string name="desc_client">Клиент</string>
+    <string name="desc_phone">Телефон</string>
+    <string name="desc_address">Адрес</string>
+    <string name="desc_next_action_date">Дата следующего действия</string>
+    <string name="desc_comment">Комментарий</string>
+    <string name="desc_close">Закрыть</string>
+    <string name="stats_no_chart_data">Нет данных для отображения графика</string>
+    <string name="stats_success">Успешно</string>
+    <string name="stats_legend_format">%1$d заяв. (%2$d%%)</string>
 
 </resources>

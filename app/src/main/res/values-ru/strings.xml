@@ -96,6 +96,7 @@
     <string name="complete_dialog_confirm">Подтвердить выполнение</string>
 
     <!-- Notifications -->
+    <string name="not_assigned">Не назначено</string>
     <string name="notification_channel_name">Напоминания о действиях</string>
     <string name="notification_channel_description">Напоминания о запланированных действиях и звонках клиентам</string>
     <string name="notification_today">Сегодня</string>
