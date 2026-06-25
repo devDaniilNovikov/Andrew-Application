@@ -258,54 +258,40 @@ fun ActiveRequestsScreen(
                                 SwipeToDismissBox(
                                     state = dismissState,
                                     backgroundContent = {
-                                        val color by animateColorAsState(
-                                            targetValue = when (dismissState.targetValue) {
-                                                SwipeToDismissBoxValue.StartToEnd -> Color(0xFF2E7D32) // Мягкий зеленый для выполнения
-                                                SwipeToDismissBoxValue.EndToStart -> Color(0xFFC62828) // Мягкий красный для отмены
-                                                SwipeToDismissBoxValue.Settled -> Color.Transparent
-                                            },
-                                            label = "dismissColor"
+                                        val color = when (dismissState.dismissDirection) {
+                                            SwipeToDismissBoxValue.StartToEnd -> Color(0xFF2E7D32) // Зеленый для выполнения
+                                            SwipeToDismissBoxValue.EndToStart -> Color(0xFFC62828) // Красный для отмены
+                                            SwipeToDismissBoxValue.Settled -> Color.Transparent
+                                            null -> Color.Transparent
+                                        }
+
+                                        val alpha by animateFloatAsState(
+                                            targetValue = if (dismissState.dismissDirection == SwipeToDismissBoxValue.Settled || dismissState.dismissDirection == null) 0f else 1f,
+                                            label = "bgAlpha"
                                         )
+
                                         Box(
                                             modifier = Modifier
                                                 .fillMaxSize()
                                                 .padding(vertical = 6.dp, horizontal = 12.dp)
-                                                .background(color, shape = RoundedCornerShape(16.dp))
+                                                .background(color.copy(alpha = alpha), shape = RoundedCornerShape(16.dp))
                                                 .padding(horizontal = 20.dp)
                                         ) {
-                                            val startScale by animateFloatAsState(
-                                                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) 1.2f else 0.8f,
-                                                label = "startScale"
-                                            )
-                                            val startAlpha by animateFloatAsState(
-                                                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) 1f else 0.5f,
-                                                label = "startAlpha"
-                                            )
-                                            Icon(
-                                                imageVector = Icons.Default.Check,
-                                                contentDescription = stringResource(R.string.btn_complete),
-                                                tint = Color.White.copy(alpha = startAlpha),
-                                                modifier = Modifier
-                                                    .align(Alignment.CenterStart)
-                                                    .scale(startScale)
-                                            )
-
-                                            val endScale by animateFloatAsState(
-                                                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) 1.2f else 0.8f,
-                                                label = "endScale"
-                                            )
-                                            val endAlpha by animateFloatAsState(
-                                                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) 1f else 0.5f,
-                                                label = "endAlpha"
-                                            )
-                                            Icon(
-                                                imageVector = Icons.Default.Close,
-                                                contentDescription = cancelActionLabel,
-                                                tint = Color.White.copy(alpha = endAlpha),
-                                                modifier = Modifier
-                                                    .align(Alignment.CenterEnd)
-                                                    .scale(endScale)
-                                            )
+                                            if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Check,
+                                                    contentDescription = stringResource(R.string.btn_complete),
+                                                    tint = Color.White,
+                                                    modifier = Modifier.align(Alignment.CenterStart)
+                                                )
+                                            } else if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Close,
+                                                    contentDescription = cancelActionLabel,
+                                                    tint = Color.White,
+                                                    modifier = Modifier.align(Alignment.CenterEnd)
+                                                )
+                                            }
                                         }
                                     },
                                     content = {
