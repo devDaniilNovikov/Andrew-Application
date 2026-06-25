@@ -474,16 +474,16 @@ fun HistoryRequestCard(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Dates Row (Created / Closed)
-            Row(
+            // Dates Column (Created / Closed)
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 // Created Date Chip
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .weight(1f)
+                        .fillMaxWidth()
                         .clip(RoundedCornerShape(10.dp))
                         .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f))
                         .padding(horizontal = 10.dp, vertical = 6.dp)
@@ -498,9 +498,7 @@ fun HistoryRequestCard(
                     Text(
                         text = stringResource(id = R.string.history_created_at, formattedCreated),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
@@ -510,7 +508,7 @@ fun HistoryRequestCard(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .weight(1f)
+                            .fillMaxWidth()
                             .clip(RoundedCornerShape(10.dp))
                             .background(statusColor.copy(alpha = 0.12f))
                             .padding(horizontal = 10.dp, vertical = 6.dp)
@@ -526,9 +524,7 @@ fun HistoryRequestCard(
                             text = stringResource(id = R.string.history_closed_at, formattedClosed),
                             style = MaterialTheme.typography.bodySmall,
                             color = statusColor,
-                            fontWeight = FontWeight.Medium,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
