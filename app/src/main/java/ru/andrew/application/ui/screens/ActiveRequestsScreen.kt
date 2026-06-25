@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
+import ru.andrew.application.ui.extensions.smoothScroll
 
 /**
  * Экран списка активных заявок.
@@ -227,7 +228,7 @@ fun ActiveRequestsScreen(
                         }
                     } else {
                         LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize().smoothScroll(0.80f),
                             contentPadding = PaddingValues(bottom = 16.dp)
                         ) {
                             items(
