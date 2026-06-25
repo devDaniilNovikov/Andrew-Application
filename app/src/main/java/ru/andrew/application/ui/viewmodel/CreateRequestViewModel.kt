@@ -89,19 +89,23 @@ class CreateRequestViewModel(
     }
 
     fun updateTitle(title: String) {
-        _uiState.update { it.copy(title = title, error = null) }
+        val sanitized = title.replace(Regex("[\\n\\t\\r]+"), " ")
+        _uiState.update { it.copy(title = sanitized, error = null) }
     }
 
     fun updatePhone(phone: String) {
-        _uiState.update { it.copy(phone = phone, error = null) }
+        val sanitized = phone.replace(Regex("[\\n\\t\\r]+"), "")
+        _uiState.update { it.copy(phone = sanitized, error = null) }
     }
 
     fun updateClientName(clientName: String) {
-        _uiState.update { it.copy(clientName = clientName) }
+        val sanitized = clientName.replace(Regex("[\\n\\t\\r]+"), " ")
+        _uiState.update { it.copy(clientName = sanitized) }
     }
 
     fun updateAddress(address: String) {
-        _uiState.update { it.copy(address = address) }
+        val sanitized = address.replace(Regex("[\\n\\t\\r]+"), " ")
+        _uiState.update { it.copy(address = sanitized) }
     }
 
     fun updateEquipmentType(type: EquipmentType) {
