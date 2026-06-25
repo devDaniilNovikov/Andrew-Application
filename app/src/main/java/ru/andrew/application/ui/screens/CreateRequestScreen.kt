@@ -365,7 +365,9 @@ fun CreateRequestScreen(
                 label = { Text(stringResource(id = R.string.create_address_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                singleLine = true,
+                singleLine = false,
+                minLines = 1,
+                maxLines = 4,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 leadingIcon = {
                     Icon(
