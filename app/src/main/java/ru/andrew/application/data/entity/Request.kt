@@ -17,7 +17,8 @@ import ru.andrew.application.domain.ActionType
     indices = [
         Index("status"),
         Index("nextActionDateTime"),
-        Index("closedAt")
+        Index("closedAt"),
+        Index("createdAt")
     ]
 )
 data class Request(
@@ -35,8 +36,7 @@ data class Request(
     val equipmentType: EquipmentType? = null,
     
     val actionType: ActionType? = null,
-    
-    val nextActionDateTime: LocalDateTime,
+    val nextActionDateTime: LocalDateTime? = null,
     
     val comment: String? = null,
     

@@ -65,7 +65,7 @@ object NotificationHelper {
         val titleText = "$capitalizedAction: ${request.title}"
 
         // Форматируем время выполнения напоминания
-        val formattedTime = formatNotificationDateTime(context, request.nextActionDateTime)
+        val formattedTime = request.nextActionDateTime?.let { formatNotificationDateTime(context, it) } ?: context.getString(R.string.not_assigned)
         
         // Маскируем номер телефона клиента для защиты персональных данных (PII)
         val maskedPhone = maskPhoneNumber(request.phone)

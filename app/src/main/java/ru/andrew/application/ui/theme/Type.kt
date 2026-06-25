@@ -8,75 +8,75 @@ private val DefaultTypography = Typography()
 
 internal val AppTypography = Typography(
     displayLarge = DefaultTypography.displayLarge.copy(
-        fontSize = 58.sp,
-        lineHeight = 66.sp,
-        fontWeight = FontWeight.SemiBold
+        fontSize = 60.sp,
+        lineHeight = 68.sp,
+        fontWeight = FontWeight.Bold
     ),
     displayMedium = DefaultTypography.displayMedium.copy(
-        fontSize = 48.sp,
-        lineHeight = 56.sp,
-        fontWeight = FontWeight.SemiBold
+        fontSize = 50.sp,
+        lineHeight = 58.sp,
+        fontWeight = FontWeight.Bold
     ),
     displaySmall = DefaultTypography.displaySmall.copy(
-        fontSize = 40.sp,
-        lineHeight = 48.sp,
-        fontWeight = FontWeight.SemiBold
+        fontSize = 42.sp,
+        lineHeight = 50.sp,
+        fontWeight = FontWeight.Bold
     ),
     headlineLarge = DefaultTypography.headlineLarge.copy(
-        fontSize = 34.sp,
-        lineHeight = 42.sp,
+        fontSize = 36.sp,
+        lineHeight = 44.sp,
         fontWeight = FontWeight.SemiBold
     ),
     headlineMedium = DefaultTypography.headlineMedium.copy(
-        fontSize = 30.sp,
-        lineHeight = 38.sp,
+        fontSize = 32.sp,
+        lineHeight = 40.sp,
         fontWeight = FontWeight.SemiBold
     ),
     headlineSmall = DefaultTypography.headlineSmall.copy(
+        fontSize = 28.sp,
+        lineHeight = 36.sp,
+        fontWeight = FontWeight.SemiBold
+    ),
+    titleLarge = DefaultTypography.titleLarge.copy(
         fontSize = 26.sp,
         lineHeight = 34.sp,
         fontWeight = FontWeight.SemiBold
     ),
-    titleLarge = DefaultTypography.titleLarge.copy(
-        fontSize = 24.sp,
-        lineHeight = 32.sp,
-        fontWeight = FontWeight.SemiBold
-    ),
     titleMedium = DefaultTypography.titleMedium.copy(
+        fontSize = 22.sp,
+        lineHeight = 30.sp,
+        fontWeight = FontWeight.Medium
+    ),
+    titleSmall = DefaultTypography.titleSmall.copy(
         fontSize = 20.sp,
         lineHeight = 28.sp,
         fontWeight = FontWeight.Medium
     ),
-    titleSmall = DefaultTypography.titleSmall.copy(
-        fontSize = 18.sp,
-        lineHeight = 26.sp,
-        fontWeight = FontWeight.Medium
-    ),
     bodyLarge = DefaultTypography.bodyLarge.copy(
-        fontSize = 18.sp,
-        lineHeight = 28.sp
+        fontSize = 20.sp,
+        lineHeight = 30.sp
     ),
     bodyMedium = DefaultTypography.bodyMedium.copy(
+        fontSize = 18.sp,
+        lineHeight = 26.sp
+    ),
+    bodySmall = DefaultTypography.bodySmall.copy(
         fontSize = 16.sp,
         lineHeight = 24.sp
     ),
-    bodySmall = DefaultTypography.bodySmall.copy(
-        fontSize = 15.sp,
-        lineHeight = 22.sp
-    ),
     labelLarge = DefaultTypography.labelLarge.copy(
+        fontSize = 18.sp,
+        lineHeight = 24.sp,
+        fontWeight = FontWeight.Medium
+    ),
+    labelMedium = DefaultTypography.labelMedium.copy(
         fontSize = 16.sp,
         lineHeight = 22.sp,
         fontWeight = FontWeight.Medium
     ),
-    labelMedium = DefaultTypography.labelMedium.copy(
+    labelSmall = DefaultTypography.labelSmall.copy(
         fontSize = 15.sp,
         lineHeight = 20.sp,
-        fontWeight = FontWeight.Medium
-    ),
-    labelSmall = DefaultTypography.labelSmall.copy(
-        fontSize = 14.sp,
-        lineHeight = 18.sp,
         fontWeight = FontWeight.Medium
     )
 )

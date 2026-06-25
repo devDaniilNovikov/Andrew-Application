@@ -17,13 +17,11 @@ val RequestStatus.displayNameResId: Int
 @get:StringRes
 val EquipmentType.displayNameResId: Int
     get() = when (this) {
-        EquipmentType.DOMESTIC_REFRIGERATOR -> R.string.equipment_domestic_refrigerator
-        EquipmentType.COMMERCIAL_EQUIPMENT -> R.string.equipment_commercial
-        EquipmentType.INDUSTRIAL_EQUIPMENT -> R.string.equipment_industrial
+        EquipmentType.CABIN -> R.string.equipment_cabin
+        EquipmentType.COMMERCIAL -> R.string.equipment_commercial
+        EquipmentType.INDUSTRIAL -> R.string.equipment_industrial
+        EquipmentType.AIR_CONDITIONER -> R.string.equipment_air_conditioner
         EquipmentType.ICE_GENERATOR -> R.string.equipment_ice_generator
-        EquipmentType.FREEZER_CHAMBER -> R.string.equipment_freezer_chamber
-        EquipmentType.REFRIGERATED_SHOWCASE -> R.string.equipment_refrigerated_showcase
-        EquipmentType.SPLIT_SYSTEM -> R.string.equipment_split_system
         EquipmentType.OTHER -> R.string.equipment_other
     }
 

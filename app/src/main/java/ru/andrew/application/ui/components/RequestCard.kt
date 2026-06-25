@@ -140,7 +140,7 @@ fun RequestCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Person,
-                        contentDescription = "Клиент",
+                        contentDescription = stringResource(R.string.desc_client),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(16.dp)
                     )
@@ -157,7 +157,7 @@ fun RequestCard(
                         Spacer(modifier = Modifier.width(12.dp))
                         Icon(
                             imageVector = Icons.Default.Phone,
-                            contentDescription = "Телефон",
+                            contentDescription = stringResource(R.string.desc_phone),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(16.dp)
                         )
@@ -182,7 +182,7 @@ fun RequestCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Place,
-                        contentDescription = "Адрес",
+                        contentDescription = stringResource(R.string.desc_address),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(16.dp)
                     )
@@ -210,7 +210,7 @@ fun RequestCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.DateRange,
-                        contentDescription = "Дата следующего действия",
+                        contentDescription = stringResource(R.string.desc_next_action_date),
                         tint = dateContentColor,
                         modifier = Modifier.size(16.dp)
                     )
@@ -278,7 +278,7 @@ fun RequestCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Comment,
-                        contentDescription = "Комментарий",
+                        contentDescription = stringResource(R.string.desc_comment),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                         modifier = Modifier.size(14.dp).padding(top = 2.dp)
                     )

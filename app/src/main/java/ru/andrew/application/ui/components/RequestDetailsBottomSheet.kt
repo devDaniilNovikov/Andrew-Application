@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -99,7 +100,7 @@ fun RequestDetailsBottomSheet(
                 IconButton(onClick = onDismissRequest) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Закрыть"
+                        contentDescription = stringResource(R.string.desc_close)
                     )
                 }
             }
@@ -131,7 +132,7 @@ fun RequestDetailsBottomSheet(
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "АКТИВНАЯ",
+                        text = stringResource(R.string.details_active_badge),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         fontWeight = FontWeight.Bold
@@ -146,7 +147,7 @@ fun RequestDetailsBottomSheet(
             // Client Name & Phone
             if (!request.clientName.isNullOrBlank() || request.phone.isNotEmpty()) {
                 Text(
-                    text = "Контактные данные",
+                    text = stringResource(R.string.details_section_contact),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -157,7 +158,7 @@ fun RequestDetailsBottomSheet(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.Person,
-                                contentDescription = "Клиент",
+                                contentDescription = stringResource(R.string.desc_client),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -173,7 +174,7 @@ fun RequestDetailsBottomSheet(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.Phone,
-                                contentDescription = "Телефон",
+                                contentDescription = stringResource(R.string.desc_phone),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -193,7 +194,7 @@ fun RequestDetailsBottomSheet(
             // Address
             if (!request.address.isNullOrBlank()) {
                 Text(
-                    text = "Адрес проведения работ",
+                    text = stringResource(R.string.details_section_address),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -202,7 +203,7 @@ fun RequestDetailsBottomSheet(
                 Row(verticalAlignment = Alignment.Top) {
                     Icon(
                         imageVector = Icons.Default.Place,
-                        contentDescription = "Адрес",
+                        contentDescription = stringResource(R.string.desc_address),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(20.dp)
                     )
@@ -218,7 +219,7 @@ fun RequestDetailsBottomSheet(
 
             // Next Action & Chips
             Text(
-                text = "Детали запланированного действия",
+                text = stringResource(R.string.details_section_action),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -229,7 +230,7 @@ fun RequestDetailsBottomSheet(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
-                            contentDescription = "Срок действия",
+                            contentDescription = stringResource(R.string.desc_next_action_date),
                             tint = urgencyColor,
                             modifier = Modifier.size(20.dp)
                         )
@@ -283,7 +284,7 @@ fun RequestDetailsBottomSheet(
             if (!request.comment.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Комментарий к заявке",
+                    text = stringResource(R.string.details_section_comment),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -292,7 +293,7 @@ fun RequestDetailsBottomSheet(
                 Row(verticalAlignment = Alignment.Top) {
                     Icon(
                         imageVector = Icons.Default.Comment,
-                        contentDescription = "Комментарий",
+                        contentDescription = stringResource(R.string.desc_comment),
                         tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
                         modifier = Modifier.size(20.dp)
                     )
@@ -318,51 +319,51 @@ fun RequestDetailsBottomSheet(
                     onClick = onCallClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(50.dp),
+                        .height(dimensionResource(id = R.dimen.button_height)),
                     contentPadding = PaddingValues(horizontal = 8.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Phone,
-                        contentDescription = "Позвонить",
+                        contentDescription = stringResource(R.string.btn_call),
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "Позвонить", style = MaterialTheme.typography.titleSmall)
+                    Text(text = stringResource(R.string.btn_call), style = MaterialTheme.typography.titleSmall)
                 }
 
                 OutlinedButton(
                     onClick = onEditClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(50.dp),
+                        .height(dimensionResource(id = R.dimen.button_height)),
                     contentPadding = PaddingValues(horizontal = 8.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Изменить",
+                        contentDescription = stringResource(R.string.btn_edit),
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "Изменить", style = MaterialTheme.typography.titleSmall)
+                    Text(text = stringResource(R.string.btn_edit), style = MaterialTheme.typography.titleSmall)
                 }
 
                 OutlinedButton(
                     onClick = onRescheduleClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(50.dp),
+                        .height(dimensionResource(id = R.dimen.button_height)),
                     contentPadding = PaddingValues(horizontal = 8.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.DateRange,
-                        contentDescription = "Перенести",
+                        contentDescription = stringResource(R.string.btn_reschedule),
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = "Перенести", style = MaterialTheme.typography.titleSmall)
+                    Text(text = stringResource(R.string.btn_reschedule), style = MaterialTheme.typography.titleSmall)
                 }
             }
 
@@ -377,28 +378,28 @@ fun RequestDetailsBottomSheet(
                     onClick = onCompleteClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(50.dp),
+                        .height(dimensionResource(id = R.dimen.button_height)),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     ),
                     contentPadding = PaddingValues(horizontal = 8.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(text = "Выполнено", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(text = stringResource(R.string.btn_complete), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
 
                 Button(
                     onClick = onCancelClick,
                     modifier = Modifier
                         .weight(1f)
-                        .height(50.dp),
+                        .height(dimensionResource(id = R.dimen.button_height)),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error,
                         contentColor = MaterialTheme.colorScheme.onError
                     ),
                     contentPadding = PaddingValues(horizontal = 8.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(text = stringResource(R.string.btn_cancel_action), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }

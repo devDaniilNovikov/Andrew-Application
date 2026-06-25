@@ -29,6 +29,8 @@ import java.time.ZoneOffset
 import androidx.navigation.NavController
 import androidx.compose.ui.res.stringResource
 import ru.andrew.application.R
+import ru.andrew.application.ui.theme.AppTheme
+import ru.andrew.application.ui.components.ThemeIconButton
 import ru.andrew.application.ui.util.cleanPhoneNumber
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -40,6 +42,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 
 /**
  * Экран списка активных заявок.
@@ -48,6 +52,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ActiveRequestsScreen(
     navController: NavController,
+    currentTheme: AppTheme,
+    onThemeSelected: (AppTheme) -> Unit,
     deepLinkRequestId: Long = -1L,
     viewModel: ActiveRequestsViewModel = viewModel(factory = ActiveRequestsViewModel.Factory)
 ) {
@@ -76,6 +82,10 @@ fun ActiveRequestsScreen(
     var showCancelDialog by remember { mutableStateOf(false) }
     var cancelTargetRequest by remember { mutableStateOf<Request?>(null) }
 
+    // Состояния для выполнения заявки с вводом цены (fix-add-money)
+    var showCompleteDialog by remember { mutableStateOf(false) }
+    var completeTargetRequest by remember { mutableStateOf<Request?>(null) }
+
     val (rescheduleDatePickerState, rescheduleTimePickerState) = key(rescheduleTargetRequest?.id) {
         val dateState = rememberDatePickerState(
             initialSelectedDateMillis = rescheduleTargetRequest?.nextActionDateTime
@@ -97,9 +107,15 @@ fun ActiveRequestsScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Активные заявки",
+                        text = stringResource(R.string.active_requests_title),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
+                    )
+                },
+                actions = {
+                    ThemeIconButton(
+                        currentTheme = currentTheme,
+                        onThemeSelected = onThemeSelected
                     )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -134,14 +150,14 @@ fun ActiveRequestsScreen(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Ошибка при загрузке данных",
+                            text = stringResource(R.string.active_error_loading),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.error
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = uiState.error ?: "Неизвестная ошибка",
+                            text = uiState.error ?: stringResource(R.string.active_unknown_error),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
@@ -222,18 +238,9 @@ fun ActiveRequestsScreen(
                                     confirmValueChange = { dismissValue ->
                                         when (dismissValue) {
                                             SwipeToDismissBoxValue.StartToEnd -> {
-                                                scope.launch {
-                                                    viewModel.completeRequest(request.id)
-                                                    val result = snackbarHostState.showSnackbar(
-                                                        message = "Заявка успешно выполнена!",
-                                                        actionLabel = cancelActionLabel,
-                                                        duration = SnackbarDuration.Short
-                                                    )
-                                                    if (result == SnackbarResult.ActionPerformed) {
-                                                        viewModel.restoreRequest(request.id)
-                                                    }
-                                                }
-                                                true
+                                                completeTargetRequest = request
+                                                showCompleteDialog = true
+                                                false // snaps card back, dialog takes over
                                             }
                                             SwipeToDismissBoxValue.EndToStart -> {
                                                 cancelTargetRequest = request
@@ -271,7 +278,7 @@ fun ActiveRequestsScreen(
                                             when (dismissState.dismissDirection) {
                                                 SwipeToDismissBoxValue.StartToEnd -> Icon(
                                                     imageVector = Icons.Default.Check,
-                                                    contentDescription = "Выполнено",
+                                                    contentDescription = stringResource(R.string.btn_complete),
                                                     tint = Color.White
                                                 )
                                                 SwipeToDismissBoxValue.EndToStart -> Icon(
@@ -311,10 +318,10 @@ fun ActiveRequestsScreen(
                                 }
                                 context.startActivity(intent)
                             } catch (e: Exception) {
-                                Toast.makeText(context, "Не удалось открыть номеронабиратель", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.active_toast_dial_error), Toast.LENGTH_SHORT).show()
                             }
                         } else {
-                            Toast.makeText(context, "Номер телефона не указан", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, context.getString(R.string.active_toast_no_phone), Toast.LENGTH_SHORT).show()
                         }
                     },
                     onEditClick = {
@@ -326,19 +333,9 @@ fun ActiveRequestsScreen(
                         showDatePickerForReschedule = true
                     },
                     onCompleteClick = {
-                        val targetId = request.id
-                        viewModel.completeRequest(targetId)
+                        completeTargetRequest = request
+                        showCompleteDialog = true
                         selectedRequest = null // Закрываем шторку деталей
-                        scope.launch {
-                            val result = snackbarHostState.showSnackbar(
-                                message = "Заявка успешно выполнена!",
-                                actionLabel = cancelActionLabel,
-                                duration = SnackbarDuration.Short
-                            )
-                            if (result == SnackbarResult.ActionPerformed) {
-                                viewModel.restoreRequest(targetId)
-                            }
-                        }
                     },
                     onCancelClick = {
                         cancelTargetRequest = request
@@ -359,12 +356,12 @@ fun ActiveRequestsScreen(
                             },
                             enabled = rescheduleDatePickerState.selectedDateMillis != null
                         ) {
-                            Text("ОК")
+                            Text(stringResource(R.string.dialog_ok))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showDatePickerForReschedule = false }) {
-                            Text("Отмена")
+                            Text(stringResource(R.string.dialog_cancel))
                         }
                     }
                 ) {
@@ -390,21 +387,21 @@ fun ActiveRequestsScreen(
                                     
                                     viewModel.rescheduleRequest(rescheduleTargetRequest!!, selectedDateTime)
                                     selectedRequest = null // Закрываем шторку деталей
-                                    Toast.makeText(context, "Заявка успешно перенесена", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, context.getString(R.string.active_toast_rescheduled), Toast.LENGTH_SHORT).show()
                                 }
                             }
                         ) {
-                            Text("ОК")
+                            Text(stringResource(R.string.dialog_ok))
                         }
                     },
                     dismissButton = {
                         TextButton(onClick = { showTimePickerForReschedule = false }) {
-                            Text("Отмена")
+                            Text(stringResource(R.string.dialog_cancel))
                         }
                     },
                     title = {
                         Text(
-                            text = "Выберите время действия",
+                            text = stringResource(R.string.active_reschedule_time_title),
                             style = MaterialTheme.typography.titleMedium
                         )
                     },
@@ -449,7 +446,7 @@ fun ActiveRequestsScreen(
                                 selectedRequest = null // Закрываем шторку деталей
                                 scope.launch {
                                     val result = snackbarHostState.showSnackbar(
-                                        message = "Заявка отменена.",
+                                        message = context.getString(R.string.toast_request_cancelled),
                                         actionLabel = cancelActionLabel,
                                         duration = SnackbarDuration.Short
                                     )
@@ -509,9 +506,9 @@ fun ActiveRequestsScreen(
                                 label = {
                                     Text(
                                         text = if (selectedReasonIndex == 3) {
-                                            "Укажите причину отмены *"
+                                            stringResource(R.string.active_cancel_reason_required)
                                         } else {
-                                            "Итоговый комментарий (необязательно)"
+                                            stringResource(R.string.active_cancel_optional_comment)
                                         }
                                     )
                                 },
@@ -524,6 +521,109 @@ fun ActiveRequestsScreen(
                     }
                 )
             }
+
+            // Диалог выполнения заявки с вводом стоимости (fix-add-money)
+            if (showCompleteDialog && completeTargetRequest != null) {
+                CompleteRequestDialog(
+                    request = completeTargetRequest!!,
+                    onDismiss = { showCompleteDialog = false },
+                    onConfirm = { parsedPrice, commentText ->
+                        val targetId = completeTargetRequest!!.id
+                        viewModel.completeRequest(targetId, parsedPrice, commentText)
+                        showCompleteDialog = false
+                        scope.launch {
+                            val result = snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.toast_request_completed),
+                                actionLabel = cancelActionLabel,
+                                duration = SnackbarDuration.Short
+                            )
+                            if (result == SnackbarResult.ActionPerformed) {
+                                viewModel.restoreRequest(targetId)
+                            }
+                        }
+                    }
+                )
+            }
         }
     }
+}
+
+/**
+ * Диалог завершения заявки с вводом стоимости и итогового комментария.
+ */
+@Composable
+fun CompleteRequestDialog(
+    request: Request,
+    onDismiss: () -> Unit,
+    onConfirm: (finalPrice: Double?, finalComment: String?) -> Unit
+) {
+    var priceText by remember { mutableStateOf("") }
+    var commentText by remember { mutableStateOf("") }
+    var priceError by remember { mutableStateOf<String?>(null) }
+    val invalidPriceMsg = stringResource(id = R.string.history_invalid_price_error)
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(id = R.string.complete_dialog_title),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Поле ввода цены
+                OutlinedTextField(
+                    value = priceText,
+                    onValueChange = {
+                        priceText = it
+                        priceError = null
+                    },
+                    label = { Text(text = stringResource(id = R.string.complete_dialog_price_label)) },
+                    isError = priceError != null,
+                    supportingText = priceError?.let { error -> { Text(text = error) } },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                // Поле ввода комментария
+                OutlinedTextField(
+                    value = commentText,
+                    onValueChange = { commentText = it },
+                    label = { Text(text = stringResource(id = R.string.complete_dialog_comment_label)) },
+                    minLines = 3,
+                    maxLines = 5,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    val parsedPrice = priceText.trim().replace(",", ".").toDoubleOrNull()
+                    if (priceText.trim().isNotEmpty() && parsedPrice == null) {
+                        priceError = invalidPriceMsg
+                    } else {
+                        onConfirm(parsedPrice, commentText.trim().takeIf { it.isNotEmpty() })
+                    }
+                }
+            ) {
+                Text(text = stringResource(id = R.string.complete_dialog_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(id = R.string.dialog_cancel))
+            }
+        }
+    )
 }

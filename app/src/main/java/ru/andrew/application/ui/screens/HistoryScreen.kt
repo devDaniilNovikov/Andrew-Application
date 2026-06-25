@@ -42,6 +42,7 @@ import ru.andrew.application.R
 import ru.andrew.application.data.entity.Request
 import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.ui.theme.AppTheme
+import ru.andrew.application.ui.components.ThemeIconButton
 import ru.andrew.application.ui.util.formatPhoneNumber
 import ru.andrew.application.ui.viewmodel.HistoryFilter
 import ru.andrew.application.ui.viewmodel.HistoryViewModel
@@ -72,6 +73,12 @@ fun HistoryScreen(
                     text = stringResource(id = R.string.history_title),
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.titleLarge
+                )
+            },
+            actions = {
+                ThemeIconButton(
+                    currentTheme = currentTheme,
+                    onThemeSelected = onThemeSelected
                 )
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -153,7 +160,6 @@ fun HistoryScreen(
                             color = MaterialTheme.colorScheme.onSurface,
                             textAlign = TextAlign.Center
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = stringResource(id = R.string.history_empty_desc),
                             style = MaterialTheme.typography.bodyMedium,
@@ -162,12 +168,6 @@ fun HistoryScreen(
                         )
                     }
                 }
-
-                // Theme selector always accessible in empty state
-                ThemeSelectorCard(
-                    currentTheme = currentTheme,
-                    onThemeSelected = onThemeSelected
-                )
             }
         } else {
             // LazyColumn with historical cards
@@ -184,15 +184,6 @@ fun HistoryScreen(
                         formatter = dateTimeFormatter,
                         onClick = { editingRequest = request }
                     )
-                }
-
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    ThemeSelectorCard(
-                        currentTheme = currentTheme,
-                        onThemeSelected = onThemeSelected
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }

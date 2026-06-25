@@ -134,7 +134,9 @@ fun MainScreen(
                 val deepLinkRequestIdArg = backStackEntry.arguments?.getLong("deepLinkRequestId") ?: -1L
                 ActiveRequestsScreen(
                     navController = navController,
-                    deepLinkRequestId = deepLinkRequestIdArg
+                    deepLinkRequestId = deepLinkRequestIdArg,
+                    currentTheme = currentTheme,
+                    onThemeSelected = onThemeSelected
                 )
             }
             composable(Screen.History.route) {

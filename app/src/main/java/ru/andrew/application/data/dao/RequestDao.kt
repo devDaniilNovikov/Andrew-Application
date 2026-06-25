@@ -74,3 +74,4 @@ interface RequestDao {
         updatedAt: java.time.LocalDateTime
     )
 }
+
