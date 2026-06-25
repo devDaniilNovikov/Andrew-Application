@@ -129,6 +129,7 @@ class CreateRequestViewModel(
     }
 
     private fun isValidPhoneNumber(phone: String): Boolean {
+        if (phone.trim().isEmpty()) return true
         val cleanPhone = phone.replace(Regex("[\\s\\-\\(\\)]"), "")
         val phoneRegex = "^\\+?\\d{7,15}$".toRegex()
         return phoneRegex.matches(cleanPhone)
@@ -142,9 +143,8 @@ class CreateRequestViewModel(
         val currentState = _uiState.value
         if (currentState.isLoading) return
         
-        // Валидация полей согласно PRD (название, телефон, дата следующего действия)
+        // Валидация полей согласно PRD (название, дата следующего действия)
         if (currentState.title.trim().isEmpty() || 
-            currentState.phone.trim().isEmpty() || 
             !isValidPhoneNumber(currentState.phone) ||
             currentState.nextActionDateTime == null
         ) {

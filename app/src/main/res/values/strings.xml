@@ -35,7 +35,7 @@
 
     <!-- Create Request Form -->
     <string name="create_title_label">Название заявки *</string>
-    <string name="create_phone_label">Телефон *</string>
+    <string name="create_phone_label">Телефон</string>
     <string name="create_client_name_label">Имя клиента</string>
     <string name="create_address_label">Адрес</string>
     <string name="create_equipment_type_label">Тип заявки</string>
