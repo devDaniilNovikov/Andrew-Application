@@ -47,6 +47,7 @@ import ru.andrew.application.ui.util.formatPhoneNumber
 import ru.andrew.application.ui.viewmodel.HistoryFilter
 import ru.andrew.application.ui.viewmodel.HistoryViewModel
 import java.time.format.DateTimeFormatter
+import ru.andrew.application.ui.extensions.smoothScroll
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -174,7 +175,8 @@ fun HistoryScreen(
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .smoothScroll(0.80f),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
