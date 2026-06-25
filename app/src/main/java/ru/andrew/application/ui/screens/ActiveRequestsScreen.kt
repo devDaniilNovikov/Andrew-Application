@@ -42,6 +42,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.launch
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import ru.andrew.application.ui.extensions.smoothScroll
@@ -269,26 +271,41 @@ fun ActiveRequestsScreen(
                                                 .fillMaxSize()
                                                 .padding(vertical = 6.dp, horizontal = 12.dp)
                                                 .background(color, shape = RoundedCornerShape(16.dp))
-                                                .padding(horizontal = 20.dp),
-                                            contentAlignment = when (dismissState.dismissDirection) {
-                                                SwipeToDismissBoxValue.StartToEnd -> Alignment.CenterStart
-                                                SwipeToDismissBoxValue.EndToStart -> Alignment.CenterEnd
-                                                else -> Alignment.Center
-                                            }
+                                                .padding(horizontal = 20.dp)
                                         ) {
-                                            when (dismissState.dismissDirection) {
-                                                SwipeToDismissBoxValue.StartToEnd -> Icon(
-                                                    imageVector = Icons.Default.Check,
-                                                    contentDescription = stringResource(R.string.btn_complete),
-                                                    tint = Color.White
-                                                )
-                                                SwipeToDismissBoxValue.EndToStart -> Icon(
-                                                    imageVector = Icons.Default.Close,
-                                                    contentDescription = cancelActionLabel,
-                                                    tint = Color.White
-                                                )
-                                                else -> {}
-                                            }
+                                            val startScale by animateFloatAsState(
+                                                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) 1.2f else 0.8f,
+                                                label = "startScale"
+                                            )
+                                            val startAlpha by animateFloatAsState(
+                                                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.StartToEnd) 1f else 0.5f,
+                                                label = "startAlpha"
+                                            )
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = stringResource(R.string.btn_complete),
+                                                tint = Color.White.copy(alpha = startAlpha),
+                                                modifier = Modifier
+                                                    .align(Alignment.CenterStart)
+                                                    .scale(startScale)
+                                            )
+
+                                            val endScale by animateFloatAsState(
+                                                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) 1.2f else 0.8f,
+                                                label = "endScale"
+                                            )
+                                            val endAlpha by animateFloatAsState(
+                                                targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) 1f else 0.5f,
+                                                label = "endAlpha"
+                                            )
+                                            Icon(
+                                                imageVector = Icons.Default.Close,
+                                                contentDescription = cancelActionLabel,
+                                                tint = Color.White.copy(alpha = endAlpha),
+                                                modifier = Modifier
+                                                    .align(Alignment.CenterEnd)
+                                                    .scale(endScale)
+                                            )
                                         }
                                     },
                                     content = {
