@@ -366,7 +366,7 @@ fun CreateRequestScreen(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 singleLine = false,
-                minLines = 2,
+                minLines = 1,
                 maxLines = 4,
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 leadingIcon = {
