@@ -29,6 +29,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -473,7 +475,7 @@ fun CreateRequestScreen(
                 label = { Text(stringResource(id = R.string.create_comment_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
-                minLines = 3,
+                minLines = 1,
                 maxLines = 5,
                 leadingIcon = {
                     Icon(
@@ -534,16 +536,19 @@ fun CreateRequestScreen(
                         .weight(1f)
                         .height(60.dp),
                     enabled = !uiState.isLoading,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         stringResource(id = R.string.btn_clear),
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
 
@@ -556,7 +561,8 @@ fun CreateRequestScreen(
                         .weight(1.3f)
                         .height(60.dp),
                     enabled = !uiState.isLoading,
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(16.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
                     if (uiState.isLoading) {
                         CircularProgressIndicator(
@@ -569,12 +575,14 @@ fun CreateRequestScreen(
                             imageVector = Icons.Default.Create,
                             contentDescription = null
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = stringResource(
                                 id = if (viewModel.editingRequestId != null) R.string.btn_save_changes else R.string.btn_create
                             ),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
