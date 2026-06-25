@@ -130,73 +130,7 @@ fun RequestCard(
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
 
-            // Имя клиента и телефон
-            if (!request.clientName.isNullOrBlank() || request.phone.isNotEmpty()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = stringResource(R.string.desc_client),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = request.clientName ?: stringResource(R.string.client_name_hint),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    
-                    if (request.phone.isNotEmpty()) {
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Icon(
-                            imageVector = Icons.Default.Phone,
-                            contentDescription = stringResource(R.string.desc_phone),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = formatPhoneNumber(request.phone),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-            }
-
-            // Адрес
-            if (!request.address.isNullOrBlank()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Place,
-                        contentDescription = stringResource(R.string.desc_address),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = request.address,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                Spacer(modifier = Modifier.height(6.dp))
-            }
 
             // Премиальная плашка даты и времени с индикацией срочности
             if (formattedDateTime.isNotEmpty()) {
@@ -253,20 +187,7 @@ fun RequestCard(
                     border = null
                 )
 
-                SuggestionChip(
-                    onClick = {},
-                    label = {
-                        Text(
-                            text = stringResource(id = (request.actionType ?: ActionType.OTHER).displayNameResId),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    },
-                    colors = SuggestionChipDefaults.suggestionChipColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
-                        labelColor = MaterialTheme.colorScheme.onSecondaryContainer
-                    ),
-                    border = null
-                )
+
             }
 
             // Короткий комментарий, если есть
