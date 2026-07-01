@@ -57,6 +57,12 @@ class ActiveRequestsViewModel(
         }
     }
 
+    fun deleteRequest(requestId: Long) {
+        viewModelScope.launch {
+            requestRepository.deleteRequest(requestId)
+        }
+    }
+
     fun cancelRequest(requestId: Long, cancelReason: String, finalComment: String? = null) {
         viewModelScope.launch {
             requestRepository.cancelRequest(requestId, cancelReason, finalComment)

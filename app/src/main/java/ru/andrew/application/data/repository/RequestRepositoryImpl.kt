@@ -68,6 +68,13 @@ class RequestRepositoryImpl(
         }
     }
 
+    override suspend fun deleteRequest(id: Long) {
+        val deletedRows = requestDao.deleteRequestById(id)
+        if (deletedRows > 0) {
+            notificationScheduler.cancelNotification(id)
+        }
+    }
+
     override suspend fun completeRequest(id: Long, finalPrice: Double?, finalComment: String?) {
         val now = timeProvider.getNow()
         requestDao.updateRequestStatusAndResults(
@@ -129,4 +136,3 @@ class RequestRepositoryImpl(
         )
     }
 }
-

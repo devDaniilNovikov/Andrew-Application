@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Place
@@ -47,7 +48,8 @@ enum class UrgencyStatus {
 fun RequestCard(
     request: Request,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onDeleteClick: (() -> Unit)? = null
 ) {
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
     val formattedDateTime = remember(request.nextActionDateTime) {
@@ -128,6 +130,16 @@ fun RequestCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
+                if (onDeleteClick != null) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(onClick = onDeleteClick) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.btn_delete_request),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
             }
 
 

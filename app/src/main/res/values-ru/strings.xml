@@ -60,8 +60,13 @@
     <string name="cancel_reason_other">Другое (укажите ниже)</string>
     <string name="cancel_dialog_comment_placeholder">Опишите причину подробнее…</string>
     <string name="cancel_dialog_confirm">Подтвердить отмену</string>
+    <string name="btn_delete_request">Удалить</string>
+    <string name="delete_dialog_title">Удалить заявку?</string>
+    <string name="delete_dialog_message">Заявка будет удалена из списка без переноса в историю.</string>
+    <string name="delete_dialog_confirm">Удалить</string>
     <string name="toast_request_completed">Заявка перенесена в историю</string>
     <string name="toast_request_cancelled">Заявка перенесена в историю</string>
+    <string name="toast_request_deleted">Заявка удалена</string>
     <string name="client_name_hint">Без имени</string>
     <string name="urgency_overdue">Просрочено</string>
     <string name="urgency_today">Сегодня</string>

@@ -89,6 +89,10 @@ fun ActiveRequestsScreen(
     var showCompleteDialog by remember { mutableStateOf(false) }
     var completeTargetRequest by remember { mutableStateOf<Request?>(null) }
 
+    // Состояния для физического удаления заявки из списка
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var deleteTargetRequest by remember { mutableStateOf<Request?>(null) }
+
     val (rescheduleDatePickerState, rescheduleTimePickerState) = key(rescheduleTargetRequest?.id) {
         val dateState = rememberDatePickerState(
             initialSelectedDateMillis = rescheduleTargetRequest?.nextActionDateTime
@@ -299,6 +303,10 @@ fun ActiveRequestsScreen(
                                             request = request,
                                             onClick = {
                                                 selectedRequest = request
+                                            },
+                                            onDeleteClick = {
+                                                deleteTargetRequest = request
+                                                showDeleteDialog = true
                                             }
                                         )
                                     }
@@ -344,6 +352,11 @@ fun ActiveRequestsScreen(
                     onCancelClick = {
                         cancelTargetRequest = request
                         showCancelDialog = true
+                    },
+                    onDeleteClick = {
+                        deleteTargetRequest = request
+                        showDeleteDialog = true
+                        selectedRequest = null
                     }
                 )
             }
@@ -545,6 +558,61 @@ fun ActiveRequestsScreen(
                                 viewModel.restoreRequest(targetId)
                             }
                         }
+                    }
+                )
+            }
+
+            // Диалог физического удаления заявки из базы
+            if (showDeleteDialog && deleteTargetRequest != null) {
+                AlertDialog(
+                    onDismissRequest = {
+                        showDeleteDialog = false
+                        deleteTargetRequest = null
+                    },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                val targetId = deleteTargetRequest!!.id
+                                viewModel.deleteRequest(targetId)
+                                showDeleteDialog = false
+                                deleteTargetRequest = null
+                                selectedRequest = null
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.toast_request_deleted),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError
+                            )
+                        ) {
+                            Text(stringResource(id = R.string.delete_dialog_confirm))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(
+                            onClick = {
+                                showDeleteDialog = false
+                                deleteTargetRequest = null
+                            }
+                        ) {
+                            Text(stringResource(id = R.string.dialog_cancel))
+                        }
+                    },
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.delete_dialog_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    text = {
+                        Text(
+                            text = stringResource(id = R.string.delete_dialog_message),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
                     }
                 )
             }

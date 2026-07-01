@@ -20,6 +20,9 @@ interface RequestDao {
     @Delete
     suspend fun deleteRequest(request: Request)
 
+    @Query("DELETE FROM requests WHERE id = :id")
+    suspend fun deleteRequestById(id: Long): Int
+
     @Query("SELECT * FROM requests WHERE id = :id")
     fun getRequestById(id: Long): Flow<Request?>
 
@@ -74,4 +77,3 @@ interface RequestDao {
         updatedAt: java.time.LocalDateTime
     )
 }
-

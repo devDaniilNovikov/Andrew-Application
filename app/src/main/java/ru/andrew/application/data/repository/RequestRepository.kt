@@ -16,9 +16,9 @@ interface RequestRepository {
     
     suspend fun createRequest(request: Request): Long
     suspend fun updateRequest(request: Request)
+    suspend fun deleteRequest(id: Long)
     suspend fun completeRequest(id: Long, finalPrice: Double?, finalComment: String?)
     suspend fun cancelRequest(id: Long, cancelReason: String, finalComment: String?)
     suspend fun restoreToActive(id: Long)
     suspend fun updateRequestResults(id: Long, finalPrice: Double?, finalComment: String?, cancelReason: String?)
 }
-

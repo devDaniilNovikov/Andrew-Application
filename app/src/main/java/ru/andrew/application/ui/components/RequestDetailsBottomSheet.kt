@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
@@ -46,6 +47,7 @@ fun RequestDetailsBottomSheet(
     onRescheduleClick: () -> Unit = {},
     onCompleteClick: () -> Unit = {},
     onCancelClick: () -> Unit = {},
+    onDeleteClick: (() -> Unit)? = null,
     sheetState: SheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
     timeProvider: TimeProvider = SystemTimeProvider()
 ) {
@@ -97,6 +99,15 @@ fun RequestDetailsBottomSheet(
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
+                if (onDeleteClick != null) {
+                    IconButton(onClick = onDeleteClick) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.btn_delete_request),
+                            tint = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
                 IconButton(onClick = onDismissRequest) {
                     Icon(
                         imageVector = Icons.Default.Close,
