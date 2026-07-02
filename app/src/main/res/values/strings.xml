@@ -42,7 +42,8 @@
     <string name="create_action_type_label">Тип действия</string>
     <string name="create_date_time_label">Дата и время следующего действия *</string>
     <string name="create_comment_label">Комментарий</string>
-    <string name="create_validation_error">Заполните название, телефон и дату следующего действия.</string>
+    <string name="create_validation_error">Заполните название и дату следующего действия.</string>
+    <string name="create_phone_validation_error">Введите корректный номер телефона или оставьте поле пустым.</string>
     <string name="create_db_error">Ошибка базы данных</string>
     <string name="create_success_message">Заявка создана</string>
     <string name="btn_create">Создать заявку</string>

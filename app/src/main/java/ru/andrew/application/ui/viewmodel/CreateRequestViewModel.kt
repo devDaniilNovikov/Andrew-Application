@@ -141,19 +141,23 @@ class CreateRequestViewModel(
 
     /**
      * Попытаться сохранить заявку в базу данных.
-     * Проверяет обязательные поля: название, телефон и дата действия.
+     * Проверяет обязательные поля: название и дата действия.
      */
     fun saveRequest() {
         val currentState = _uiState.value
         if (currentState.isLoading) return
         
         // Валидация полей согласно PRD (название, дата следующего действия)
-        if (currentState.title.trim().isEmpty() || 
-            !isValidPhoneNumber(currentState.phone) ||
-            currentState.nextActionDateTime == null
-        ) {
+        if (currentState.title.trim().isEmpty() || currentState.nextActionDateTime == null) {
             _uiState.update { 
                 it.copy(error = UiText.StringResource(R.string.create_validation_error)) 
+            }
+            return
+        }
+
+        if (!isValidPhoneNumber(currentState.phone)) {
+            _uiState.update {
+                it.copy(error = UiText.StringResource(R.string.create_phone_validation_error))
             }
             return
         }
@@ -239,4 +243,3 @@ class CreateRequestViewModel(
         }
     }
 }
-

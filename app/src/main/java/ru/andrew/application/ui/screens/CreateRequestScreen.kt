@@ -312,7 +312,7 @@ fun CreateRequestScreen(
                 }
             )
 
-            // Телефон *
+            // Телефон
             OutlinedTextField(
                 value = uiState.phone,
                 onValueChange = { viewModel.updatePhone(it) },
@@ -590,4 +590,3 @@ fun CreateRequestScreen(
         }
     }
 }
-
