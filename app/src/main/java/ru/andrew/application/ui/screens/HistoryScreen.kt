@@ -1,5 +1,6 @@
 package ru.andrew.application.ui.screens
 
+import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
@@ -30,7 +32,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,11 +60,13 @@ fun HistoryScreen(
     onThemeSelected: (AppTheme) -> Unit,
     viewModel: HistoryViewModel = viewModel(factory = HistoryViewModel.Factory)
 ) {
+    val context = LocalContext.current
     val historyRequests by viewModel.historyRequests.collectAsStateWithLifecycle()
     val sortByStatus by viewModel.sortByStatus.collectAsStateWithLifecycle()
     val filterMode by viewModel.filterMode.collectAsStateWithLifecycle()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
     var editingRequest by remember { mutableStateOf<Request?>(null) }
+    var deleteTargetRequest by remember { mutableStateOf<Request?>(null) }
 
     Column(
         modifier = Modifier
@@ -181,10 +187,50 @@ fun HistoryScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(historyRequests, key = { it.id }) { request ->
-                    HistoryRequestCard(
-                        request = request,
-                        formatter = dateTimeFormatter,
-                        onClick = { editingRequest = request }
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { dismissValue ->
+                            when (dismissValue) {
+                                SwipeToDismissBoxValue.EndToStart -> {
+                                    deleteTargetRequest = request
+                                    false
+                                }
+                                SwipeToDismissBoxValue.StartToEnd,
+                                SwipeToDismissBoxValue.Settled -> false
+                            }
+                        }
+                    )
+
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        enableDismissFromStartToEnd = false,
+                        backgroundContent = {
+                            val alpha by animateFloatAsState(
+                                targetValue = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) 1f else 0f,
+                                label = "historyDeleteBgAlpha"
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(20.dp))
+                                    .background(MaterialTheme.colorScheme.error.copy(alpha = alpha))
+                                    .padding(horizontal = 24.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.btn_delete_request),
+                                    tint = Color.White
+                                )
+                            }
+                        },
+                        content = {
+                            HistoryRequestCard(
+                                request = request,
+                                formatter = dateTimeFormatter,
+                                onClick = { editingRequest = request }
+                            )
+                        }
                     )
                 }
             }
@@ -197,6 +243,49 @@ fun HistoryScreen(
                 onConfirm = { finalPrice, finalComment, cancelReason ->
                     viewModel.updateRequestResults(request.id, finalPrice, finalComment, cancelReason)
                     editingRequest = null
+                }
+            )
+        }
+
+        deleteTargetRequest?.let { request ->
+            AlertDialog(
+                onDismissRequest = { deleteTargetRequest = null },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.deleteRequest(request.id)
+                            deleteTargetRequest = null
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.toast_request_deleted),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.error,
+                            contentColor = MaterialTheme.colorScheme.onError
+                        )
+                    ) {
+                        Text(stringResource(id = R.string.delete_dialog_confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { deleteTargetRequest = null }) {
+                        Text(stringResource(id = R.string.dialog_cancel))
+                    }
+                },
+                title = {
+                    Text(
+                        text = stringResource(id = R.string.delete_dialog_title),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                text = {
+                    Text(
+                        text = stringResource(id = R.string.delete_dialog_message),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             )
         }

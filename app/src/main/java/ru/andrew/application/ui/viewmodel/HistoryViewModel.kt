@@ -65,6 +65,12 @@ class HistoryViewModel(
         }
     }
 
+    fun deleteRequest(id: Long) {
+        viewModelScope.launch {
+            requestRepository.deleteRequest(id)
+        }
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
