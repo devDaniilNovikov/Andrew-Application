@@ -141,6 +141,7 @@ fun MainScreen(
             }
             composable(Screen.History.route) {
                 HistoryScreen(
+                    navController = navController,
                     currentTheme = currentTheme,
                     onThemeSelected = onThemeSelected
                 )
