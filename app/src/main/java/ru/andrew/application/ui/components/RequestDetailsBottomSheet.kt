@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.andrew.application.R
 import ru.andrew.application.data.entity.Request
 import ru.andrew.application.domain.ActionType
@@ -312,26 +313,37 @@ fun RequestDetailsBottomSheet(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f))
             Spacer(modifier = Modifier.height(20.dp))
 
+            val compactActionTextStyle = MaterialTheme.typography.labelLarge.copy(
+                fontSize = 12.sp,
+                lineHeight = 14.sp,
+                fontWeight = FontWeight.Bold
+            )
+
             // Quick Actions: Позвонить, Изменить, Перенести
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedButton(
                     onClick = onCallClick,
                     modifier = Modifier
                         .weight(1f)
                         .height(dimensionResource(id = R.dimen.button_height)),
-                    contentPadding = PaddingValues(horizontal = 8.dp),
+                    contentPadding = PaddingValues(horizontal = 6.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Phone,
                         contentDescription = stringResource(R.string.btn_call),
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = stringResource(R.string.btn_call), style = MaterialTheme.typography.titleSmall)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.btn_call),
+                        style = compactActionTextStyle,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
 
                 OutlinedButton(
@@ -339,16 +351,21 @@ fun RequestDetailsBottomSheet(
                     modifier = Modifier
                         .weight(1f)
                         .height(dimensionResource(id = R.dimen.button_height)),
-                    contentPadding = PaddingValues(horizontal = 8.dp),
+                    contentPadding = PaddingValues(horizontal = 6.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = stringResource(R.string.btn_edit),
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = stringResource(R.string.btn_edit), style = MaterialTheme.typography.titleSmall)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.btn_edit),
+                        style = compactActionTextStyle,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
 
                 OutlinedButton(
@@ -356,16 +373,21 @@ fun RequestDetailsBottomSheet(
                     modifier = Modifier
                         .weight(1f)
                         .height(dimensionResource(id = R.dimen.button_height)),
-                    contentPadding = PaddingValues(horizontal = 8.dp),
+                    contentPadding = PaddingValues(horizontal = 6.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.DateRange,
                         contentDescription = stringResource(R.string.btn_reschedule),
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(text = stringResource(R.string.btn_reschedule), style = MaterialTheme.typography.titleSmall)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = stringResource(R.string.btn_reschedule),
+                        style = compactActionTextStyle,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
 
@@ -403,7 +425,12 @@ fun RequestDetailsBottomSheet(
                     contentPadding = PaddingValues(horizontal = 8.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(text = stringResource(R.string.btn_cancel_action), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = stringResource(R.string.btn_cancel_action),
+                        style = compactActionTextStyle,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 }
             }
 
