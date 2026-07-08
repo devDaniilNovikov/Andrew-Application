@@ -314,8 +314,8 @@ fun RequestDetailsBottomSheet(
             Spacer(modifier = Modifier.height(20.dp))
 
             val compactActionTextStyle = MaterialTheme.typography.labelLarge.copy(
-                fontSize = 12.sp,
-                lineHeight = 14.sp,
+                fontSize = 13.sp,
+                lineHeight = 16.sp,
                 fontWeight = FontWeight.Bold
             )
 
@@ -335,9 +335,9 @@ fun RequestDetailsBottomSheet(
                     Icon(
                         imageVector = Icons.Default.Phone,
                         contentDescription = stringResource(R.string.btn_call),
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(17.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(5.dp))
                     Text(
                         text = stringResource(R.string.btn_call),
                         style = compactActionTextStyle,
@@ -357,9 +357,9 @@ fun RequestDetailsBottomSheet(
                     Icon(
                         imageVector = Icons.Default.Edit,
                         contentDescription = stringResource(R.string.btn_edit),
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(17.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(5.dp))
                     Text(
                         text = stringResource(R.string.btn_edit),
                         style = compactActionTextStyle,
@@ -379,9 +379,9 @@ fun RequestDetailsBottomSheet(
                     Icon(
                         imageVector = Icons.Default.DateRange,
                         contentDescription = stringResource(R.string.btn_reschedule),
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(17.dp)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(5.dp))
                     Text(
                         text = stringResource(R.string.btn_reschedule),
                         style = compactActionTextStyle,
@@ -425,12 +425,7 @@ fun RequestDetailsBottomSheet(
                     contentPadding = PaddingValues(horizontal = 8.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(
-                        text = stringResource(R.string.btn_cancel_action),
-                        style = compactActionTextStyle,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Text(text = stringResource(R.string.btn_cancel_action), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 }
             }
 
