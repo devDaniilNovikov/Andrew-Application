@@ -53,6 +53,7 @@
     <string name="edit_request_title">Редактирование заявки</string>
     <string name="btn_save_changes">Сохранить</string>
     <string name="update_success_message">Изменения сохранены</string>
+    <string name="edit_results_section_title">Итоги заявки</string>
     <string name="cancel_dialog_title">Отмена заявки</string>
     <string name="cancel_reason_client_refused">Клиент отказался</string>
     <string name="cancel_reason_no_contact">Не удалось дозвониться</string>
@@ -85,7 +86,6 @@
     <string name="history_filter_all">Все</string>
     <string name="history_filter_completed">Выполненные</string>
     <string name="history_filter_cancelled">Отмененные</string>
-    <string name="history_edit_dialog_title">Редактирование итога</string>
     <string name="history_edit_price_label">Финальная стоимость (₽)</string>
     <string name="history_edit_comment_label">Итоговый комментарий</string>
     <string name="history_edit_reason_label">Причина отмены</string>

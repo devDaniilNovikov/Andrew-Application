@@ -46,6 +46,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import ru.andrew.application.R
 import ru.andrew.application.domain.ActionType
 import ru.andrew.application.domain.EquipmentType
+import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.ui.extensions.displayNameResId
 import ru.andrew.application.ui.navigation.Screen
 import ru.andrew.application.ui.viewmodel.CreateRequestViewModel
@@ -485,6 +486,56 @@ fun CreateRequestScreen(
                 }
             )
 
+            if (viewModel.editingRequestId != null && uiState.requestStatus != RequestStatus.ACTIVE) {
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+                )
+
+                Text(
+                    text = stringResource(id = R.string.edit_results_section_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                if (uiState.requestStatus == RequestStatus.COMPLETED) {
+                    OutlinedTextField(
+                        value = uiState.finalPrice,
+                        onValueChange = { viewModel.updateFinalPrice(it) },
+                        label = { Text(stringResource(id = R.string.history_edit_price_label)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+                }
+
+                if (uiState.requestStatus == RequestStatus.CANCELLED) {
+                    OutlinedTextField(
+                        value = uiState.cancelReason,
+                        onValueChange = { viewModel.updateCancelReason(it) },
+                        label = { Text(stringResource(id = R.string.history_edit_reason_label)) },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        minLines = 1,
+                        maxLines = 4,
+                        keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
+                    )
+                }
+
+                OutlinedTextField(
+                    value = uiState.finalComment,
+                    onValueChange = { viewModel.updateFinalComment(it) },
+                    label = { Text(stringResource(id = R.string.history_edit_comment_label)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    minLines = 1,
+                    maxLines = 5,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
+                )
+            }
+
             // Сообщение об ошибке валидации с кэшированием последнего значения для плавной анимации закрытия
             var lastNonNullError by remember { mutableStateOf<UiText?>(null) }
             if (uiState.error != null) {
@@ -590,4 +641,3 @@ fun CreateRequestScreen(
         }
     }
 }
-

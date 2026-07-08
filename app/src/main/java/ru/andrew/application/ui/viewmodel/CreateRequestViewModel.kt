@@ -34,6 +34,10 @@ data class CreateRequestUiState(
     val actionType: ActionType = ActionType.OTHER,
     val nextActionDateTime: LocalDateTime? = null,
     val comment: String = "",
+    val requestStatus: RequestStatus = RequestStatus.ACTIVE,
+    val finalPrice: String = "",
+    val finalComment: String = "",
+    val cancelReason: String = "",
     val error: UiText? = null,
     val isLoading: Boolean = false
 )
@@ -75,6 +79,10 @@ class CreateRequestViewModel(
                         actionType = request.actionType ?: ActionType.OTHER,
                         nextActionDateTime = request.nextActionDateTime,
                         comment = request.comment ?: "",
+                        requestStatus = request.status,
+                        finalPrice = request.finalPrice?.toString() ?: "",
+                        finalComment = request.finalComment ?: "",
+                        cancelReason = request.cancelReason ?: "",
                         error = null,
                         isLoading = false
                     )
@@ -124,6 +132,19 @@ class CreateRequestViewModel(
         _uiState.update { it.copy(comment = comment) }
     }
 
+    fun updateFinalPrice(finalPrice: String) {
+        val sanitized = finalPrice.replace(Regex("[\\n\\t\\r]+"), "")
+        _uiState.update { it.copy(finalPrice = sanitized, error = null) }
+    }
+
+    fun updateFinalComment(finalComment: String) {
+        _uiState.update { it.copy(finalComment = finalComment) }
+    }
+
+    fun updateCancelReason(cancelReason: String) {
+        _uiState.update { it.copy(cancelReason = cancelReason) }
+    }
+
     /**
      * Сбросить все поля формы в исходное состояние.
      */
@@ -158,6 +179,23 @@ class CreateRequestViewModel(
             return
         }
 
+        val parsedFinalPrice = currentState.finalPrice
+            .trim()
+            .replace(",", ".")
+            .takeIf { it.isNotEmpty() }
+            ?.toDoubleOrNull()
+
+        if (
+            currentState.requestStatus == RequestStatus.COMPLETED &&
+            currentState.finalPrice.trim().isNotEmpty() &&
+            parsedFinalPrice == null
+        ) {
+            _uiState.update {
+                it.copy(error = UiText.StringResource(R.string.history_invalid_price_error))
+            }
+            return
+        }
+
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         if (editingRequestId != null) {
@@ -173,7 +211,22 @@ class CreateRequestViewModel(
                             equipmentType = currentState.equipmentType,
                             actionType = currentState.actionType,
                             nextActionDateTime = currentState.nextActionDateTime,
-                            comment = currentState.comment.trim().takeIf { it.isNotEmpty() }
+                            comment = currentState.comment.trim().takeIf { it.isNotEmpty() },
+                            finalPrice = if (existingRequest.status == RequestStatus.COMPLETED) {
+                                parsedFinalPrice
+                            } else {
+                                existingRequest.finalPrice
+                            },
+                            finalComment = if (existingRequest.status != RequestStatus.ACTIVE) {
+                                currentState.finalComment.trim().takeIf { it.isNotEmpty() }
+                            } else {
+                                existingRequest.finalComment
+                            },
+                            cancelReason = if (existingRequest.status == RequestStatus.CANCELLED) {
+                                currentState.cancelReason.trim().takeIf { it.isNotEmpty() }
+                            } else {
+                                existingRequest.cancelReason
+                            }
                         )
                         requestRepository.updateRequest(updatedRequest)
                         clearForm()
@@ -239,4 +292,3 @@ class CreateRequestViewModel(
         }
     }
 }
-
