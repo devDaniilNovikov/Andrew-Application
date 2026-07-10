@@ -20,5 +20,6 @@ interface RequestRepository {
     suspend fun cancelRequest(id: Long, cancelReason: String, finalComment: String?)
     suspend fun restoreToActive(id: Long)
     suspend fun updateRequestResults(id: Long, finalPrice: Double?, finalComment: String?, cancelReason: String?)
+    suspend fun deleteRequest(request: Request)
 }
 
