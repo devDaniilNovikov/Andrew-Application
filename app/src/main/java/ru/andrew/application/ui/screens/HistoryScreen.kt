@@ -258,7 +258,7 @@ fun HistoryScreen(
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
-                        Text(stringResource(id = R.string.btn_clear) + " (Удалить)")
+                        Text("Удалить")
                     }
                 },
                 dismissButton = {
