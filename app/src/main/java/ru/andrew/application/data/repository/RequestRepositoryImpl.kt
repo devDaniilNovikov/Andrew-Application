@@ -128,5 +128,10 @@ class RequestRepositoryImpl(
             updatedAt = now
         )
     }
+
+    override suspend fun deleteRequest(request: Request) {
+        requestDao.deleteRequest(request)
+        notificationScheduler.cancelNotification(request.id)
+    }
 }
 

@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,7 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,6 +61,8 @@ fun HistoryScreen(
     val sortByStatus by viewModel.sortByStatus.collectAsStateWithLifecycle()
     val filterMode by viewModel.filterMode.collectAsStateWithLifecycle()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
+    var deleteTargetRequest by remember { mutableStateOf<Request?>(null) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -167,7 +172,6 @@ fun HistoryScreen(
                     }
                 }
             }
-        } else {
             // LazyColumn with historical cards
             LazyColumn(
                 modifier = Modifier
@@ -177,14 +181,89 @@ fun HistoryScreen(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(historyRequests, key = { it.id }) { request ->
-                    HistoryRequestCard(
-                        request = request,
-                        formatter = dateTimeFormatter,
-                        onClick = { navController.navigate("create?requestId=${request.id}") }
+                items(
+                    items = historyRequests,
+                    key = { it.id }
+                ) { request ->
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { dismissValue ->
+                            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
+                                deleteTargetRequest = request
+                                showDeleteDialog = true
+                                false
+                            } else {
+                                false
+                            }
+                        },
+                        positionalThreshold = { it * 0.4f }
                     )
+
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        enableDismissFromStartToEnd = false,
+                        backgroundContent = {
+                            val color = when (dismissState.dismissDirection) {
+                                SwipeToDismissBoxValue.EndToStart -> Color(0xFFC62828) // Красный для удаления
+                                else -> Color.Transparent
+                            }
+                            val scale by animateFloatAsState(
+                                targetValue = if (dismissState.dismissDirection == SwipeToDismissBoxValue.EndToStart) 1f else 0f,
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                label = "scale_anim"
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(color, RoundedCornerShape(20.dp))
+                                    .padding(horizontal = 24.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.scale(scale).size(32.dp)
+                                )
+                            }
+                        }
+                    ) {
+                        HistoryRequestCard(
+                            request = request,
+                            formatter = dateTimeFormatter,
+                            onClick = { navController.navigate("create?requestId=${request.id}") }
+                        )
+                    }
                 }
             }
+        }
+
+        if (showDeleteDialog && deleteTargetRequest != null) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text(text = stringResource(id = R.string.nav_history) + " - Удаление") },
+                text = { Text("Вы действительно хотите удалить эту заявку навсегда? Это действие нельзя отменить.") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            viewModel.deleteRequest(deleteTargetRequest!!)
+                            showDeleteDialog = false
+                            deleteTargetRequest = null
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text(stringResource(id = R.string.btn_clear) + " (Удалить)")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDeleteDialog = false }) {
+                        Text(stringResource(id = R.string.btn_cancel_action))
+                    }
+                }
+            )
         }
     }
 }
