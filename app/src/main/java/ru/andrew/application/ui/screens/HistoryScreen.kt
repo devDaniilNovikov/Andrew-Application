@@ -174,6 +174,7 @@ fun HistoryScreen(
                     }
                 }
             }
+        } else {
             // LazyColumn with historical cards
             LazyColumn(
                 modifier = Modifier
