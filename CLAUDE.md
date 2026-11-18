@@ -48,9 +48,7 @@ UI (Compose screens) → ViewModel (StateFlow) → `RequestRepository` → `Requ
 - The code intentionally diverges from `PRD.md` in places: phone is optional, `nextActionDateTime` is nullable in the DB (the form still requires it), `EquipmentType` has 6 values instead of the PRD's 8, and History supports hard delete. Treat the code and recent commits as current behaviour; ask before "fixing" it toward the PRD.
 - Release builds run R8 with resource shrinking; Room classes are kept by `proguard-rules.pro` and the domain enums are `@Keep`.
 
-## Repo workflow and automation
+## Repo workflow
 
-- `main` is the default branch and where all current work lands, through short-lived branches (`fix-*`) and PRs. Recent commit messages are mostly English Conventional Commits (`fix:`, `feat:`, `style:`). The `dev` and `fix` branches are stale leftovers of the old scripted flow.
-- `TASKS.md` is parsed by the scripts below — keep the `## Этап N. …` headings and the `- [ ] N.M. …` line format.
-- `scripts/` is legacy Gemini (`google-antigravity`) automation: `orchestrator.py` runs a developer → reviewer → debugger agent loop over `TASKS.md`, auto-commits and pushes to `fix`, and opens PRs into `dev` via `create_pr.py`; `pr_reviewer.py` LLM-reviews the diff, writes `scripts/latest_review.json`, `scripts/data.js` and `evaluations.json`, and messages Telegram; `dashboard.html` is a static viewer for `scripts/data.js`. They read `GEMINI_API_KEY` (plus optional `TELEGRAM_*`, `GITHUB_TOKEN`) from the git-ignored `.env`, call paid APIs and push to the remote — don't run them unless asked.
-- CI (`.github/workflows/pr_review.yml`, on PRs to `main`/`dev`) runs only `scripts/pr_reviewer.py`. Nothing in CI builds the app or runs tests, and on any API failure the reviewer falls back to the cached `latest_review.json` or a hard-coded 100/100 review, so a green check says nothing about correctness — verify with Gradle.
+- `main` is the default branch and where all current work lands, through short-lived branches (`fix-*`) and PRs. Recent commit messages are mostly English Conventional Commits (`fix:`, `feat:`, `style:`). The `dev` and `fix` branches are stale leftovers of an earlier Gemini-agent workflow whose scripts and CI review have been removed.
+- There is no CI: nothing builds the app or runs tests on PRs, so run the Gradle checks above yourself before pushing.
