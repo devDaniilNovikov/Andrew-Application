@@ -54,7 +54,9 @@ class NotificationSchedulerImpl(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Проверяем разрешение на точные будильники на устройствах Android 12+
+        // Проверяем разрешение на точные будильники на устройствах Android 12+.
+        // На Android 13+ USE_EXACT_ALARM выдаётся при установке, поэтому проверка проходит всегда.
+        // Неточный запасной вариант остаётся для Android 12–12L, если пользователь отключил SCHEDULE_EXACT_ALARM.
         val canScheduleExact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             alarmManager.canScheduleExactAlarms()
         } else {
