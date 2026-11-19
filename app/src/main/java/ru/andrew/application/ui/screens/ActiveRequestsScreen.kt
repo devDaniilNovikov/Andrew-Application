@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.andrew.application.data.entity.Request
 import ru.andrew.application.ui.components.RequestCard
 import ru.andrew.application.ui.components.RequestDetailsBottomSheet
+import ru.andrew.application.ui.components.ReminderStatusBanner
 import ru.andrew.application.ui.viewmodel.ActiveRequestsUiState
 import ru.andrew.application.ui.viewmodel.ActiveRequestsViewModel
 import java.time.Instant
@@ -109,24 +110,28 @@ fun ActiveRequestsScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.active_requests_title),
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleLarge
+            Column {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.active_requests_title),
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    },
+                    actions = {
+                        ThemeIconButton(
+                            currentTheme = currentTheme,
+                            onThemeSelected = onThemeSelected
+                        )
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
                     )
-                },
-                actions = {
-                    ThemeIconButton(
-                        currentTheme = currentTheme,
-                        onThemeSelected = onThemeSelected
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
                 )
-            )
+                // Предупреждение, если напоминания не придут или будут опаздывать
+                ReminderStatusBanner()
+            }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->

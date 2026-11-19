@@ -138,4 +138,9 @@
     <string name="stats_success">Успешно</string>
     <string name="stats_legend_format">%1$d заяв. (%2$d%%)</string>
 
+    <!-- Баннер о состоянии напоминаний на экране списка -->
+    <string name="reminder_banner_notifications_off">Уведомления выключены — напоминания о звонках и выездах не придут.</string>
+    <string name="reminder_banner_exact_alarms_off">Напоминания могут опаздывать. Разрешите точные будильники.</string>
+    <string name="reminder_banner_action_enable">Включить</string>
+    <string name="reminder_banner_action_allow">Разрешить</string>
 </resources>
