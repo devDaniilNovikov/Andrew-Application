@@ -12,7 +12,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,7 +23,9 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.ui.platform.LocalContext
+import ru.andrew.application.ui.navigation.EditRequestRoute
 import ru.andrew.application.ui.navigation.Screen
+import ru.andrew.application.ui.navigation.navigateToTab
 import ru.andrew.application.ui.theme.AppTheme
 
 @Composable
@@ -48,6 +49,12 @@ fun MainScreen(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    // Экран редактирования открыт поверх вкладки — подсвечиваем вкладку, с которой его открыли
+    val selectedTabRoute = if (currentRoute == EditRequestRoute.PATTERN) {
+        navController.previousBackStackEntry?.destination?.route
+    } else {
+        currentRoute
+    }
 
     val navigationItems = listOf(
         Screen.Create,
@@ -61,13 +68,7 @@ fun MainScreen(
         if (deepLinkRequestId != null &&
             navController.currentDestination?.route != Screen.Active.route
         ) {
-            navController.navigate(Screen.Active.route) {
-                popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
-                }
-                launchSingleTop = true
-                restoreState = true
-            }
+            navController.navigateToTab(Screen.Active.route)
         }
     }
 
@@ -76,20 +77,11 @@ fun MainScreen(
         bottomBar = {
             NavigationBar {
                 navigationItems.forEach { screen ->
-                    val isSelected = currentRoute?.substringBefore('?') == screen.route.substringBefore('?')
                     NavigationBarItem(
-                        selected = isSelected,
+                        selected = selectedTabRoute == screen.route,
                         onClick = {
-                            val baseRoute = screen.route.substringBefore('?')
-                            val currentBaseRoute = currentRoute?.substringBefore('?')
-                            if (currentBaseRoute != baseRoute) {
-                                navController.navigate(screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+                            if (currentRoute != screen.route) {
+                                navController.navigateToTab(screen.route)
                             }
                         },
                         icon = {
@@ -113,16 +105,18 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            composable(Screen.Create.route) {
+                CreateRequestScreen(navController = navController)
+            }
             composable(
-                route = Screen.Create.route,
+                route = EditRequestRoute.PATTERN,
                 arguments = listOf(
-                    navArgument("requestId") {
+                    navArgument(EditRequestRoute.ARG_REQUEST_ID) {
                         type = NavType.LongType
-                        defaultValue = -1L
                     }
                 )
             ) { backStackEntry ->
-                val requestId = backStackEntry.arguments?.getLong("requestId") ?: -1L
+                val requestId = backStackEntry.arguments?.getLong(EditRequestRoute.ARG_REQUEST_ID) ?: -1L
                 CreateRequestScreen(navController = navController, requestId = requestId)
             }
             composable(Screen.Active.route) {

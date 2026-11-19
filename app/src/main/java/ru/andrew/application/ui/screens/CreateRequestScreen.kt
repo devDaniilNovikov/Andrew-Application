@@ -14,6 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Comment
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
@@ -42,13 +43,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import ru.andrew.application.R
 import ru.andrew.application.domain.ActionType
 import ru.andrew.application.domain.EquipmentType
 import ru.andrew.application.domain.RequestStatus
 import ru.andrew.application.ui.extensions.displayNameResId
 import ru.andrew.application.ui.navigation.Screen
+import ru.andrew.application.ui.navigation.navigateToTab
 import ru.andrew.application.ui.viewmodel.CreateRequestViewModel
 import ru.andrew.application.ui.utils.UiText
 import java.time.Instant
@@ -137,11 +138,12 @@ fun CreateRequestScreen(
         }
     }
 
+    // Вкладка «Создание» и экран редактирования — разные записи навигации со своими ViewModel.
+    // Форму создания здесь не очищаем: при возврате на вкладку черновик должен остаться на месте.
+    val isEditMode = requestId != -1L
     LaunchedEffect(requestId) {
-        if (requestId != -1L) {
+        if (isEditMode) {
             viewModel.loadRequestForEditing(requestId)
-        } else {
-            viewModel.clearForm()
         }
     }
 
@@ -256,13 +258,7 @@ fun CreateRequestScreen(
                         if (event.isEdit) {
                             navController.popBackStack()
                         } else {
-                            navController.navigate(Screen.Active.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
+                            navController.navigateToTab(Screen.Active.route)
                         }
                     }
                 }
@@ -275,7 +271,7 @@ fun CreateRequestScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = if (viewModel.editingRequestId != null) R.string.edit_request_title else R.string.nav_create),
+                        text = stringResource(id = if (isEditMode) R.string.edit_request_title else R.string.nav_create),
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleLarge
                     )
@@ -486,7 +482,7 @@ fun CreateRequestScreen(
                 }
             )
 
-            if (viewModel.editingRequestId != null && uiState.requestStatus != RequestStatus.ACTIVE) {
+            if (isEditMode && uiState.requestStatus != RequestStatus.ACTIVE) {
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 4.dp),
                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
@@ -581,8 +577,16 @@ fun CreateRequestScreen(
                     .padding(vertical = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                // При редактировании «Очистить» превращало экран в создание новой заявки;
+                // вместо этого — «Отмена»: выйти без сохранения, исходная заявка не меняется.
                 OutlinedButton(
-                    onClick = { viewModel.clearForm() },
+                    onClick = {
+                        if (isEditMode) {
+                            navController.popBackStack()
+                        } else {
+                            viewModel.clearForm()
+                        }
+                    },
                     modifier = Modifier
                         .weight(1f)
                         .height(60.dp),
@@ -591,12 +595,12 @@ fun CreateRequestScreen(
                     contentPadding = PaddingValues(horizontal = 8.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Delete,
+                        imageVector = if (isEditMode) Icons.Default.Close else Icons.Default.Delete,
                         contentDescription = null
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        stringResource(id = R.string.btn_clear),
+                        stringResource(id = if (isEditMode) R.string.dialog_cancel else R.string.btn_clear),
                         style = MaterialTheme.typography.titleSmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -629,7 +633,7 @@ fun CreateRequestScreen(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = stringResource(
-                                id = if (viewModel.editingRequestId != null) R.string.btn_save_changes else R.string.btn_create
+                                id = if (isEditMode) R.string.btn_save_changes else R.string.btn_create
                             ),
                             style = MaterialTheme.typography.titleSmall,
                             maxLines = 1,

@@ -47,6 +47,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import ru.andrew.application.ui.extensions.smoothScroll
+import ru.andrew.application.ui.navigation.EditRequestRoute
 
 /**
  * Экран списка активных заявок.
@@ -331,7 +332,7 @@ fun ActiveRequestsScreen(
                     },
                     onEditClick = {
                         selectedRequest = null
-                        navController.navigate("create?requestId=${request.id}")
+                        navController.navigate(EditRequestRoute.forRequest(request.id))
                     },
                     onRescheduleClick = {
                         rescheduleTargetRequest = request
