@@ -1,0 +1,57 @@
+name: Android CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+# Сборке не нужны права на запись и секреты: только чтение кода.
+permissions:
+  contents: read
+
+concurrency:
+  group: android-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Debug build, unit tests, lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Не оставлять GITHUB_TOKEN в .git/config.
+          persist-credentials: false
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build debug APK
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Unit tests
+        if: ${{ !cancelled() }}
+        run: ./gradlew --no-daemon testDebugUnitTest
+
+      - name: Lint
+        if: ${{ !cancelled() }}
+        run: ./gradlew --no-daemon lintDebug
+
+      - name: Upload reports
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-reports
+          path: |
+            app/build/reports
+            app/build/test-results
+          retention-days: 7
