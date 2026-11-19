@@ -15,17 +15,24 @@ import ru.andrew.application.ui.theme.AndrewApplicationTheme
 import ru.andrew.application.ui.theme.AppTheme
 import ru.andrew.application.ui.viewmodel.ThemeViewModel
 import ru.andrew.application.ui.screens.MainScreen
+import ru.andrew.application.notifications.NotificationHelper
 import android.content.Intent
+import android.util.Log
 
 class MainActivity : ComponentActivity() {
 
-    private val deepLinkRequestId = mutableStateOf(-1L)
+    /** Id заявки из тапа по уведомлению; сбрасывается, как только экран списка его обработал. */
+    private val pendingDeepLinkRequestId = mutableStateOf<Long?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        handleIntent(intent)
-        
+
+        // При пересоздании (поворот экрана, восстановление процесса) система отдаёт тот же Intent,
+        // что и при запуске: повторно открывать по нему карточку не нужно.
+        if (savedInstanceState == null) {
+            handleIntent(intent)
+        }
+
         val themeViewModel = ViewModelProvider(this, ThemeViewModel.Factory)[ThemeViewModel::class.java]
         
         val initialTheme = themeViewModel.themeState.value
@@ -56,7 +63,7 @@ class MainActivity : ComponentActivity() {
         
         setContent {
             val currentTheme by themeViewModel.themeState.collectAsStateWithLifecycle()
-            val deepLinkId by deepLinkRequestId
+            val deepLinkId by pendingDeepLinkRequestId
             val darkTheme = when (currentTheme) {
                 AppTheme.LIGHT -> false
                 AppTheme.DARK -> true
@@ -92,7 +99,7 @@ class MainActivity : ComponentActivity() {
                         themeViewModel.selectTheme(newTheme)
                     },
                     onDeepLinkHandled = {
-                        deepLinkRequestId.value = -1L
+                        pendingDeepLinkRequestId.value = null
                     }
                 )
             }
@@ -105,16 +112,21 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        val requestId = intent?.getLongExtra("requestId", -1L) ?: -1L
-        val token = intent?.getStringExtra("secure_token")
-        
-        if (requestId != -1L) {
-            // Валидируем одноразовый токен безопасности перед раскрытием деталей заявки
-            if (ru.andrew.application.notifications.SecureTokenManager.validateAndConsumeToken(requestId, token)) {
-                deepLinkRequestId.value = requestId
-            }
-            intent?.removeExtra("requestId")
-            intent?.removeExtra("secure_token")
+        // Activity экспортирована (лаунчер), поэтому extras может прислать любое приложение.
+        // Худшее, что даёт такой Intent, — открыть карточку внутри нашего же UI; данные наружу не уходят.
+        // Повреждённые extras (например, неизвестный Parcelable на старых Android) не должны ронять приложение.
+        val requestId = try {
+            intent?.getLongExtra(NotificationHelper.EXTRA_REQUEST_ID, -1L) ?: -1L
+        } catch (e: RuntimeException) {
+            Log.w(TAG, "Ignoring intent with unreadable extras", e)
+            -1L
         }
+        if (requestId > 0L) {
+            pendingDeepLinkRequestId.value = requestId
+        }
+    }
+
+    private companion object {
+        const val TAG = "MainActivity"
     }
 }

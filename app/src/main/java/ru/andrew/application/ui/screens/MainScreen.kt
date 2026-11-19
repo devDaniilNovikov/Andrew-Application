@@ -30,7 +30,7 @@ import ru.andrew.application.ui.theme.AppTheme
 @Composable
 fun MainScreen(
     currentTheme: AppTheme,
-    deepLinkRequestId: Long = -1L,
+    deepLinkRequestId: Long? = null,
     onThemeSelected: (AppTheme) -> Unit,
     onDeepLinkHandled: () -> Unit = {}
 ) {
@@ -55,16 +55,19 @@ fun MainScreen(
         Screen.History
     )
 
+    // Тап по уведомлению: переходим на «Список». Карточку откроет сам экран списка, когда загрузит
+    // заявки, и сразу сбросит запрос — иначе она всплывала бы при каждом изменении списка.
     LaunchedEffect(deepLinkRequestId) {
-        if (deepLinkRequestId != -1L) {
-            navController.navigate("active?deepLinkRequestId=$deepLinkRequestId") {
+        if (deepLinkRequestId != null &&
+            navController.currentDestination?.route != Screen.Active.route
+        ) {
+            navController.navigate(Screen.Active.route) {
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
                 }
                 launchSingleTop = true
                 restoreState = true
             }
-            onDeepLinkHandled()
         }
     }
 
@@ -122,19 +125,11 @@ fun MainScreen(
                 val requestId = backStackEntry.arguments?.getLong("requestId") ?: -1L
                 CreateRequestScreen(navController = navController, requestId = requestId)
             }
-            composable(
-                route = "active?deepLinkRequestId={deepLinkRequestId}",
-                arguments = listOf(
-                    navArgument("deepLinkRequestId") {
-                        type = NavType.LongType
-                        defaultValue = -1L
-                    }
-                )
-            ) { backStackEntry ->
-                val deepLinkRequestIdArg = backStackEntry.arguments?.getLong("deepLinkRequestId") ?: -1L
+            composable(Screen.Active.route) {
                 ActiveRequestsScreen(
                     navController = navController,
-                    deepLinkRequestId = deepLinkRequestIdArg,
+                    deepLinkRequestId = deepLinkRequestId,
+                    onDeepLinkConsumed = onDeepLinkHandled,
                     currentTheme = currentTheme,
                     onThemeSelected = onThemeSelected
                 )

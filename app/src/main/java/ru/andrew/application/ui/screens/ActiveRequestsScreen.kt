@@ -57,20 +57,21 @@ fun ActiveRequestsScreen(
     navController: NavController,
     currentTheme: AppTheme,
     onThemeSelected: (AppTheme) -> Unit,
-    deepLinkRequestId: Long = -1L,
+    deepLinkRequestId: Long? = null,
+    onDeepLinkConsumed: () -> Unit = {},
     viewModel: ActiveRequestsViewModel = viewModel(factory = ActiveRequestsViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var selectedRequest by remember { mutableStateOf<Request?>(null) }
 
-    LaunchedEffect(uiState.requests, deepLinkRequestId) {
-        if (deepLinkRequestId != -1L && uiState.requests.isNotEmpty()) {
-            val matchingRequest = uiState.requests.find { it.id == deepLinkRequestId }
-            if (matchingRequest != null) {
-                selectedRequest = matchingRequest
-            }
-        }
+    // Карточка из уведомления открывается один раз, когда список уже загружен, после чего запрос
+    // сбрасывается: последующие изменения списка не должны снова открывать ту же карточку.
+    LaunchedEffect(deepLinkRequestId, uiState.isLoading) {
+        val targetId = deepLinkRequestId ?: return@LaunchedEffect
+        if (uiState.isLoading) return@LaunchedEffect
+        uiState.requests.find { it.id == targetId }?.let { selectedRequest = it }
+        onDeepLinkConsumed()
     }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
