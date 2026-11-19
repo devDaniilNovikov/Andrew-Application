@@ -11,6 +11,7 @@ import androidx.activity.SystemBarStyle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.mutableStateOf
+import ru.andrew.application.di.DependencyProvider
 import ru.andrew.application.ui.theme.AndrewApplicationTheme
 import ru.andrew.application.ui.theme.AppTheme
 import ru.andrew.application.ui.viewmodel.ThemeViewModel
@@ -101,16 +102,18 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
         handleIntent(intent)
     }
 
     private fun handleIntent(intent: Intent?) {
         val requestId = intent?.getLongExtra("requestId", -1L) ?: -1L
         val token = intent?.getStringExtra("secure_token")
-        
+
         if (requestId != -1L) {
             // Валидируем одноразовый токен безопасности перед раскрытием деталей заявки
-            if (ru.andrew.application.notifications.SecureTokenManager.validateAndConsumeToken(requestId, token)) {
+            val tokenManager = DependencyProvider.provideSecureTokenManager(this)
+            if (tokenManager.validateAndConsumeToken(requestId, token)) {
                 deepLinkRequestId.value = requestId
             }
             intent?.removeExtra("requestId")

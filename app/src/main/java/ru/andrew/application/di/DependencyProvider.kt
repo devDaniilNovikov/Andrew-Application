@@ -13,6 +13,7 @@ import ru.andrew.application.data.util.TimeProvider
 import ru.andrew.application.data.util.SystemTimeProvider
 import ru.andrew.application.notifications.NotificationScheduler
 import ru.andrew.application.notifications.NotificationSchedulerImpl
+import ru.andrew.application.notifications.SecureTokenManager
 
 /**
  * Поставщик зависимостей (Dependency Provider / Service Locator) для внедрения репозиториев во ViewModel.
@@ -32,6 +33,9 @@ object DependencyProvider {
     @Volatile
     private var notificationScheduler: NotificationScheduler? = null
 
+    @Volatile
+    private var secureTokenManager: SecureTokenManager? = null
+
     fun provideThemeRepository(context: Context): ThemeRepository {
         return themeRepository ?: synchronized(this) {
             themeRepository ?: ThemeRepositoryImpl(
@@ -49,6 +53,19 @@ object DependencyProvider {
                 context.applicationContext
             ).also {
                 notificationScheduler = it
+            }
+        }
+    }
+
+    fun provideSecureTokenManager(context: Context): SecureTokenManager {
+        return secureTokenManager ?: synchronized(this) {
+            secureTokenManager ?: SecureTokenManager(
+                context.applicationContext.getSharedPreferences(
+                    SecureTokenManager.PREFS_NAME,
+                    Context.MODE_PRIVATE
+                )
+            ).also {
+                secureTokenManager = it
             }
         }
     }

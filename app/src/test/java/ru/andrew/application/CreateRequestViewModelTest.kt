@@ -147,5 +147,9 @@ class CreateRequestViewModelTest {
         ) {
             error("Not used in this test")
         }
+
+        override suspend fun deleteRequest(request: Request) {
+            error("Not used in this test")
+        }
     }
 }
