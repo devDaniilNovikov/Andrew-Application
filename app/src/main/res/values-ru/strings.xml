@@ -13,7 +13,7 @@
 
     <!-- EquipmentType -->
     <string name="equipment_cabin">бытовка</string>
-    <string name="equipment_commercial">торговая</string>
+    <string name="equipment_commercial">торговое оборудование</string>
     <string name="equipment_industrial">промка</string>
     <string name="equipment_air_conditioner">кондеи</string>
     <string name="equipment_ice_generator">ледогенератор</string>
