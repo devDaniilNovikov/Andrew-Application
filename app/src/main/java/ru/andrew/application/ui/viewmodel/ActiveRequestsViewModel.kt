@@ -45,6 +45,12 @@ class ActiveRequestsViewModel(
             initialValue = ActiveRequestsUiState(isLoading = true)
         )
 
+    /**
+     * Ищет заявку в БД независимо от статуса — нужно, чтобы понять, почему deep link
+     * не нашёл её среди активных (закрыта или удалена).
+     */
+    suspend fun findRequest(id: Long): Request? = requestRepository.getRequestByIdOneShot(id)
+
     fun rescheduleRequest(request: Request, nextDateTime: LocalDateTime) {
         viewModelScope.launch {
             requestRepository.updateRequest(request.copy(nextActionDateTime = nextDateTime))

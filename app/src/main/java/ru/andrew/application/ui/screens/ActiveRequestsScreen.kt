@@ -27,6 +27,8 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import ru.andrew.application.ui.navigation.Screen
 import androidx.compose.ui.res.stringResource
 import ru.andrew.application.R
 import ru.andrew.application.ui.theme.AppTheme
@@ -58,23 +60,54 @@ fun ActiveRequestsScreen(
     currentTheme: AppTheme,
     onThemeSelected: (AppTheme) -> Unit,
     deepLinkRequestId: Long = -1L,
+    onDeepLinkHandled: () -> Unit = {},
     viewModel: ActiveRequestsViewModel = viewModel(factory = ActiveRequestsViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var selectedRequest by remember { mutableStateOf<Request?>(null) }
-
-    LaunchedEffect(uiState.requests, deepLinkRequestId) {
-        if (deepLinkRequestId != -1L && uiState.requests.isNotEmpty()) {
-            val matchingRequest = uiState.requests.find { it.id == deepLinkRequestId }
-            if (matchingRequest != null) {
-                selectedRequest = matchingRequest
-            }
-        }
-    }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val cancelActionLabel = stringResource(R.string.btn_cancel_action)
+
+    // Обработка deep link из уведомления: ждём первую загрузку списка (не непустой список —
+    // иначе при пустом списке ссылка терялась бы), затем открываем карточку или объясняем,
+    // почему её нет. Событие сбрасывается в конце, чтобы оно не срабатывало повторно.
+    LaunchedEffect(deepLinkRequestId, uiState.isLoading) {
+        if (deepLinkRequestId == -1L || uiState.isLoading) return@LaunchedEffect
+
+        val activeRequest = uiState.requests.find { it.id == deepLinkRequestId }
+        if (activeRequest != null) {
+            selectedRequest = activeRequest
+        } else {
+            val isClosed = viewModel.findRequest(deepLinkRequestId) != null
+            // Снекбар запускаем в scope экрана: onDeepLinkHandled() меняет ключ эффекта и отменяет его
+            scope.launch {
+                if (isClosed) {
+                    val result = snackbarHostState.showSnackbar(
+                        message = context.getString(R.string.deeplink_request_closed),
+                        actionLabel = context.getString(R.string.nav_history),
+                        duration = SnackbarDuration.Long
+                    )
+                    if (result == SnackbarResult.ActionPerformed) {
+                        navController.navigate(Screen.History.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                } else {
+                    snackbarHostState.showSnackbar(
+                        message = context.getString(R.string.deeplink_request_not_found),
+                        duration = SnackbarDuration.Long
+                    )
+                }
+            }
+        }
+        onDeepLinkHandled()
+    }
 
     // Состояния для переноса даты/времени (Подэтап 5.2)
     var showDatePickerForReschedule by remember { mutableStateOf(false) }

@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import ru.andrew.application.MainActivity
 import ru.andrew.application.R
 import ru.andrew.application.data.entity.Request
+import ru.andrew.application.di.DependencyProvider
 import ru.andrew.application.domain.ActionType
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -71,8 +72,9 @@ object NotificationHelper {
         val maskedPhone = maskPhoneNumber(request.phone)
         val contentText = "$formattedTime\n$maskedPhone"
 
-        // Генерируем одноразовый криптографический токен безопасности для защиты от Intent Redirection
-        val token = SecureTokenManager.generateAndSaveToken(request.id)
+        // Одноразовый токен: MainActivity экспортирована, поэтому deep link принимается только с ним.
+        // Токен сохраняется на диск синхронно — тап может произойти уже в новом процессе.
+        val token = DependencyProvider.provideSecureTokenManager(context).generateAndSaveToken(request.id)
 
         // Настраиваем Intent для запуска MainActivity с передачей ID заявки и защитного токена
         val intent = Intent(context, MainActivity::class.java).apply {

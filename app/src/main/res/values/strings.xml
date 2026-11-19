@@ -126,6 +126,8 @@
     <string name="active_reschedule_time_title">Выберите время действия</string>
     <string name="active_cancel_reason_required">Укажите причину отмены *</string>
     <string name="active_cancel_optional_comment">Итоговый комментарий (необязательно)</string>
+    <string name="deeplink_request_closed">Заявка уже закрыта — она в истории</string>
+    <string name="deeplink_request_not_found">Заявка не найдена — возможно, она удалена</string>
 
     <!-- Accessibility / TalkBack -->
     <string name="desc_client">Клиент</string>

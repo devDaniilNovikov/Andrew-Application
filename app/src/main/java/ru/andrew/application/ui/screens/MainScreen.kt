@@ -55,16 +55,18 @@ fun MainScreen(
         Screen.History
     )
 
+    // Deep link — одноразовое событие: переключаемся на вкладку «Список», а сбрасывает его
+    // ActiveRequestsScreen после того, как разрешит заявку (откроет карточку или покажет сообщение).
+    // Через аргумент навигации не передаём: он сохраняется в back stack и срабатывал бы повторно.
     LaunchedEffect(deepLinkRequestId) {
         if (deepLinkRequestId != -1L) {
-            navController.navigate("active?deepLinkRequestId=$deepLinkRequestId") {
+            navController.navigate(Screen.Active.route) {
                 popUpTo(navController.graph.findStartDestination().id) {
                     saveState = true
                 }
                 launchSingleTop = true
                 restoreState = true
             }
-            onDeepLinkHandled()
         }
     }
 
@@ -122,19 +124,11 @@ fun MainScreen(
                 val requestId = backStackEntry.arguments?.getLong("requestId") ?: -1L
                 CreateRequestScreen(navController = navController, requestId = requestId)
             }
-            composable(
-                route = "active?deepLinkRequestId={deepLinkRequestId}",
-                arguments = listOf(
-                    navArgument("deepLinkRequestId") {
-                        type = NavType.LongType
-                        defaultValue = -1L
-                    }
-                )
-            ) { backStackEntry ->
-                val deepLinkRequestIdArg = backStackEntry.arguments?.getLong("deepLinkRequestId") ?: -1L
+            composable(Screen.Active.route) {
                 ActiveRequestsScreen(
                     navController = navController,
-                    deepLinkRequestId = deepLinkRequestIdArg,
+                    deepLinkRequestId = deepLinkRequestId,
+                    onDeepLinkHandled = onDeepLinkHandled,
                     currentTheme = currentTheme,
                     onThemeSelected = onThemeSelected
                 )
