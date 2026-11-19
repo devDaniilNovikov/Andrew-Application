@@ -78,6 +78,13 @@ fun ActiveRequestsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val cancelActionLabel = stringResource(R.string.btn_cancel_action)
+    // Тексты тостов и snackbar берём в композиции: context.getString() от LocalContext.current
+    // не учитывает смену конфигурации (lint LocalContextGetResourceValueCall)
+    val dialErrorText = stringResource(R.string.active_toast_dial_error)
+    val noPhoneText = stringResource(R.string.active_toast_no_phone)
+    val rescheduledText = stringResource(R.string.active_toast_rescheduled)
+    val requestCancelledText = stringResource(R.string.toast_request_cancelled)
+    val requestCompletedText = stringResource(R.string.toast_request_completed)
 
     // Состояния для переноса даты/времени (Подэтап 5.2)
     var showDatePickerForReschedule by remember { mutableStateOf(false) }
@@ -329,10 +336,10 @@ fun ActiveRequestsScreen(
                                 }
                                 context.startActivity(intent)
                             } catch (e: Exception) {
-                                Toast.makeText(context, context.getString(R.string.active_toast_dial_error), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, dialErrorText, Toast.LENGTH_SHORT).show()
                             }
                         } else {
-                            Toast.makeText(context, context.getString(R.string.active_toast_no_phone), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, noPhoneText, Toast.LENGTH_SHORT).show()
                         }
                     },
                     onEditClick = {
@@ -398,7 +405,7 @@ fun ActiveRequestsScreen(
                                     
                                     viewModel.rescheduleRequest(rescheduleTargetRequest!!, selectedDateTime)
                                     selectedRequest = null // Закрываем шторку деталей
-                                    Toast.makeText(context, context.getString(R.string.active_toast_rescheduled), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, rescheduledText, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         ) {
@@ -457,7 +464,7 @@ fun ActiveRequestsScreen(
                                 selectedRequest = null // Закрываем шторку деталей
                                 scope.launch {
                                     val result = snackbarHostState.showSnackbar(
-                                        message = context.getString(R.string.toast_request_cancelled),
+                                        message = requestCancelledText,
                                         actionLabel = cancelActionLabel,
                                         duration = SnackbarDuration.Short
                                     )
@@ -544,7 +551,7 @@ fun ActiveRequestsScreen(
                         showCompleteDialog = false
                         scope.launch {
                             val result = snackbarHostState.showSnackbar(
-                                message = context.getString(R.string.toast_request_completed),
+                                message = requestCompletedText,
                                 actionLabel = cancelActionLabel,
                                 duration = SnackbarDuration.Short
                             )

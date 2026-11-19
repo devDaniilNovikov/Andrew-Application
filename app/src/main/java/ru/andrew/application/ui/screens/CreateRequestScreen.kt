@@ -75,6 +75,11 @@ fun CreateRequestScreen(
     val scrollState = rememberScrollState()
     val dateTimeFormatter = remember { DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm") }
 
+    // Тексты тостов берём в композиции: context.getString() от LocalContext.current
+    // не учитывает смену конфигурации (lint LocalContextGetResourceValueCall)
+    val importContactSuccessText = stringResource(R.string.import_contact_success)
+    val importContactErrorText = stringResource(R.string.import_contact_error_no_phone)
+
     val contactPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
@@ -103,34 +108,34 @@ fun CreateRequestScreen(
                                 }
                                 android.widget.Toast.makeText(
                                     context,
-                                    context.getString(R.string.import_contact_success),
+                                    importContactSuccessText,
                                     android.widget.Toast.LENGTH_SHORT
                                 ).show()
                             } else {
                                 android.widget.Toast.makeText(
                                     context,
-                                    context.getString(R.string.import_contact_error_no_phone),
+                                    importContactErrorText,
                                     android.widget.Toast.LENGTH_SHORT
                                 ).show()
                             }
                         } else {
                             android.widget.Toast.makeText(
                                 context,
-                                context.getString(R.string.import_contact_error_no_phone),
+                                importContactErrorText,
                                 android.widget.Toast.LENGTH_SHORT
                             ).show()
                         }
                     } ?: run {
                         android.widget.Toast.makeText(
                             context,
-                            context.getString(R.string.import_contact_error_no_phone),
+                            importContactErrorText,
                             android.widget.Toast.LENGTH_SHORT
                         ).show()
                     }
                 } catch (e: Exception) {
                     android.widget.Toast.makeText(
                         context,
-                        context.getString(R.string.import_contact_error_no_phone),
+                        importContactErrorText,
                         android.widget.Toast.LENGTH_SHORT
                     ).show()
                 }
