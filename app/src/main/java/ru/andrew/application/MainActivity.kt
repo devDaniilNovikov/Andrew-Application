@@ -16,8 +16,13 @@ import ru.andrew.application.ui.theme.AppTheme
 import ru.andrew.application.ui.viewmodel.ThemeViewModel
 import ru.andrew.application.ui.screens.MainScreen
 import ru.andrew.application.notifications.NotificationHelper
+import ru.andrew.application.notifications.ReminderRescheduler
 import android.content.Intent
 import android.util.Log
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -102,6 +107,21 @@ class MainActivity : ComponentActivity() {
                         pendingDeepLinkRequestId.value = null
                     }
                 )
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Будильники могли пропасть (force stop, «очистка» прошивки) или перейти в точный режим,
+        // если пользователь только что выдал разрешение в настройках. Сверка идемпотентна.
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                ReminderRescheduler.rescheduleAll(applicationContext)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to re-schedule reminders on start", e)
             }
         }
     }
