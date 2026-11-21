@@ -50,6 +50,7 @@ import ru.andrew.application.ui.viewmodel.HistoryFilter
 import ru.andrew.application.ui.viewmodel.HistoryViewModel
 import java.time.format.DateTimeFormatter
 import ru.andrew.application.ui.extensions.smoothScroll
+import ru.andrew.application.ui.navigation.EditRequestRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -237,7 +238,7 @@ fun HistoryScreen(
                         HistoryRequestCard(
                             request = request,
                             formatter = dateTimeFormatter,
-                            onClick = { navController.navigate("create?requestId=${request.id}") }
+                            onClick = { navController.navigate(EditRequestRoute.forRequest(request.id)) }
                         )
                     }
                 }

@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.andrew.application.data.entity.Request
 import ru.andrew.application.ui.components.RequestCard
 import ru.andrew.application.ui.components.RequestDetailsBottomSheet
+import ru.andrew.application.ui.components.ReminderStatusBanner
 import ru.andrew.application.ui.viewmodel.ActiveRequestsUiState
 import ru.andrew.application.ui.viewmodel.ActiveRequestsViewModel
 import java.time.Instant
@@ -47,6 +48,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import ru.andrew.application.ui.extensions.smoothScroll
+import ru.andrew.application.ui.navigation.EditRequestRoute
 
 /**
  * Экран списка активных заявок.
@@ -57,24 +59,32 @@ fun ActiveRequestsScreen(
     navController: NavController,
     currentTheme: AppTheme,
     onThemeSelected: (AppTheme) -> Unit,
-    deepLinkRequestId: Long = -1L,
+    deepLinkRequestId: Long? = null,
+    onDeepLinkConsumed: () -> Unit = {},
     viewModel: ActiveRequestsViewModel = viewModel(factory = ActiveRequestsViewModel.Factory)
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     var selectedRequest by remember { mutableStateOf<Request?>(null) }
 
-    LaunchedEffect(uiState.requests, deepLinkRequestId) {
-        if (deepLinkRequestId != -1L && uiState.requests.isNotEmpty()) {
-            val matchingRequest = uiState.requests.find { it.id == deepLinkRequestId }
-            if (matchingRequest != null) {
-                selectedRequest = matchingRequest
-            }
-        }
+    // Карточка из уведомления открывается один раз, когда список уже загружен, после чего запрос
+    // сбрасывается: последующие изменения списка не должны снова открывать ту же карточку.
+    LaunchedEffect(deepLinkRequestId, uiState.isLoading) {
+        val targetId = deepLinkRequestId ?: return@LaunchedEffect
+        if (uiState.isLoading) return@LaunchedEffect
+        uiState.requests.find { it.id == targetId }?.let { selectedRequest = it }
+        onDeepLinkConsumed()
     }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val cancelActionLabel = stringResource(R.string.btn_cancel_action)
+    // Тексты тостов и snackbar берём в композиции: context.getString() от LocalContext.current
+    // не учитывает смену конфигурации (lint LocalContextGetResourceValueCall)
+    val dialErrorText = stringResource(R.string.active_toast_dial_error)
+    val noPhoneText = stringResource(R.string.active_toast_no_phone)
+    val rescheduledText = stringResource(R.string.active_toast_rescheduled)
+    val requestCancelledText = stringResource(R.string.toast_request_cancelled)
+    val requestCompletedText = stringResource(R.string.toast_request_completed)
 
     // Состояния для переноса даты/времени (Подэтап 5.2)
     var showDatePickerForReschedule by remember { mutableStateOf(false) }
@@ -107,24 +117,28 @@ fun ActiveRequestsScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.active_requests_title),
-                        fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.titleLarge
+            Column {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.active_requests_title),
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    },
+                    actions = {
+                        ThemeIconButton(
+                            currentTheme = currentTheme,
+                            onThemeSelected = onThemeSelected
+                        )
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
                     )
-                },
-                actions = {
-                    ThemeIconButton(
-                        currentTheme = currentTheme,
-                        onThemeSelected = onThemeSelected
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
                 )
-            )
+                // Предупреждение, если напоминания не придут или будут опаздывать
+                ReminderStatusBanner()
+            }
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
@@ -322,15 +336,15 @@ fun ActiveRequestsScreen(
                                 }
                                 context.startActivity(intent)
                             } catch (e: Exception) {
-                                Toast.makeText(context, context.getString(R.string.active_toast_dial_error), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, dialErrorText, Toast.LENGTH_SHORT).show()
                             }
                         } else {
-                            Toast.makeText(context, context.getString(R.string.active_toast_no_phone), Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, noPhoneText, Toast.LENGTH_SHORT).show()
                         }
                     },
                     onEditClick = {
                         selectedRequest = null
-                        navController.navigate("create?requestId=${request.id}")
+                        navController.navigate(EditRequestRoute.forRequest(request.id))
                     },
                     onRescheduleClick = {
                         rescheduleTargetRequest = request
@@ -391,7 +405,7 @@ fun ActiveRequestsScreen(
                                     
                                     viewModel.rescheduleRequest(rescheduleTargetRequest!!, selectedDateTime)
                                     selectedRequest = null // Закрываем шторку деталей
-                                    Toast.makeText(context, context.getString(R.string.active_toast_rescheduled), Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, rescheduledText, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         ) {
@@ -450,7 +464,7 @@ fun ActiveRequestsScreen(
                                 selectedRequest = null // Закрываем шторку деталей
                                 scope.launch {
                                     val result = snackbarHostState.showSnackbar(
-                                        message = context.getString(R.string.toast_request_cancelled),
+                                        message = requestCancelledText,
                                         actionLabel = cancelActionLabel,
                                         duration = SnackbarDuration.Short
                                     )
@@ -537,7 +551,7 @@ fun ActiveRequestsScreen(
                         showCompleteDialog = false
                         scope.launch {
                             val result = snackbarHostState.showSnackbar(
-                                message = context.getString(R.string.toast_request_completed),
+                                message = requestCompletedText,
                                 actionLabel = cancelActionLabel,
                                 duration = SnackbarDuration.Short
                             )

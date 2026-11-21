@@ -21,6 +21,9 @@ import java.time.format.DateTimeFormatter
 object NotificationHelper {
     private const val CHANNEL_ID = "request_actions"
 
+    /** Extra с id заявки, карточку которой нужно открыть по тапу на уведомление. */
+    const val EXTRA_REQUEST_ID = "requestId"
+
     /**
      * Создает высокоприоритетный канал уведомлений (для Android 8.0+).
      */
@@ -71,14 +74,15 @@ object NotificationHelper {
         val maskedPhone = maskPhoneNumber(request.phone)
         val contentText = "$formattedTime\n$maskedPhone"
 
-        // Генерируем одноразовый криптографический токен безопасности для защиты от Intent Redirection
-        val token = SecureTokenManager.generateAndSaveToken(request.id)
-
-        // Настраиваем Intent для запуска MainActivity с передачей ID заявки и защитного токена
+        // Тап открывает карточку заявки. Без FLAG_ACTIVITY_CLEAR_TASK: уже запущенное приложение
+        // получает Intent в onNewIntent, и несохранённая форма создания не теряется.
+        // Одноразовый токен в памяти здесь не нужен: процесс, поднятый будильником, обычно
+        // погибает до тапа, и проверка токена молча ломала открытие карточки.
         val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            putExtra("requestId", request.id)
-            putExtra("secure_token", token)
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_SINGLE_TOP
+            putExtra(EXTRA_REQUEST_ID, request.id)
         }
         
         // Создаем PendingIntent для обработки тапа по уведомлению
