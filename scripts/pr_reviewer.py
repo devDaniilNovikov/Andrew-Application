@@ -320,38 +320,13 @@ async def main():
         if not review_data:
             raise ValueError("Agent chat succeeded but returned no structured output or valid steps.")
     except Exception as exc:
-        print("\n" + "!"*60, file=sys.stderr)
-        print(f"WARNING: Reviewer Agent execution failed: {exc}", file=sys.stderr)
-        print("This is usually caused by API quota/billing limit depletion (HTTP 429) or networking issues.", file=sys.stderr)
-        print("Activating graceful fallback to ensure CI/CD pipeline does not fail...", file=sys.stderr)
-        print("!"*60 + "\n", file=sys.stderr)
-        
-        # Graceful fallback: Read existing latest_review.json or generate a mock review
-        latest_review_path = os.path.join(workspace_dir, "scripts", "latest_review.json")
-        if os.path.exists(latest_review_path):
-            try:
-                with open(latest_review_path, 'r', encoding='utf-8') as f:
-                    review_data = json.load(f)
-                print("Successfully loaded fallback review from scripts/latest_review.json", file=sys.stderr)
-            except Exception as fe:
-                print(f"Error reading latest_review.json: {fe}", file=sys.stderr)
-        
-        if not review_data:
-            # Absolute baseline fallback
-            review_data = {
-                "stage_name": "Этап 9. Уведомления",
-                "score": 100,
-                "summary": "Автоматическое код-ревью завершено успешно с отличным результатом! Все файлы проекта полностью соответствуют архитектурным требованиям MVVM, Jetpack Compose и Clean Architecture.",
-                "bugs_and_issues": [],
-                "recommendations": [
-                    "Архитектурные решения полностью соответствуют современным стандартам Android-разработки.",
-                    "Все локальные юнит-тесты выполняются успешно."
-                ]
-            }
-            print("Generated fallback mock review data.", file=sys.stderr)
-
-    if not review_data:
-        print("Error: Failed to obtain structured output from the reviewer agent or load fallback data.", file=sys.stderr)
+        # No review means no score: never substitute a cached or made-up one,
+        # otherwise a failed API call shows up as a passing review.
+        print(f"Error: Reviewer Agent execution failed: {exc}", file=sys.stderr)
+        print("No review was produced (invalid or disabled API key, quota/billing limit, "
+              "HTTP 429 or network; see the error above). "
+              "Exiting with an error instead of reporting a cached or made-up score.",
+              file=sys.stderr)
         sys.exit(1)
 
     # 3. Print beautiful markdown report

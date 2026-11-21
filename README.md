@@ -253,7 +253,7 @@ Unit-тесты на JVM: переходы статусов и сортиров�
 
 Папка [`scripts/`](scripts/), страница [`dashboard.html`](dashboard.html) и CI-workflow — обвязка для разработки с ИИ-агентами на Google Antigravity SDK (модели Gemini). Для сборки и работы приложения они не нужны.
 
-**CI.** [`.github/workflows/pr_review.yml`](.github/workflows/pr_review.yml) на каждый PR в `main` или `dev` запускает `scripts/pr_reviewer.py`: ИИ-ревью изменений с оценкой по 100-балльной шкале. Результат попадает в лог job'а и в Telegram, низкая оценка PR не блокирует. Нужны секреты репозитория `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`.
+**CI.** [`.github/workflows/pr_review.yml`](.github/workflows/pr_review.yml) на каждый PR в `main` или `dev` запускает `scripts/pr_reviewer.py`: ИИ-ревью изменений с оценкой по 100-балльной шкале. Результат попадает в лог job'а и в Telegram, низкая оценка PR не блокирует. Если ревью получить не удалось (ключ недействителен, кончилась квота Gemini, сеть), job падает, а не показывает прошлую или выдуманную оценку. Сборку, юнит-тесты и lint проверяет отдельный workflow [`.github/workflows/android-ci.yml`](.github/workflows/android-ci.yml). Нужны секреты репозитория `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`.
 
 **Локальный запуск.** Нужен Python 3.10+, скрипты запускаются из корня репозитория. Зависимости те же, что ставит CI:
 
