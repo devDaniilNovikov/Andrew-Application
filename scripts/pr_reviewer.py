@@ -323,7 +323,8 @@ async def main():
         # No review means no score: never substitute a cached or made-up one,
         # otherwise a failed API call shows up as a passing review.
         print(f"Error: Reviewer Agent execution failed: {exc}", file=sys.stderr)
-        print("No review was produced (API quota/billing limit, HTTP 429 or network). "
+        print("No review was produced (invalid or disabled API key, quota/billing limit, "
+              "HTTP 429 or network; see the error above). "
               "Exiting with an error instead of reporting a cached or made-up score.",
               file=sys.stderr)
         sys.exit(1)
