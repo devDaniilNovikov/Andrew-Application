@@ -154,9 +154,11 @@ class CreateRequestViewModel(
     }
 
     /**
-     * Телефон обязателен (PRD, критерий готовности №2): пустое значение не проходит проверку.
+     * Телефон необязателен (решение из e18de8e, в отличие от PRD): пустое значение допустимо,
+     * но указанный номер должен содержать от 7 до 15 цифр, в начале можно «+».
      */
     private fun isValidPhoneNumber(phone: String): Boolean {
+        if (phone.trim().isEmpty()) return true
         val cleanPhone = phone.replace(Regex("[\\s\\-\\(\\)]"), "")
         val phoneRegex = "^\\+?\\d{7,15}$".toRegex()
         return phoneRegex.matches(cleanPhone)
@@ -164,19 +166,25 @@ class CreateRequestViewModel(
 
     /**
      * Попытаться сохранить заявку в базу данных.
-     * Проверяет обязательные поля: название, телефон и дата действия.
+     * Обязательны название и дата следующего действия. Телефон необязателен,
+     * но если он указан, то должен быть корректным номером (см. [isValidPhoneNumber]).
      */
     fun saveRequest() {
         val currentState = _uiState.value
         if (currentState.isLoading) return
-        
-        // Валидация обязательных полей согласно PRD: название, телефон, дата следующего действия
-        if (currentState.title.trim().isEmpty() || 
-            !isValidPhoneNumber(currentState.phone) ||
-            currentState.nextActionDateTime == null
-        ) {
-            _uiState.update { 
-                it.copy(error = UiText.StringResource(R.string.create_validation_error)) 
+
+        // Обязательные поля: название и дата следующего действия
+        if (currentState.title.trim().isEmpty() || currentState.nextActionDateTime == null) {
+            _uiState.update {
+                it.copy(error = UiText.StringResource(R.string.create_validation_error))
+            }
+            return
+        }
+
+        // Телефон необязателен, но если он указан, то должен быть корректным номером
+        if (!isValidPhoneNumber(currentState.phone)) {
+            _uiState.update {
+                it.copy(error = UiText.StringResource(R.string.create_phone_invalid_error))
             }
             return
         }

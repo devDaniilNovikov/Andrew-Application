@@ -101,12 +101,58 @@ class CreateRequestViewModelTest {
     }
 
     @Test
-    fun saveRequestWithoutPhoneShowsValidationErrorAndDoesNotSave() = runTest {
-        val repository = FakeRequestRepository(placeholderRequest())
-        val viewModel = CreateRequestViewModel(repository)
+    fun saveRequestWithoutPhoneCreatesRequest() = runTest {
+        listOf("", "   ").forEach { phone ->
+            val repository = FakeRequestRepository(placeholderRequest())
+            val viewModel = formViewModel(repository, phone = phone)
 
-        viewModel.updateTitle("Samsung No Frost не морозит")
-        viewModel.updateNextActionDateTime(LocalDateTime.of(2026, 1, 11, 14, 0))
+            viewModel.saveRequest()
+            advanceUntilIdle()
+
+            assertEquals("Phone '$phone' must be accepted", 1, repository.createdRequests.size)
+            assertEquals("", repository.createdRequests.single().phone)
+            assertNull(viewModel.uiState.value.error)
+        }
+    }
+
+    @Test
+    fun saveRequestWithoutTitleOrDateShowsRequiredFieldsError() = runTest {
+        listOf(
+            formViewModel(FakeRequestRepository(placeholderRequest()), title = "   "),
+            formViewModel(FakeRequestRepository(placeholderRequest()), nextActionDateTime = null)
+        ).forEach { viewModel ->
+            viewModel.saveRequest()
+            advanceUntilIdle()
+
+            assertEquals(
+                UiText.StringResource(R.string.create_validation_error),
+                viewModel.uiState.value.error
+            )
+        }
+    }
+
+    @Test
+    fun saveRequestWithInvalidPhoneShowsPhoneFormatError() = runTest {
+        listOf("12-34", "12ab", "123456", "1234567890123456").forEach { phone ->
+            val repository = FakeRequestRepository(placeholderRequest())
+            val viewModel = formViewModel(repository, phone = phone)
+
+            viewModel.saveRequest()
+            advanceUntilIdle()
+
+            assertTrue("Phone '$phone' must be rejected", repository.createdRequests.isEmpty())
+            assertEquals(
+                UiText.StringResource(R.string.create_phone_invalid_error),
+                viewModel.uiState.value.error
+            )
+        }
+    }
+
+    @Test
+    fun saveRequestReportsMissingRequiredFieldsBeforeInvalidPhone() = runTest {
+        val repository = FakeRequestRepository(placeholderRequest())
+        val viewModel = formViewModel(repository, title = "", phone = "12ab")
+
         viewModel.saveRequest()
         advanceUntilIdle()
 
@@ -118,22 +164,16 @@ class CreateRequestViewModelTest {
     }
 
     @Test
-    fun saveRequestWithBlankOrTooShortPhoneShowsValidationError() = runTest {
-        listOf("   ", "12-34").forEach { phone ->
+    fun saveRequestAcceptsSevenAndFifteenDigitPhones() = runTest {
+        listOf("1234567", "+123456789012345").forEach { phone ->
             val repository = FakeRequestRepository(placeholderRequest())
-            val viewModel = CreateRequestViewModel(repository)
+            val viewModel = formViewModel(repository, phone = phone)
 
-            viewModel.updateTitle("Ледогенератор ошибка")
-            viewModel.updatePhone(phone)
-            viewModel.updateNextActionDateTime(LocalDateTime.of(2026, 1, 11, 14, 0))
             viewModel.saveRequest()
             advanceUntilIdle()
 
-            assertTrue("Phone '$phone' must be rejected", repository.createdRequests.isEmpty())
-            assertEquals(
-                UiText.StringResource(R.string.create_validation_error),
-                viewModel.uiState.value.error
-            )
+            assertEquals("Phone '$phone' must be accepted", 1, repository.createdRequests.size)
+            assertNull(viewModel.uiState.value.error)
         }
     }
 
@@ -155,6 +195,19 @@ class CreateRequestViewModelTest {
         assertEquals(nextAction, created.nextActionDateTime)
         assertEquals(RequestStatus.ACTIVE, created.status)
         assertNull(viewModel.uiState.value.error)
+    }
+
+    private fun formViewModel(
+        repository: FakeRequestRepository,
+        title: String = "Починить холодильник",
+        phone: String = "",
+        nextActionDateTime: LocalDateTime? = LocalDateTime.of(2026, 1, 11, 14, 0)
+    ): CreateRequestViewModel {
+        val viewModel = CreateRequestViewModel(repository)
+        viewModel.updateTitle(title)
+        viewModel.updatePhone(phone)
+        viewModel.updateNextActionDateTime(nextActionDateTime)
+        return viewModel
     }
 
     private fun placeholderRequest() = Request(

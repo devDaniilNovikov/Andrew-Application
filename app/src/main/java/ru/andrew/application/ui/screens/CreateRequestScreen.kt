@@ -314,7 +314,7 @@ fun CreateRequestScreen(
                 }
             )
 
-            // Телефон *
+            // Телефон (необязательное поле)
             OutlinedTextField(
                 value = uiState.phone,
                 onValueChange = { viewModel.updatePhone(it) },
