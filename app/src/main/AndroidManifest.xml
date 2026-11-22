@@ -2,7 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- Точные напоминания. Android 12–12L: SCHEDULE_EXACT_ALARM (пользователь может его отозвать,
+         тогда экран списка предложит выдать его снова). -->
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        android:maxSdkVersion="32" />
+    <!-- Android 13+: USE_EXACT_ALARM выдаётся при установке и не отзывается, настраивать ничего не нужно.
+         Приложение ставится APK. Google Play разрешает USE_EXACT_ALARM только будильникам и календарям:
+         для публикации в Play его придётся заменить на запрос SCHEDULE_EXACT_ALARM у пользователя. -->
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
@@ -32,8 +40,19 @@
             android:name=".notifications.BootReceiver"
             android:enabled="true"
             android:exported="true">
+            <!-- Должно совпадать с BootReceiver.RESCHEDULE_ACTIONS. -->
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Системная рассылка о выдаче разрешения на точные будильники (Android 12+) -->
+        <receiver
+            android:name=".notifications.ExactAlarmPermissionReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
     </application>

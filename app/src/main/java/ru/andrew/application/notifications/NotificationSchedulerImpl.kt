@@ -4,7 +4,6 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import ru.andrew.application.data.entity.Request
 import java.time.ZoneId
@@ -22,21 +21,17 @@ class NotificationSchedulerImpl(
     }
 
     override fun scheduleNotification(request: Request) {
-        val nextAction = request.nextActionDateTime
-        if (nextAction == null) {
+        val triggerAtMillis = reminderTriggerAtMillis(
+            nextAction = request.nextActionDateTime,
+            nowMillis = System.currentTimeMillis(),
+            zone = ZoneId.systemDefault()
+        )
+
+        // Даты нет или она уже прошла (например, заявку перенесли на прошедшее время):
+        // снимаем ранее поставленный будильник, иначе он сработает по старому времени.
+        if (triggerAtMillis == null) {
             cancelNotification(request.id)
-            return
-        }
-        val triggerAtMillis = nextAction
-            .atZone(ZoneId.systemDefault())
-            .toInstant()
-            .toEpochMilli()
-
-        val nowMillis = System.currentTimeMillis()
-
-        // Планируем уведомление только для будущих событий
-        if (triggerAtMillis <= nowMillis) {
-            Log.d(TAG, "Request #${request.id} nextActionDateTime is in the past ($triggerAtMillis <= $nowMillis). Skipping alarm.")
+            Log.d(TAG, "Request #${request.id} has no future nextActionDateTime. Pending alarm cancelled.")
             return
         }
 
@@ -54,12 +49,9 @@ class NotificationSchedulerImpl(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Проверяем разрешение на точные будильники на устройствах Android 12+
-        val canScheduleExact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            alarmManager.canScheduleExactAlarms()
-        } else {
-            true
-        }
+        // Проверяем разрешение на точные будильники на устройствах Android 12+.
+        // Без него напоминание неточное; экран списка предлагает выдать разрешение.
+        val canScheduleExact = ExactAlarmPermission.isGranted(context)
 
         try {
             if (canScheduleExact) {

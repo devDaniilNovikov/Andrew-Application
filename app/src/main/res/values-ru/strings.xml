@@ -13,7 +13,7 @@
 
     <!-- EquipmentType -->
     <string name="equipment_cabin">бытовка</string>
-    <string name="equipment_commercial">торговая</string>
+    <string name="equipment_commercial">торговое оборудование</string>
     <string name="equipment_industrial">промка</string>
     <string name="equipment_air_conditioner">кондеи</string>
     <string name="equipment_ice_generator">ледогенератор</string>
@@ -35,14 +35,15 @@
 
     <!-- Create Request Form -->
     <string name="create_title_label">Название заявки *</string>
-    <string name="create_phone_label">Телефон *</string>
+    <string name="create_phone_label">Телефон</string>
     <string name="create_client_name_label">Имя клиента</string>
     <string name="create_address_label">Адрес</string>
     <string name="create_equipment_type_label">Тип заявки</string>
     <string name="create_action_type_label">Тип действия</string>
     <string name="create_date_time_label">Дата и время следующего действия *</string>
     <string name="create_comment_label">Комментарий</string>
-    <string name="create_validation_error">Заполните название, телефон и дату следующего действия.</string>
+    <string name="create_validation_error">Заполните название и дату следующего действия.</string>
+    <string name="create_phone_invalid_error">Некорректный номер телефона: нужно от 7 до 15 цифр, в начале можно указать «+».</string>
     <string name="create_db_error">Ошибка базы данных</string>
     <string name="create_success_message">Заявка создана</string>
     <string name="btn_create">Создать заявку</string>
@@ -134,8 +135,10 @@
     <string name="desc_next_action_date">Дата следующего действия</string>
     <string name="desc_comment">Комментарий</string>
     <string name="desc_close">Закрыть</string>
-    <string name="stats_no_chart_data">Нет данных для отображения графика</string>
-    <string name="stats_success">Успешно</string>
-    <string name="stats_legend_format">%1$d заяв. (%2$d%%)</string>
 
+    <!-- Баннер о состоянии напоминаний на экране списка -->
+    <string name="reminder_banner_notifications_off">Уведомления выключены — напоминания о звонках и выездах не придут.</string>
+    <string name="reminder_banner_exact_alarms_off">Напоминания могут опаздывать. Разрешите точные будильники.</string>
+    <string name="reminder_banner_action_enable">Включить</string>
+    <string name="reminder_banner_action_allow">Разрешить</string>
 </resources>
