@@ -232,7 +232,7 @@ app/src/main/java/ru/andrew/application/
 
 ### Тесты
 
-Unit-тесты на JVM: переходы статусов и сортировки заявок, `CreateRequestViewModel`, офлайн-политика манифеста.
+Unit-тесты на JVM: переходы статусов и сортировки заявок, `CreateRequestViewModel`, время срабатывания напоминаний, разрешения в манифесте (офлайн-политика и точные будильники) и совпадение строк в `values/` и `values-ru/`.
 
 ```bash
 ./gradlew testDebugUnitTest
@@ -244,37 +244,9 @@ Unit-тесты на JVM: переходы статусов и сортиров�
 ./gradlew connectedDebugAndroidTest
 ```
 
+CI ([`.github/workflows/android-ci.yml`](.github/workflows/android-ci.yml)) на каждый PR и каждый пуш в `main` собирает debug-APK, запускает unit-тесты и lint.
+
 ### Документы
 
 - [PRD.md](PRD.md) — исходные требования к продукту. Часть деталей реализована иначе; актуальное поведение описано в этом README.
 - [TASKS.md](TASKS.md) — план разработки по этапам с отметками о готовности.
-
-### Инструменты разработки с ИИ
-
-Папка [`scripts/`](scripts/), страница [`dashboard.html`](dashboard.html) и CI-workflow — обвязка для разработки с ИИ-агентами на Google Antigravity SDK (модели Gemini). Для сборки и работы приложения они не нужны.
-
-**CI.** [`.github/workflows/pr_review.yml`](.github/workflows/pr_review.yml) на каждый PR в `main` или `dev` запускает `scripts/pr_reviewer.py`: ИИ-ревью изменений с оценкой по 100-балльной шкале. Результат попадает в лог job'а и в Telegram, низкая оценка PR не блокирует. Нужны секреты репозитория `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN` и `TELEGRAM_CHAT_ID`.
-
-**Локальный запуск.** Нужен Python 3.10+, скрипты запускаются из корня репозитория. Зависимости те же, что ставит CI:
-
-```bash
-pip install google-antigravity requests python-dotenv pydantic
-```
-
-Ключи кладутся в файл `.env` в корне репозитория (он в `.gitignore`): `GEMINI_API_KEY`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, а для `create_pr.py` — ещё `GITHUB_TOKEN`.
-
-| Скрипт в `scripts/` | Что делает |
-|---|---|
-| `pr_reviewer.py` | разовое ИИ-ревью диффа: пишет `scripts/latest_review.json` и `scripts/data.js`, отправляет итог в Telegram |
-| `pr_reviewer_daemon.py` | то же в цикле: каждые 20 секунд проверяет, появились ли новые коммиты |
-| `orchestrator.py` | автономный цикл по `TASKS.md`: агент берёт следующую задачу, реализует её, проходит ревью и доработку до оценки 95+, коммитит и пушит в ветку `fix`; с флагом `--single-step` делает одну задачу |
-| `debugger_daemon.py` | следит за `latest_review.json` и при оценке ниже 95 запускает агента-исправителя |
-| `create_pr.py` | открывает PR `fix → dev` через GitHub API |
-| `audit_tasks.py` | сверяет отметки в `TASKS.md` с кодом |
-| `verify_schema.py` | сверяет схему Room с моделью данных из PRD |
-| `generate_ui_components.py` | генерирует черновик Compose-компонента по PRD |
-| `inspect_sdk.py`, `test_gemini.py`, `test_antigravity_model.py` | проверка SDK и API-ключа |
-
-`dashboard.html` открывается в браузере прямо из корня репозитория и показывает оценки ревью по этапам из `scripts/data.js`.
-
-> **Осторожно:** `orchestrator.py` и `debugger_daemon.py` запускают агентов с политикой `allow_all()` — они сами меняют файлы, выполняют команды, коммитят и пушат в ветку `fix` без подтверждения. Запускайте их только в отдельной ветке или отдельном клоне.
